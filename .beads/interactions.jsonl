@@ -1,0 +1,1 @@
+{"id":"int-310e75f8","kind":"field_change","created_at":"2026-05-24T20:23:20.785952Z","actor":"thomas","issue_id":"df-cni","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Domain model designed and documented. MongoDB documents defined, module boundaries sharpened, Valkey dropped."}}
