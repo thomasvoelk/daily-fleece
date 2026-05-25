@@ -4,3 +4,14 @@
 .dolt/
 *.db
 .beads-credential-key
+
+# Backend
+backend/target/
+backend/*.jar
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/src/app/api/
+frontend/.vscode/

@@ -981,7 +981,6 @@ components:
       properties:
         event:
           type: string
-          enum: [player-joined]
         data:
           type: object
           required: [playerId, displayName]
@@ -1005,7 +1004,6 @@ components:
       properties:
         event:
           type: string
-          enum: [session-started]
         data:
           type: object
           description: Empty payload — clients act on the event type alone.
@@ -1023,7 +1021,6 @@ components:
       properties:
         event:
           type: string
-          enum: [answer-count-updated]
         data:
           type: object
           required: [question, answered, total]
@@ -1058,7 +1055,6 @@ components:
       properties:
         event:
           type: string
-          enum: [question-scored]
         data:
           type: object
           required: [question, correctAnswer, answers]
@@ -1098,7 +1094,6 @@ components:
       properties:
         event:
           type: string
-          enum: [session-ended]
         data:
           type: object
           description: Empty payload — clients navigate to results on this event type alone.
