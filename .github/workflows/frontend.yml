@@ -40,5 +40,5 @@ jobs:
         working-directory: frontend
 
       - name: Test
-        run: npm test -- --run
+        run: npm test
         working-directory: frontend
