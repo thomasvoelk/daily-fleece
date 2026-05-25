@@ -1,0 +1,1140 @@
+openapi: "3.0.3"
+info:
+  title: Daily Fleece API
+  version: "0.1.0"
+  description: |
+    Spec-first REST API for the Daily Fleece daily standup quiz app.
+
+    ## Overview
+
+    A host creates a session by uploading two photos (one knowledge question, one
+    geography question). Players join the lobby, the host starts the quiz, players
+    answer both questions, and the host declares the correct answers. Scores
+    accumulate on a persistent leaderboard.
+
+    ## Actors
+
+    - **Host** — the player who creates and controls the session. Also answers as a player.
+    - **Player** — any participant, including the host.
+
+    ## Session lifecycle
+
+    ```
+    Lobby → Active → Ended
+                └── Q1 Open → Q1 Closed → Q2 Open → Q2 Closed
+    ```
+
+    Transitions are triggered by host actions:
+    - `POST /sessions/{id}/start` — Lobby → Active (opens Q1 voting)
+    - `POST /sessions/{id}/questions/q1/correct` — closes Q1 voting, scores Q1, opens Q2 voting
+    - `POST /sessions/{id}/questions/q2/correct` — closes Q2 voting, scores Q2, ends session
+
+    ## Stub authentication
+
+    Authentication is not implemented yet. Players register with a display name and
+    receive a stable `playerId` stored client-side (localStorage). This ID is the
+    identity for all subsequent calls and survives page refreshes. The `playerId`
+    is designed to survive a future migration to company SSO — the player record
+    will be linked to the SSO identity without changing the ID.
+
+    ## Real-time events
+
+    Session state changes are pushed to clients via `GET /sessions/{id}/events`
+    (Server-Sent Events). The protocol choice (SSE vs WebSocket) is deferred
+    pending intranet proxy restrictions check — see issue df-lg7. The endpoint is
+    defined here with `text/event-stream` as a placeholder; event schemas are
+    documented in the `SessionEvent` component schema.
+
+    ## One session per day
+
+    Sessions are scoped to a project (one global project for now) and a calendar
+    date (server timezone). At most one session exists per day. `GET /sessions/today`
+    is the entry point for all clients on app open.
+
+    ## Error responses
+
+    All error responses use `application/problem+json` per
+    [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457). The `type` URI
+    identifies the problem type; `detail` gives a human-readable explanation
+    specific to the occurrence.
+
+servers:
+  - url: /api/v1
+    description: Application server
+
+tags:
+  - name: Players
+    description: Player registration (stub auth)
+  - name: Sessions
+    description: Session lifecycle — create, discover, join, start
+  - name: Voting
+    description: Answer submission and correct answer declaration
+  - name: Results
+    description: Session results and leaderboard
+  - name: Events
+    description: Real-time session event stream
+
+paths:
+
+  # ---------------------------------------------------------------------------
+  # Players
+  # ---------------------------------------------------------------------------
+
+  /players:
+    post:
+      operationId: registerPlayer
+      tags: [Players]
+      summary: Register a player
+      description: |
+        Stub authentication. The client provides a display name; the server
+        creates a new player record and returns a stable `playerId`. The client
+        stores this ID in localStorage and includes it in all subsequent requests
+        that require player identity.
+
+        Duplicate display names are allowed — `displayName` is not an identity,
+        `playerId` is.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterPlayerRequest'
+            example:
+              displayName: "Thomas"
+      responses:
+        '201':
+          description: Player registered successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerResponse'
+              example:
+                playerId: "p-4f3a9b"
+                displayName: "Thomas"
+
+  # ---------------------------------------------------------------------------
+  # Sessions
+  # ---------------------------------------------------------------------------
+
+  /sessions/today:
+    get:
+      operationId: getTodaySession
+      tags: [Sessions]
+      summary: Get today's session
+      description: |
+        Returns the session for today's date (server timezone) in the default
+        project, regardless of its phase (Lobby, Active, or Ended).
+
+        This is the entry point called by every client on app open. The client
+        uses the returned `phase` to decide which screen to render:
+        - `Lobby` — show lobby screen; host may still be setting up
+        - `Active` — show the current question screen
+        - `Ended` — show results or leaderboard
+
+        Returns 404 if no session has been created today. The host should then
+        proceed to `POST /sessions`.
+      responses:
+        '200':
+          description: Today's session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '404':
+          description: No session exists for today.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/session-not-found"
+                title: "Session Not Found"
+                status: 404
+                detail: "No session exists for today."
+
+  /sessions:
+    post:
+      operationId: createSession
+      tags: [Sessions]
+      summary: Create today's session
+      description: |
+        Creates a new session for today in the Lobby phase. Both photos are
+        uploaded in a single multipart request together with the host's player ID.
+
+        Photos are stored in MongoDB GridFS with a 28-day TTL. The session
+        document holds references to the GridFS IDs.
+
+        Returns 409 if a session already exists for today — the client should
+        redirect the host to `GET /sessions/today` instead.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+      responses:
+        '201':
+          description: Session created in Lobby phase.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '409':
+          description: A session already exists for today.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/session-already-exists"
+                title: "Session Already Exists"
+                status: 409
+                detail: "A session already exists for 2026-05-25. Use GET /sessions/today to join it."
+
+  /sessions/{sessionId}:
+    get:
+      operationId: getSession
+      tags: [Sessions]
+      summary: Get session state
+      description: |
+        Returns the full session document. Used by clients after reconnect to
+        determine the current phase and render the correct screen before
+        subscribing to the event stream.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Session state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '404':
+          description: Session not found.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/session-not-found"
+                title: "Session Not Found"
+                status: 404
+                detail: "No session found with ID s-7c2d1e."
+
+  /sessions/{sessionId}/join:
+    post:
+      operationId: joinSession
+      tags: [Sessions]
+      summary: Join the session lobby
+      description: |
+        Adds the player to the session's player list. Only possible while the
+        session is in Lobby phase.
+
+        Returns 409 if the session has already started — the client should
+        show a "session in progress" message.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JoinSessionRequest'
+            example:
+              playerId: "p-4f3a9b"
+      responses:
+        '200':
+          description: Joined successfully. Returns updated session state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '404':
+          description: Session not found.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/session-not-found"
+                title: "Session Not Found"
+                status: 404
+                detail: "No session found with ID s-7c2d1e."
+        '409':
+          description: Session is already active; cannot join.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/session-already-active"
+                title: "Session Already Active"
+                status: 409
+                detail: "This session is already in progress. New players cannot join."
+
+  /sessions/{sessionId}/start:
+    post:
+      operationId: startSession
+      tags: [Sessions]
+      summary: Start the session
+      description: |
+        Transitions the session from Lobby to Active phase and opens Q1 voting.
+        Only the host may call this endpoint.
+
+        A `session-started` event is broadcast to all connected clients via the
+        event stream, prompting them to navigate to the Q1 answer screen.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HostActionRequest'
+            example:
+              hostId: "p-4f3a9b"
+      responses:
+        '200':
+          description: Session started. Returns updated session state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '403':
+          description: Caller is not the host.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/not-the-host"
+                title: "Forbidden"
+                status: 403
+                detail: "Only the host may start the session."
+        '404':
+          description: Session not found.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/session-not-found"
+                title: "Session Not Found"
+                status: 404
+                detail: "No session found with ID s-7c2d1e."
+        '409':
+          description: Session is not in Lobby phase.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/invalid-phase-transition"
+                title: "Invalid Phase Transition"
+                status: 409
+                detail: "Session s-7c2d1e is in Active phase and cannot be started again."
+
+  # ---------------------------------------------------------------------------
+  # Voting
+  # ---------------------------------------------------------------------------
+
+  /sessions/{sessionId}/questions/{question}/answers:
+    put:
+      operationId: submitAnswer
+      tags: [Voting]
+      summary: Submit or change an answer
+      description: |
+        Records the player's answer for the given question. Idempotent — calling
+        again with a different value overwrites the previous answer. Players may
+        change their answer any number of times while voting is open.
+
+        **Q1** — `answer` must be one of `A`, `B`, `C`.
+        **Q2** — `answer` must be an ISO 3166-1 alpha-2 country code (e.g. `DE`).
+
+        Returns 409 if voting is already closed for this question.
+
+        Individual answers are not visible to other players while voting is open.
+        They are revealed to all when the host sets the correct answer.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - $ref: '#/components/parameters/Question'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitAnswerRequest'
+            examples:
+              q1Answer:
+                summary: Q1 multiple-choice answer
+                value:
+                  playerId: "p-4f3a9b"
+                  answer: "B"
+              q2Answer:
+                summary: Q2 country answer
+                value:
+                  playerId: "p-4f3a9b"
+                  answer: "DE"
+      responses:
+        '200':
+          description: Answer recorded.
+        '404':
+          description: Session not found.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/session-not-found"
+                title: "Session Not Found"
+                status: 404
+                detail: "No session found with ID s-7c2d1e."
+        '409':
+          description: Voting is already closed for this question.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/voting-closed"
+                title: "Voting Closed"
+                status: 409
+                detail: "Voting for q1 is already closed."
+
+  /sessions/{sessionId}/questions/{question}/correct:
+    post:
+      operationId: setCorrectAnswer
+      tags: [Voting]
+      summary: Set the correct answer
+      description: |
+        Host declares the correct answer for the question. This single action:
+        1. Closes voting (no further answers accepted)
+        2. Records the correct answer
+        3. Awards 1 point to each player who answered correctly
+        4. For Q1: opens Q2 voting and broadcasts `question-scored` event
+        5. For Q2: ends the session and broadcasts `session-ended` event
+
+        **Q1** — `correctAnswer` must be one of `A`, `B`, `C`.
+        **Q2** — `correctAnswer` must be an ISO 3166-1 alpha-2 country code (e.g. `DE`).
+
+        A `question-scored` event is broadcast immediately, revealing all player
+        answers and the correct answer to all connected clients simultaneously.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - $ref: '#/components/parameters/Question'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetCorrectAnswerRequest'
+            examples:
+              q1Correct:
+                summary: Q1 correct answer
+                value:
+                  hostId: "p-4f3a9b"
+                  correctAnswer: "B"
+              q2Correct:
+                summary: Q2 correct answer
+                value:
+                  hostId: "p-4f3a9b"
+                  correctAnswer: "DE"
+      responses:
+        '200':
+          description: Correct answer set, voting closed, scores updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '403':
+          description: Caller is not the host.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/not-the-host"
+                title: "Forbidden"
+                status: 403
+                detail: "Only the host may set the correct answer."
+        '404':
+          description: Session not found.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/session-not-found"
+                title: "Session Not Found"
+                status: 404
+                detail: "No session found with ID s-7c2d1e."
+        '409':
+          description: Correct answer already set for this question.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/answer-already-set"
+                title: "Answer Already Set"
+                status: 409
+                detail: "The correct answer for q1 has already been set."
+
+  # ---------------------------------------------------------------------------
+  # Results
+  # ---------------------------------------------------------------------------
+
+  /sessions/{sessionId}/results:
+    get:
+      operationId: getSessionResults
+      tags: [Results]
+      summary: Get session results
+      description: |
+        Returns per-player Q1 and Q2 outcomes for the session. Correctness is
+        derived at read time by comparing each player's answer against the stored
+        correct answer — it is never stored separately.
+
+        Only available once the session has Ended.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Session results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResultsResponse'
+              example:
+                sessionId: "s-7c2d1e"
+                date: "2026-05-25"
+                results:
+                  - playerId: "p-4f3a9b"
+                    displayName: "Thomas"
+                    q1Correct: true
+                    q2Correct: false
+                    totalPoints: 1
+                  - playerId: "p-8b1c3a"
+                    displayName: "Anna"
+                    q1Correct: true
+                    q2Correct: true
+                    totalPoints: 2
+        '404':
+          description: Session not found.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/session-not-found"
+                title: "Session Not Found"
+                status: 404
+                detail: "No session found with ID s-7c2d1e."
+        '409':
+          description: Session has not ended yet.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/session-not-ended"
+                title: "Session Not Ended"
+                status: 409
+                detail: "Results are only available after the session has ended. Current phase: Active."
+
+  /leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [Results]
+      summary: Get the project leaderboard
+      description: |
+        Returns cumulative standings for all players who have participated in
+        any session in the default project, ordered by total points descending.
+
+        The leaderboard is pre-computed (Computed Pattern) and updated atomically
+        when each correct answer is set. It is available at any time — not only
+        at the end of a session.
+      responses:
+        '200':
+          description: Project leaderboard.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaderboardResponse'
+              example:
+                projectId: "default"
+                entries:
+                  - playerId: "p-8b1c3a"
+                    displayName: "Anna"
+                    totalPoints: 15
+                    sessionsParticipated: 8
+                  - playerId: "p-4f3a9b"
+                    displayName: "Thomas"
+                    totalPoints: 12
+                    sessionsParticipated: 8
+
+  # ---------------------------------------------------------------------------
+  # Events
+  # ---------------------------------------------------------------------------
+
+  /sessions/{sessionId}/events:
+    get:
+      operationId: getSessionEvents
+      tags: [Events]
+      summary: Subscribe to session events
+      description: |
+        Server-Sent Events stream for real-time session state changes. Clients
+        subscribe after joining or reconnecting and use events to navigate screens
+        without polling.
+
+        **Protocol note**: The transport (SSE vs WebSocket) is deferred pending
+        intranet proxy restrictions check — see issue df-lg7. This endpoint is
+        defined as SSE (`text/event-stream`) as the working assumption. If
+        WebSockets are chosen, this endpoint will be replaced by an AsyncAPI
+        spec entry and this definition removed.
+
+        ## Event types
+
+        | `event` field            | Triggered by                        | Relevant to        |
+        |--------------------------|-------------------------------------|--------------------|
+        | `player-joined`          | A player joins the lobby            | Host (lobby screen)|
+        | `session-started`        | Host starts the session             | All clients        |
+        | `answer-count-updated`   | A player submits or changes answer  | Host only          |
+        | `question-scored`        | Host sets correct answer            | All clients        |
+        | `session-ended`          | Host sets Q2 correct answer         | All clients        |
+
+        Each event `data` field is a JSON string. Clients should parse it to
+        access the payload and ignore unknown event types to remain
+        forward-compatible.
+
+        ## Reconnection
+
+        On reconnect, call `GET /sessions/{id}` first to recover full current
+        state, then re-subscribe here to receive subsequent changes.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Event stream. Connection stays open until the session ends.
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/SessionEvent'
+        '404':
+          description: Session not found.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "/problems/session-not-found"
+                title: "Session Not Found"
+                status: 404
+                detail: "No session found with ID s-7c2d1e."
+
+# =============================================================================
+# Components
+# =============================================================================
+
+components:
+
+  parameters:
+
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      description: The session ID returned by `POST /sessions` or `GET /sessions/today`.
+      schema:
+        type: string
+      example: "s-7c2d1e"
+
+    Question:
+      name: question
+      in: path
+      required: true
+      description: Which question — `q1` (knowledge) or `q2` (geography).
+      schema:
+        type: string
+        enum: [q1, q2]
+
+  schemas:
+
+    # -------------------------------------------------------------------------
+    # Players
+    # -------------------------------------------------------------------------
+
+    RegisterPlayerRequest:
+      type: object
+      required: [displayName]
+      properties:
+        displayName:
+          type: string
+          description: The name displayed to other players. Not unique — playerId is the identity.
+          example: "Thomas"
+
+    PlayerResponse:
+      type: object
+      required: [playerId, displayName]
+      properties:
+        playerId:
+          type: string
+          description: Stable player identifier. Store in localStorage for all subsequent requests.
+          example: "p-4f3a9b"
+        displayName:
+          type: string
+          example: "Thomas"
+
+    # -------------------------------------------------------------------------
+    # Sessions
+    # -------------------------------------------------------------------------
+
+    CreateSessionRequest:
+      type: object
+      required: [hostId, q1, q2]
+      properties:
+        hostId:
+          type: string
+          description: The playerId of the player creating the session. They become the host.
+          example: "p-4f3a9b"
+        q1:
+          type: string
+          format: binary
+          description: Photo for Q1 (knowledge question — image of the calendar page).
+        q2:
+          type: string
+          format: binary
+          description: Photo for Q2 (geography question — image of the location).
+
+    JoinSessionRequest:
+      type: object
+      required: [playerId]
+      properties:
+        playerId:
+          type: string
+          description: The playerId of the joining player.
+          example: "p-8b1c3a"
+
+    HostActionRequest:
+      type: object
+      required: [hostId]
+      properties:
+        hostId:
+          type: string
+          description: Must match the session's hostId. Used for authorization until real auth is implemented.
+          example: "p-4f3a9b"
+
+    SessionResponse:
+      type: object
+      required: [sessionId, projectId, date, phase, hostId, players, photos, voting]
+      description: Full session document. Returned by all session state-changing endpoints.
+      properties:
+        sessionId:
+          type: string
+          example: "s-7c2d1e"
+        projectId:
+          type: string
+          description: Always "default" for now. Multi-project support is deferred.
+          example: "default"
+        date:
+          type: string
+          format: date
+          description: Session date in YYYY-MM-DD format, server timezone.
+          example: "2026-05-25"
+        phase:
+          type: string
+          enum: [Lobby, Active, Ended]
+          description: |
+            Current lifecycle phase.
+            - `Lobby` — session created, waiting for players and host to start
+            - `Active` — quiz in progress
+            - `Ended` — both questions scored, results available
+          example: "Active"
+        hostId:
+          type: string
+          description: playerId of the host.
+          example: "p-4f3a9b"
+        players:
+          type: array
+          description: All players who have joined the session, including the host.
+          items:
+            $ref: '#/components/schemas/SessionPlayer'
+        photos:
+          $ref: '#/components/schemas/SessionPhotos'
+        voting:
+          $ref: '#/components/schemas/VotingState'
+
+    SessionPlayer:
+      type: object
+      required: [playerId, displayName]
+      description: A player as embedded in the session document. Display name is denormalised here for rendering without a separate player lookup.
+      properties:
+        playerId:
+          type: string
+          example: "p-4f3a9b"
+        displayName:
+          type: string
+          example: "Thomas"
+
+    SessionPhotos:
+      type: object
+      required: [q1, q2]
+      properties:
+        q1:
+          type: string
+          description: GridFS ID of the Q1 photo.
+          example: "gridfs-a1b2c3"
+        q2:
+          type: string
+          description: GridFS ID of the Q2 photo.
+          example: "gridfs-d4e5f6"
+
+    VotingState:
+      type: object
+      required: [q1, q2]
+      properties:
+        q1:
+          $ref: '#/components/schemas/QuestionVoting'
+        q2:
+          $ref: '#/components/schemas/QuestionVoting'
+
+    QuestionVoting:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [Open, Closed]
+          description: |
+            `Open` — voting in progress, answers accepted.
+            `Closed` — voting ended by host setting the correct answer.
+        correctAnswer:
+          type: string
+          nullable: true
+          description: |
+            Set when the host declares the correct answer. Null while voting is open.
+            A/B/C for Q1; ISO 3166-1 alpha-2 for Q2.
+          example: "B"
+        answers:
+          type: object
+          description: |
+            Map of playerId → PlayerAnswer. Hidden from non-host clients while
+            voting is Open. Revealed to all once the correct answer is set.
+          additionalProperties:
+            $ref: '#/components/schemas/PlayerAnswer'
+
+    PlayerAnswer:
+      type: object
+      required: [displayName, answer]
+      properties:
+        displayName:
+          type: string
+          description: Denormalised for rendering without a player lookup.
+          example: "Thomas"
+        answer:
+          type: string
+          description: A/B/C for Q1; ISO 3166-1 alpha-2 country code for Q2.
+          example: "B"
+
+    # -------------------------------------------------------------------------
+    # Voting
+    # -------------------------------------------------------------------------
+
+    SubmitAnswerRequest:
+      type: object
+      required: [playerId, answer]
+      properties:
+        playerId:
+          type: string
+          example: "p-4f3a9b"
+        answer:
+          type: string
+          description: |
+            Q1: one of `A`, `B`, `C`.
+            Q2: ISO 3166-1 alpha-2 country code (e.g. `DE`, `FR`, `JP`).
+          example: "B"
+
+    SetCorrectAnswerRequest:
+      type: object
+      required: [hostId, correctAnswer]
+      properties:
+        hostId:
+          type: string
+          description: Must match the session's hostId.
+          example: "p-4f3a9b"
+        correctAnswer:
+          type: string
+          description: |
+            Q1: one of `A`, `B`, `C`.
+            Q2: ISO 3166-1 alpha-2 country code (e.g. `DE`, `FR`, `JP`).
+          example: "B"
+
+    # -------------------------------------------------------------------------
+    # Results
+    # -------------------------------------------------------------------------
+
+    SessionResultsResponse:
+      type: object
+      required: [sessionId, date, results]
+      properties:
+        sessionId:
+          type: string
+          example: "s-7c2d1e"
+        date:
+          type: string
+          format: date
+          example: "2026-05-25"
+        results:
+          type: array
+          description: One entry per player. Correctness derived at read time from stored answers vs correct answers.
+          items:
+            $ref: '#/components/schemas/PlayerResult'
+
+    PlayerResult:
+      type: object
+      required: [playerId, displayName, q1Correct, q2Correct, totalPoints]
+      properties:
+        playerId:
+          type: string
+          example: "p-4f3a9b"
+        displayName:
+          type: string
+          example: "Thomas"
+        q1Correct:
+          type: boolean
+          description: True if the player's Q1 answer matches the correct answer. False if they did not answer.
+          example: true
+        q2Correct:
+          type: boolean
+          description: True if the player's Q2 answer matches the correct answer. False if they did not answer.
+          example: false
+        totalPoints:
+          type: integer
+          minimum: 0
+          maximum: 2
+          description: Points earned in this session (0, 1, or 2).
+          example: 1
+
+    LeaderboardResponse:
+      type: object
+      required: [projectId, entries]
+      properties:
+        projectId:
+          type: string
+          example: "default"
+        entries:
+          type: array
+          description: All players who have participated in at least one session, ordered by totalPoints descending.
+          items:
+            $ref: '#/components/schemas/LeaderboardEntry'
+
+    LeaderboardEntry:
+      type: object
+      required: [playerId, displayName, totalPoints, sessionsParticipated]
+      properties:
+        playerId:
+          type: string
+          example: "p-8b1c3a"
+        displayName:
+          type: string
+          description: Denormalised from the Player document for rendering without a separate lookup.
+          example: "Anna"
+        totalPoints:
+          type: integer
+          minimum: 0
+          example: 15
+        sessionsParticipated:
+          type: integer
+          minimum: 0
+          example: 8
+
+    # -------------------------------------------------------------------------
+    # Events
+    # -------------------------------------------------------------------------
+
+    SessionEvent:
+      description: |
+        A single Server-Sent Event. The `event` field identifies the type;
+        parse the `data` field as JSON to access the payload.
+
+        Clients should ignore unknown event types to remain forward-compatible.
+      type: object
+      required: [event, data]
+      discriminator:
+        propertyName: event
+        mapping:
+          player-joined: '#/components/schemas/PlayerJoinedEvent'
+          session-started: '#/components/schemas/SessionStartedEvent'
+          answer-count-updated: '#/components/schemas/AnswerCountUpdatedEvent'
+          question-scored: '#/components/schemas/QuestionScoredEvent'
+          session-ended: '#/components/schemas/SessionEndedEvent'
+      oneOf:
+        - $ref: '#/components/schemas/PlayerJoinedEvent'
+        - $ref: '#/components/schemas/SessionStartedEvent'
+        - $ref: '#/components/schemas/AnswerCountUpdatedEvent'
+        - $ref: '#/components/schemas/QuestionScoredEvent'
+        - $ref: '#/components/schemas/SessionEndedEvent'
+
+    PlayerJoinedEvent:
+      description: A player joined the lobby. Broadcast to all clients so the player list updates live.
+      type: object
+      required: [event, data]
+      properties:
+        event:
+          type: string
+          enum: [player-joined]
+        data:
+          type: object
+          required: [playerId, displayName]
+          properties:
+            playerId:
+              type: string
+              example: "p-8b1c3a"
+            displayName:
+              type: string
+              example: "Anna"
+      example:
+        event: "player-joined"
+        data:
+          playerId: "p-8b1c3a"
+          displayName: "Anna"
+
+    SessionStartedEvent:
+      description: Host started the session. All clients navigate to the Q1 answer screen.
+      type: object
+      required: [event, data]
+      properties:
+        event:
+          type: string
+          enum: [session-started]
+        data:
+          type: object
+          description: Empty payload — clients act on the event type alone.
+      example:
+        event: "session-started"
+        data: {}
+
+    AnswerCountUpdatedEvent:
+      description: |
+        A player submitted or changed their answer. Sent to all clients but
+        only meaningful to the host, who displays a live "X/N answered" count.
+        Individual answers remain hidden until the correct answer is set.
+      type: object
+      required: [event, data]
+      properties:
+        event:
+          type: string
+          enum: [answer-count-updated]
+        data:
+          type: object
+          required: [question, answered, total]
+          properties:
+            question:
+              type: string
+              enum: [q1, q2]
+              example: "q1"
+            answered:
+              type: integer
+              description: Number of players who have submitted an answer.
+              example: 4
+            total:
+              type: integer
+              description: Total number of players in the session.
+              example: 6
+      example:
+        event: "answer-count-updated"
+        data:
+          question: "q1"
+          answered: 4
+          total: 6
+
+    QuestionScoredEvent:
+      description: |
+        Host set the correct answer for a question. Voting is now closed.
+        All player answers and the correct answer are revealed simultaneously.
+        For Q1, clients render the Q2 answer screen. For Q2, a `session-ended`
+        event follows immediately after.
+      type: object
+      required: [event, data]
+      properties:
+        event:
+          type: string
+          enum: [question-scored]
+        data:
+          type: object
+          required: [question, correctAnswer, answers]
+          properties:
+            question:
+              type: string
+              enum: [q1, q2]
+              example: "q1"
+            correctAnswer:
+              type: string
+              description: A/B/C for Q1; ISO 3166-1 alpha-2 for Q2.
+              example: "B"
+            answers:
+              type: object
+              description: Map of playerId → PlayerAnswer. All answers now visible to all clients.
+              additionalProperties:
+                $ref: '#/components/schemas/PlayerAnswer'
+      example:
+        event: "question-scored"
+        data:
+          question: "q1"
+          correctAnswer: "B"
+          answers:
+            p-4f3a9b:
+              displayName: "Thomas"
+              answer: "B"
+            p-8b1c3a:
+              displayName: "Anna"
+              answer: "A"
+
+    SessionEndedEvent:
+      description: |
+        Q2 has been scored and the session is now Ended. All clients navigate
+        to the results screen. Call `GET /sessions/{id}/results` to fetch scores.
+      type: object
+      required: [event, data]
+      properties:
+        event:
+          type: string
+          enum: [session-ended]
+        data:
+          type: object
+          description: Empty payload — clients navigate to results on this event type alone.
+      example:
+        event: "session-ended"
+        data: {}
+
+    # -------------------------------------------------------------------------
+    # Errors — RFC 9457 Problem Details
+    # -------------------------------------------------------------------------
+
+    ProblemDetail:
+      type: object
+      description: |
+        Error response following [RFC 9457 Problem Details](https://datatracker.ietf.org/doc/html/rfc9457).
+      properties:
+        type:
+          type: string
+          description: |
+            A URI reference identifying the problem type. Relative URIs are
+            resolved against the server base URL. Use "about:blank" when no
+            additional documentation is available.
+          example: "/problems/session-not-found"
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type. Stable across occurrences.
+          example: "Session Not Found"
+        status:
+          type: integer
+          description: The HTTP status code for this occurrence.
+          example: 404
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence. Helps the client understand what went wrong.
+          example: "No session found with ID s-7c2d1e."
+        instance:
+          type: string
+          description: Optional URI reference identifying this specific occurrence of the problem.
+          example: "/sessions/s-7c2d1e"
