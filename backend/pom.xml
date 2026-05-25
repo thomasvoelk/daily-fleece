@@ -29,6 +29,8 @@
 	<properties>
 		<java.version>25</java.version>
 		<spring-modulith.version>2.0.6</spring-modulith.version>
+		<nullaway.version>0.13.4</nullaway.version>
+		<error-prone.version>2.49.0</error-prone.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -42,6 +44,10 @@
 		<dependency>
 			<groupId>org.springframework.modulith</groupId>
 			<artifactId>spring-modulith-starter-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jspecify</groupId>
+			<artifactId>jspecify</artifactId>
 		</dependency>
 
 		<dependency>
@@ -99,9 +105,29 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<compilerArgs>
+						<!-- javac: treat all lint warnings as errors -->
 						<arg>-Xlint:all</arg>
 						<arg>-Werror</arg>
+						<!-- Error Prone: required single-pass compilation mode -->
+						<arg>-XDcompilePolicy=simple</arg>
+						<!-- NullAway via Error Prone:
+						     - AnnotatedPackages: enforce null-safety in our code
+						     - JSpecifyMode: use @NullMarked / @Nullable from org.jspecify
+						     - ExcludedPaths: skip OpenAPI-generated sources -->
+						<arg>-Xplugin:ErrorProne -XepOpt:NullAway:AnnotatedPackages=de.dailyfleece -XepOpt:NullAway:JSpecifyMode=true -XepExcludedPaths:.*/generated-sources/.*</arg>
 					</compilerArgs>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>com.google.errorprone</groupId>
+							<artifactId>error_prone_core</artifactId>
+							<version>${error-prone.version}</version>
+						</path>
+						<path>
+							<groupId>com.uber.nullaway</groupId>
+							<artifactId>nullaway</artifactId>
+							<version>${nullaway.version}</version>
+						</path>
+					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 			<!-- ByteBuddy (Mockito) loads its agent dynamically on Java 21+, which
