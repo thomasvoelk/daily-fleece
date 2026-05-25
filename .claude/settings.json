@@ -1,7 +1,4 @@
 {
-  "env": {
-    "BEADS_DIR": "/Users/thomas/Development/Projekte/daily-fleece/.beads"
-  },
   "hooks": {
     "PreCompact": [
       {
