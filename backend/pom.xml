@@ -31,6 +31,7 @@
 		<spring-modulith.version>2.0.6</spring-modulith.version>
 		<nullaway.version>0.13.4</nullaway.version>
 		<error-prone.version>2.49.0</error-prone.version>
+		<archunit.version>1.4.2</archunit.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -79,6 +80,12 @@
 		<dependency>
 			<groupId>org.springframework.modulith</groupId>
 			<artifactId>spring-modulith-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.tngtech.archunit</groupId>
+			<artifactId>archunit-junit5</artifactId>
+			<version>${archunit.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
