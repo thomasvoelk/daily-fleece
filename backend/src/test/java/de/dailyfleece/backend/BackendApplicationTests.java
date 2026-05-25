@@ -1,10 +1,10 @@
-package com.dailyfleece;
+package de.dailyfleece.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class DailyFleeceBackendApplicationTests {
+class BackendApplicationTests {
 
 	@Test
 	void contextLoads() {
