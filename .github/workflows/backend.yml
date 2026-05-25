@@ -9,6 +9,7 @@ on:
     paths:
       - 'backend/**'
       - 'api/**'
+  workflow_dispatch:
 
 jobs:
   build:

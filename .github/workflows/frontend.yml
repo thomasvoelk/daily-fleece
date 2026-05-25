@@ -9,6 +9,7 @@ on:
     paths:
       - 'frontend/**'
       - 'api/**'
+  workflow_dispatch:
 
 jobs:
   build:
