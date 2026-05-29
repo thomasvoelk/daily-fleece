@@ -27,6 +27,19 @@ npm install
 npm start
 ```
 
+## Dev setup
+
+Code formatting (palantir-java-format for Java, Prettier for TypeScript/HTML/YAML) is enforced in CI. Unformatted code will fail the pipeline.
+
+To auto-format on every commit, install [lefthook](https://github.com/evilmartians/lefthook) once after cloning:
+
+```bash
+brew install lefthook
+lefthook install
+```
+
+lefthook is optional — the build and tests work without it. It is not required to run the app locally.
+
 ## Docs
 
 - [`REQUIREMENTS.md`](REQUIREMENTS.md) — use cases and rules

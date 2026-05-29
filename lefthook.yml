@@ -1,0 +1,13 @@
+pre-commit:
+  commands:
+    backend-format:
+      glob: "backend/**/*.java"
+      run: cd backend && ./mvnw spotless:apply
+      stage_fixed: true
+    prettier:
+      glob:
+        - "frontend/src/**/*.{ts,html,json}"
+        - "api/**/*.yaml"
+      exclude: "frontend/src/app/api/**"
+      run: frontend/node_modules/.bin/prettier --write {staged_files}
+      stage_fixed: true
