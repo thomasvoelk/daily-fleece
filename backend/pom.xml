@@ -225,6 +225,15 @@
 						<importOrder/>
 						<removeUnusedImports/>
 					</java>
+					<xml>
+						<includes>
+							<include>pom.xml</include>
+							<include>src/**/*.xml</include>
+						</includes>
+						<eclipseWtp>
+							<type>XML</type>
+						</eclipseWtp>
+					</xml>
 				</configuration>
 			</plugin>
 			<plugin>

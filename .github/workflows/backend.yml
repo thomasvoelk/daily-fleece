@@ -24,10 +24,6 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Check formatting
-        run: mvn -B spotless:check
-        working-directory: backend
-
       - name: Build and verify
         run: mvn -B verify
         working-directory: backend
