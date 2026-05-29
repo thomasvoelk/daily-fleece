@@ -6,7 +6,7 @@
 The organisational scope that groups Sessions and their Leaderboard. Every Session and every Player's score belongs to exactly one Project. One global Project exists for now; the model is multi-Project-ready from day one.
 
 ### Player
-A participant identified by an app-generated stable ID. The display name is a separate attribute and not the identity. This stable ID survives the future migration from stub (name-based) auth to company SSO. The Players collection is a thin identity registry — no scores or session history.
+A participant identified by an app-generated, opaque, stable ID — the surrogate key referenced by Sessions and the Leaderboard. The display name is a separate attribute and not the identity. Under stub authentication the Player also supplies a **Company ID**: a unique natural key used to recover their identity (e.g. on a new device) via get-or-create registration. At the future SSO cutover the app-generated ID is preserved and the JWT subject is linked to the existing Player — never a rekey (open question df-cnm: whether the JWT subject equals the Company ID). The Players collection is a thin identity registry — no scores or session history.
 
 ### Session
 A single daily quiz instance scoped to a Project. Discovered by date — there is at most one Session per Project per day, no join code needed. The session date is a `YYYY-MM-DD` string determined by the server's configured timezone. A Session embeds its players (with display names), photo references, and all voting state including answers. It is the primary read document for every screen during an active quiz.
@@ -97,6 +97,7 @@ stateDiagram-v2
 ```json
 {
   "_id": "<player-id>",
+  "companyId": "t12345a",
   "displayName": "Thomas"
 }
 ```
@@ -143,4 +144,6 @@ When Q2 is scored and the Session transitions to Ended, the `quiz` module publis
 - **Seamless reconnection**: a player who refreshes or reconnects re-enters their name, recovers their `playerId`, and the client reads current session state to render the correct screen.
 - **Q2 answers stored as ISO 3166-1 alpha-2 country codes** (e.g. `"DE"`).
 - **Duplicate display names are allowed** — no uniqueness constraint on `displayName` in the Players collection.
+- **Company ID is unique** in the Players collection — it is the recovery natural key. Registration is get-or-create keyed on it: the same Company ID always returns the same app-generated `playerId`. Stub validation is length-only (≤20 chars); real validation arrives with SSO.
+- **Identity is acquired at the edge** — the domain treats `playerId` as an opaque string. The stub auth adapter turns a typed Company ID + display name into the player principal; a future SSO adapter will turn a JWT into the same shape. The session/voting/leaderboard model is unchanged by the auth swap. Consequently the join request carries the display name with the principal rather than the server looking it up across the module boundary.
 - **Session Results** shows a table: name, Q1 result (correct/incorrect), Q2 result (correct/incorrect). Correctness is derived at read time by comparing each player's answer against `correctAnswer`.
