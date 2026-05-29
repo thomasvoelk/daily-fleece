@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.0.6</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>de.dailyfleece</groupId>
 	<artifactId>backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>backend</name>
-	<description/>
-	<url/>
+	<description />
+	<url />
 	<licenses>
-		<license/>
+		<license />
 	</licenses>
 	<developers>
-		<developer/>
+		<developer />
 	</developers>
 	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
+		<connection />
+		<developerConnection />
+		<tag />
+		<url />
 	</scm>
 	<properties>
 		<java.version>25</java.version>
@@ -54,6 +55,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
 
 		<dependency>
@@ -98,6 +103,21 @@
 			<version>${archunit.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-testcontainers</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers-junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers-mongodb</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -133,7 +153,9 @@
 						     - AnnotatedPackages: enforce null-safety in our code
 						     - JSpecifyMode: use @NullMarked / @Nullable from org.jspecify
 						     - ExcludedPaths: skip OpenAPI-generated sources -->
-						<arg>-Xplugin:ErrorProne -XepOpt:NullAway:AnnotatedPackages=de.dailyfleece -XepOpt:NullAway:JSpecifyMode=true -XepExcludedPaths:.*/generated-sources/.*</arg>
+						<arg>-Xplugin:ErrorProne -XepOpt:NullAway:AnnotatedPackages=de.dailyfleece
+							-XepOpt:NullAway:JSpecifyMode=true
+							-XepExcludedPaths:.*/generated-sources/.*</arg>
 					</compilerArgs>
 					<annotationProcessorPaths>
 						<path>
@@ -165,7 +187,8 @@
 							     path params were not resetting nullability, causing required
 							     @PathVariable params to be incorrectly annotated with @Nullable
 							     without the JSpecify import. Fixed in 7.23.0, not yet released. -->
-							<templateDirectory>${project.basedir}/src/main/resources/openapi-templates</templateDirectory>
+							<templateDirectory>
+								${project.basedir}/src/main/resources/openapi-templates</templateDirectory>
 							<apiPackage>de.dailyfleece.api</apiPackage>
 							<modelPackage>de.dailyfleece.api.model</modelPackage>
 							<configOptions>
