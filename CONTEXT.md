@@ -14,9 +14,11 @@ Any participant in a Session, including the Host. Players submit answers to both
 
 **Company ID**
 The identifier a Player enters to identify themselves under stub authentication — their company employee identifier. Entering it lets a returning Player recover their identity and Leaderboard history, including on a new device. Each Company ID belongs to exactly one Player. Distinct from the Display Name and never shown to other Players. Stub authentication will be replaced by company SSO later; whether SSO identifies a Player by this same value is not yet known.
+_Avoid_: employee ID, user ID, username, login
 
 **Display Name**
 The name shown to other Players in the Lobby, Session Results, and Leaderboard. Entered by the Player alongside their Company ID. Not an identity and not unique — two Players may share a Display Name.
+_Avoid_: username, name, nickname, alias
 
 ---
 

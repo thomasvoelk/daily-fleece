@@ -1,10 +1,13 @@
 package de.dailyfleece.backend.player.domain;
 
+import de.dailyfleece.backend.player.api.CompanyId;
+import de.dailyfleece.backend.player.api.DisplayName;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface PlayerRepository {
 
-    void save(Player player);
+    Player getOrCreate(CompanyId companyId, DisplayName displayName);
 
-    Optional<Player> findById(String playerId);
+    Optional<Player> findById(UUID playerId);
 }

@@ -1,14 +1,16 @@
 package de.dailyfleece.backend.quiz.domain;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 
 public class InMemorySessionRepository implements SessionRepository {
 
-    private final Map<String, Session> byId = new HashMap<>();
-    private final Map<String, Session> byDate = new HashMap<>();
+    private final Map<UUID, Session> byId = new HashMap<>();
+    private final Map<LocalDate, Session> byDate = new HashMap<>();
 
     @Override
     public void save(Session session) {
@@ -17,13 +19,13 @@ public class InMemorySessionRepository implements SessionRepository {
     }
 
     @Override
-    public Optional<Session> findById(String sessionId) {
+    public Optional<Session> findById(UUID sessionId) {
         @Nullable Session session = byId.get(sessionId);
         return Optional.ofNullable(session);
     }
 
     @Override
-    public Optional<Session> findByDate(String date) {
+    public Optional<Session> findByDate(LocalDate date) {
         @Nullable Session session = byDate.get(date);
         return Optional.ofNullable(session);
     }

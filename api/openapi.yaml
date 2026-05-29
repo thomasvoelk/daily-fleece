@@ -31,11 +31,14 @@ info:
 
     ## Stub authentication
 
-    Authentication is not implemented yet. Players register with a display name and
-    receive a stable `playerId` stored client-side (localStorage). This ID is the
-    identity for all subsequent calls and survives page refreshes. The `playerId`
-    is designed to survive a future migration to company SSO — the player record
-    will be linked to the SSO identity without changing the ID.
+    Authentication is not implemented yet. Players register with a `companyId`
+    (their stable company identity, max 20 characters) and a `displayName`. The
+    server performs a get-or-create keyed on `companyId`: if a player with that
+    ID already exists their `playerId` is returned, otherwise a new player record
+    is created. The `companyId` acts as a recovery key — players can recover their
+    `playerId` on a new device by registering again with the same `companyId`.
+    The stable `playerId` is stored client-side (localStorage) for all subsequent
+    calls and is designed to survive a future migration to company SSO.
 
     ## Real-time events
 
@@ -99,6 +102,7 @@ paths:
             schema:
               $ref: "#/components/schemas/RegisterPlayerRequest"
             example:
+              companyId: "thomas.voelk"
               displayName: "Thomas"
       responses:
         "201":
@@ -241,6 +245,7 @@ paths:
               $ref: "#/components/schemas/JoinSessionRequest"
             example:
               playerId: "p-4f3a9b"
+              displayName: "Thomas"
       responses:
         "200":
           description: Joined successfully. Returns updated session state.
@@ -661,10 +666,18 @@ components:
 
     RegisterPlayerRequest:
       type: object
-      required: [displayName]
+      required: [companyId, displayName]
       properties:
+        companyId:
+          type: string
+          maxLength: 20
+          description: |
+            Stable company identity used as a recovery key. If a player with this
+            companyId already exists, their existing playerId is returned (get-or-create).
+          example: "thomas.voelk"
         displayName:
           type: string
+          maxLength: 20
           description: The name displayed to other players. Not unique — playerId is the identity.
           example: "Thomas"
 
@@ -703,12 +716,17 @@ components:
 
     JoinSessionRequest:
       type: object
-      required: [playerId]
+      required: [playerId, displayName]
       properties:
         playerId:
           type: string
           description: The playerId of the joining player.
           example: "p-8b1c3a"
+        displayName:
+          type: string
+          maxLength: 20
+          description: Display name shown in the player list. Supplied by the caller to avoid a cross-module lookup.
+          example: "Thomas"
 
     HostActionRequest:
       type: object

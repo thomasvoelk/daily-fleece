@@ -1,5 +1,7 @@
 package de.dailyfleece.backend.player.application;
 
+import de.dailyfleece.backend.player.api.CompanyId;
+import de.dailyfleece.backend.player.api.DisplayName;
 import de.dailyfleece.backend.player.domain.Player;
 import de.dailyfleece.backend.player.domain.PlayerRepository;
 
@@ -11,9 +13,7 @@ public class RegisterPlayerUseCase {
         this.playerRepository = playerRepository;
     }
 
-    public Player register(String displayName) {
-        Player player = Player.register(displayName);
-        playerRepository.save(player);
-        return player;
+    public Player register(CompanyId companyId, DisplayName displayName) {
+        return playerRepository.getOrCreate(companyId, displayName);
     }
 }

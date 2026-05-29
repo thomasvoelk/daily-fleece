@@ -2,28 +2,30 @@ package de.dailyfleece.backend.player.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.dailyfleece.backend.player.api.CompanyId;
+import de.dailyfleece.backend.player.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class PlayerTest {
 
     @Test
     void register_creates_player_with_provided_display_name() {
-        Player player = Player.register("Thomas");
+        Player player = Player.register(new CompanyId("comp-1"), new DisplayName("Thomas"));
 
-        assertThat(player.displayName()).isEqualTo("Thomas");
+        assertThat(player.displayName()).isEqualTo(new DisplayName("Thomas"));
     }
 
     @Test
     void register_assigns_a_non_blank_stable_id() {
-        Player player = Player.register("Thomas");
+        Player player = Player.register(new CompanyId("comp-1"), new DisplayName("Thomas"));
 
-        assertThat(player.playerId()).isNotBlank();
+        assertThat(player.playerId()).isNotNull();
     }
 
     @Test
-    void two_registrations_produce_different_ids() {
-        Player p1 = Player.register("Thomas");
-        Player p2 = Player.register("Thomas");
+    void two_registrations_with_different_company_ids_produce_different_player_ids() {
+        Player p1 = Player.register(new CompanyId("comp-1"), new DisplayName("Thomas"));
+        Player p2 = Player.register(new CompanyId("comp-2"), new DisplayName("Thomas"));
 
         assertThat(p1.playerId()).isNotEqualTo(p2.playerId());
     }

@@ -1,14 +1,16 @@
 package de.dailyfleece.backend.player.domain;
 
+import de.dailyfleece.backend.player.api.CompanyId;
+import de.dailyfleece.backend.player.api.DisplayName;
 import java.util.UUID;
 
-public record Player(String playerId, String displayName) {
+public record Player(UUID playerId, CompanyId companyId, DisplayName displayName) {
 
-    public static Player register(String displayName) {
-        return new Player(UUID.randomUUID().toString(), displayName);
+    public static Player register(CompanyId companyId, DisplayName displayName) {
+        return new Player(UUID.randomUUID(), companyId, displayName);
     }
 
-    public static Player reconstitute(String playerId, String displayName) {
-        return new Player(playerId, displayName);
+    public static Player reconstitute(UUID playerId, CompanyId companyId, DisplayName displayName) {
+        return new Player(playerId, companyId, displayName);
     }
 }

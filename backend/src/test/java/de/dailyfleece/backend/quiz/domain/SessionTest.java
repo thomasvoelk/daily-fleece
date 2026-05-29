@@ -3,59 +3,68 @@ package de.dailyfleece.backend.quiz.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import de.dailyfleece.backend.player.api.DisplayName;
+import java.time.LocalDate;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class SessionTest {
 
+    private static final LocalDate DATE = LocalDate.of(2026, 5, 29);
+    private static final UUID PLAYER_1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private static final UUID PLAYER_2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
+
     @Test
     void new_session_starts_in_lobby_phase() {
-        Session session = Session.create("2026-05-29");
+        Session session = Session.create(DATE);
 
         assertThat(session.phase()).isEqualTo(SessionPhase.LOBBY);
     }
 
     @Test
     void new_session_has_no_players() {
-        Session session = Session.create("2026-05-29");
+        Session session = Session.create(DATE);
 
         assertThat(session.players()).isEmpty();
     }
 
     @Test
     void player_can_join_a_lobby_session() {
-        Session session = Session.create("2026-05-29");
+        Session session = Session.create(DATE);
 
-        session.join("player-1", "Thomas");
+        session.join(PLAYER_1, new DisplayName("Thomas"));
 
         assertThat(session.players()).hasSize(1);
-        assertThat(session.players().get(0).playerId()).isEqualTo("player-1");
-        assertThat(session.players().get(0).displayName()).isEqualTo("Thomas");
+        assertThat(session.players().get(0).playerId()).isEqualTo(PLAYER_1);
+        assertThat(session.players().get(0).displayName()).isEqualTo(new DisplayName("Thomas"));
     }
 
     @Test
     void multiple_players_can_join_a_lobby_session() {
-        Session session = Session.create("2026-05-29");
+        Session session = Session.create(DATE);
 
-        session.join("player-1", "Thomas");
-        session.join("player-2", "Anna");
+        session.join(PLAYER_1, new DisplayName("Thomas"));
+        session.join(PLAYER_2, new DisplayName("Anna"));
 
         assertThat(session.players()).hasSize(2);
     }
 
     @Test
     void joining_an_active_session_throws() {
-        Session session = Session.create("2026-05-29");
+        Session session = Session.create(DATE);
         session.start();
 
-        assertThatThrownBy(() -> session.join("player-1", "Thomas")).isInstanceOf(CannotJoinSessionException.class);
+        assertThatThrownBy(() -> session.join(PLAYER_1, new DisplayName("Thomas")))
+                .isInstanceOf(CannotJoinSessionException.class);
     }
 
     @Test
     void joining_an_ended_session_throws() {
-        Session session = Session.create("2026-05-29");
+        Session session = Session.create(DATE);
         session.start();
         session.end();
 
-        assertThatThrownBy(() -> session.join("player-1", "Thomas")).isInstanceOf(CannotJoinSessionException.class);
+        assertThatThrownBy(() -> session.join(PLAYER_1, new DisplayName("Thomas")))
+                .isInstanceOf(CannotJoinSessionException.class);
     }
 }

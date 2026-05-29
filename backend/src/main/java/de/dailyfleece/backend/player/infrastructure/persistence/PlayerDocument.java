@@ -1,0 +1,25 @@
+package de.dailyfleece.backend.player.infrastructure.persistence;
+
+import de.dailyfleece.backend.player.api.CompanyId;
+import de.dailyfleece.backend.player.api.DisplayName;
+import de.dailyfleece.backend.player.domain.Player;
+import java.util.UUID;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "players")
+record PlayerDocument(
+        @Id String playerId, @Indexed(unique = true) String companyId, String displayName) {
+
+    static PlayerDocument fromDomain(Player player) {
+        return new PlayerDocument(
+                player.playerId().toString(),
+                player.companyId().value(),
+                player.displayName().value());
+    }
+
+    Player toDomain() {
+        return Player.reconstitute(UUID.fromString(playerId), new CompanyId(companyId), new DisplayName(displayName));
+    }
+}

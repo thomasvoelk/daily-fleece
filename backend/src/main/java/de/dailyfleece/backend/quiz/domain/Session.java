@@ -1,5 +1,7 @@
 package de.dailyfleece.backend.quiz.domain;
 
+import de.dailyfleece.backend.player.api.DisplayName;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -7,30 +9,31 @@ import java.util.UUID;
 
 public final class Session {
 
-    private final String sessionId;
-    private final String date;
+    private final UUID sessionId;
+    private final LocalDate date;
     private SessionPhase phase;
     private final List<SessionPlayer> players;
 
-    private Session(String sessionId, String date) {
+    private Session(UUID sessionId, LocalDate date) {
         this.sessionId = sessionId;
         this.date = date;
         this.phase = SessionPhase.LOBBY;
         this.players = new ArrayList<>();
     }
 
-    public static Session create(String date) {
-        return new Session(UUID.randomUUID().toString(), date);
+    public static Session create(LocalDate date) {
+        return new Session(UUID.randomUUID(), date);
     }
 
-    public static Session reconstitute(String sessionId, String date, SessionPhase phase, List<SessionPlayer> players) {
+    public static Session reconstitute(
+            UUID sessionId, LocalDate date, SessionPhase phase, List<SessionPlayer> players) {
         Session session = new Session(sessionId, date);
         session.phase = phase;
         session.players.addAll(players);
         return session;
     }
 
-    public void join(String playerId, String displayName) {
+    public void join(UUID playerId, DisplayName displayName) {
         if (phase != SessionPhase.LOBBY) {
             throw new CannotJoinSessionException(sessionId, phase);
         }
@@ -45,11 +48,11 @@ public final class Session {
         phase = SessionPhase.ENDED;
     }
 
-    public String sessionId() {
+    public UUID sessionId() {
         return sessionId;
     }
 
-    public String date() {
+    public LocalDate date() {
         return date;
     }
 
