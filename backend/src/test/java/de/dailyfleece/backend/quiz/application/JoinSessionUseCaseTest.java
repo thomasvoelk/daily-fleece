@@ -1,12 +1,12 @@
 package de.dailyfleece.backend.quiz.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import de.dailyfleece.backend.quiz.domain.CannotJoinSessionException;
 import de.dailyfleece.backend.quiz.domain.InMemorySessionRepository;
 import de.dailyfleece.backend.quiz.domain.Session;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class JoinSessionUseCaseTest {
 

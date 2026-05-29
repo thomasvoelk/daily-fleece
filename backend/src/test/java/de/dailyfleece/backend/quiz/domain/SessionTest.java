@@ -1,9 +1,9 @@
 package de.dailyfleece.backend.quiz.domain;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import org.junit.jupiter.api.Test;
 
 class SessionTest {
 
@@ -47,8 +47,7 @@ class SessionTest {
         Session session = Session.create("2026-05-29");
         session.start();
 
-        assertThatThrownBy(() -> session.join("player-1", "Thomas"))
-                .isInstanceOf(CannotJoinSessionException.class);
+        assertThatThrownBy(() -> session.join("player-1", "Thomas")).isInstanceOf(CannotJoinSessionException.class);
     }
 
     @Test
@@ -57,7 +56,6 @@ class SessionTest {
         session.start();
         session.end();
 
-        assertThatThrownBy(() -> session.join("player-1", "Thomas"))
-                .isInstanceOf(CannotJoinSessionException.class);
+        assertThatThrownBy(() -> session.join("player-1", "Thomas")).isInstanceOf(CannotJoinSessionException.class);
     }
 }

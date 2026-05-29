@@ -1,10 +1,10 @@
 package de.dailyfleece.backend.player.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import de.dailyfleece.backend.player.domain.InMemoryPlayerRepository;
 import de.dailyfleece.backend.player.domain.Player;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class RegisterPlayerUseCaseTest {
 

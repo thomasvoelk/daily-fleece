@@ -12,8 +12,7 @@ public class JoinSessionUseCase {
     }
 
     public Session join(String date, String playerId, String displayName) {
-        Session session = sessionRepository.findByDate(date)
-                .orElseThrow(() -> new NoSessionForDateException(date));
+        Session session = sessionRepository.findByDate(date).orElseThrow(() -> new NoSessionForDateException(date));
         session.join(playerId, displayName);
         sessionRepository.save(session);
         return session;

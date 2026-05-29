@@ -1,10 +1,9 @@
 package de.dailyfleece.backend.quiz.domain;
 
-import org.jspecify.annotations.Nullable;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 public class InMemorySessionRepository implements SessionRepository {
 

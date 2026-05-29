@@ -75,7 +75,6 @@ tags:
     description: Real-time session event stream
 
 paths:
-
   # ---------------------------------------------------------------------------
   # Players
   # ---------------------------------------------------------------------------
@@ -98,16 +97,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RegisterPlayerRequest'
+              $ref: "#/components/schemas/RegisterPlayerRequest"
             example:
               displayName: "Thomas"
       responses:
-        '201':
+        "201":
           description: Player registered successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlayerResponse'
+                $ref: "#/components/schemas/PlayerResponse"
               example:
                 playerId: "p-4f3a9b"
                 displayName: "Thomas"
@@ -134,18 +133,18 @@ paths:
         Returns 404 if no session has been created today. The host should then
         proceed to `POST /sessions`.
       responses:
-        '200':
+        "200":
           description: Today's session.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SessionResponse'
-        '404':
+                $ref: "#/components/schemas/SessionResponse"
+        "404":
           description: No session exists for today.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/session-not-found"
                 title: "Session Not Found"
@@ -171,20 +170,20 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateSessionRequest'
+              $ref: "#/components/schemas/CreateSessionRequest"
       responses:
-        '201':
+        "201":
           description: Session created in Lobby phase.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SessionResponse'
-        '409':
+                $ref: "#/components/schemas/SessionResponse"
+        "409":
           description: A session already exists for today.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/session-already-exists"
                 title: "Session Already Exists"
@@ -201,20 +200,20 @@ paths:
         determine the current phase and render the correct screen before
         subscribing to the event stream.
       parameters:
-        - $ref: '#/components/parameters/SessionId'
+        - $ref: "#/components/parameters/SessionId"
       responses:
-        '200':
+        "200":
           description: Session state.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SessionResponse'
-        '404':
+                $ref: "#/components/schemas/SessionResponse"
+        "404":
           description: Session not found.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/session-not-found"
                 title: "Session Not Found"
@@ -233,39 +232,39 @@ paths:
         Returns 409 if the session has already started — the client should
         show a "session in progress" message.
       parameters:
-        - $ref: '#/components/parameters/SessionId'
+        - $ref: "#/components/parameters/SessionId"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/JoinSessionRequest'
+              $ref: "#/components/schemas/JoinSessionRequest"
             example:
               playerId: "p-4f3a9b"
       responses:
-        '200':
+        "200":
           description: Joined successfully. Returns updated session state.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SessionResponse'
-        '404':
+                $ref: "#/components/schemas/SessionResponse"
+        "404":
           description: Session not found.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/session-not-found"
                 title: "Session Not Found"
                 status: 404
                 detail: "No session found with ID s-7c2d1e."
-        '409':
+        "409":
           description: Session is already active; cannot join.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/session-already-active"
                 title: "Session Already Active"
@@ -284,50 +283,50 @@ paths:
         A `session-started` event is broadcast to all connected clients via the
         event stream, prompting them to navigate to the Q1 answer screen.
       parameters:
-        - $ref: '#/components/parameters/SessionId'
+        - $ref: "#/components/parameters/SessionId"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/HostActionRequest'
+              $ref: "#/components/schemas/HostActionRequest"
             example:
               hostId: "p-4f3a9b"
       responses:
-        '200':
+        "200":
           description: Session started. Returns updated session state.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SessionResponse'
-        '403':
+                $ref: "#/components/schemas/SessionResponse"
+        "403":
           description: Caller is not the host.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/not-the-host"
                 title: "Forbidden"
                 status: 403
                 detail: "Only the host may start the session."
-        '404':
+        "404":
           description: Session not found.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/session-not-found"
                 title: "Session Not Found"
                 status: 404
                 detail: "No session found with ID s-7c2d1e."
-        '409':
+        "409":
           description: Session is not in Lobby phase.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/invalid-phase-transition"
                 title: "Invalid Phase Transition"
@@ -356,14 +355,14 @@ paths:
         Individual answers are not visible to other players while voting is open.
         They are revealed to all when the host sets the correct answer.
       parameters:
-        - $ref: '#/components/parameters/SessionId'
-        - $ref: '#/components/parameters/Question'
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/Question"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubmitAnswerRequest'
+              $ref: "#/components/schemas/SubmitAnswerRequest"
             examples:
               q1Answer:
                 summary: Q1 multiple-choice answer
@@ -376,25 +375,25 @@ paths:
                   playerId: "p-4f3a9b"
                   answer: "DE"
       responses:
-        '200':
+        "200":
           description: Answer recorded.
-        '404':
+        "404":
           description: Session not found.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/session-not-found"
                 title: "Session Not Found"
                 status: 404
                 detail: "No session found with ID s-7c2d1e."
-        '409':
+        "409":
           description: Voting is already closed for this question.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/voting-closed"
                 title: "Voting Closed"
@@ -420,14 +419,14 @@ paths:
         A `question-scored` event is broadcast immediately, revealing all player
         answers and the correct answer to all connected clients simultaneously.
       parameters:
-        - $ref: '#/components/parameters/SessionId'
-        - $ref: '#/components/parameters/Question'
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/Question"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SetCorrectAnswerRequest'
+              $ref: "#/components/schemas/SetCorrectAnswerRequest"
             examples:
               q1Correct:
                 summary: Q1 correct answer
@@ -440,40 +439,40 @@ paths:
                   hostId: "p-4f3a9b"
                   correctAnswer: "DE"
       responses:
-        '200':
+        "200":
           description: Correct answer set, voting closed, scores updated.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SessionResponse'
-        '403':
+                $ref: "#/components/schemas/SessionResponse"
+        "403":
           description: Caller is not the host.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/not-the-host"
                 title: "Forbidden"
                 status: 403
                 detail: "Only the host may set the correct answer."
-        '404':
+        "404":
           description: Session not found.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/session-not-found"
                 title: "Session Not Found"
                 status: 404
                 detail: "No session found with ID s-7c2d1e."
-        '409':
+        "409":
           description: Correct answer already set for this question.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/answer-already-set"
                 title: "Answer Already Set"
@@ -496,14 +495,14 @@ paths:
 
         Only available once the session has Ended.
       parameters:
-        - $ref: '#/components/parameters/SessionId'
+        - $ref: "#/components/parameters/SessionId"
       responses:
-        '200':
+        "200":
           description: Session results.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SessionResultsResponse'
+                $ref: "#/components/schemas/SessionResultsResponse"
               example:
                 sessionId: "s-7c2d1e"
                 date: "2026-05-25"
@@ -518,23 +517,23 @@ paths:
                     q1Correct: true
                     q2Correct: true
                     totalPoints: 2
-        '404':
+        "404":
           description: Session not found.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/session-not-found"
                 title: "Session Not Found"
                 status: 404
                 detail: "No session found with ID s-7c2d1e."
-        '409':
+        "409":
           description: Session has not ended yet.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/session-not-ended"
                 title: "Session Not Ended"
@@ -554,12 +553,12 @@ paths:
         when each correct answer is set. It is available at any time — not only
         at the end of a session.
       responses:
-        '200':
+        "200":
           description: Project leaderboard.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LeaderboardResponse'
+                $ref: "#/components/schemas/LeaderboardResponse"
               example:
                 projectId: "default"
                 entries:
@@ -611,20 +610,20 @@ paths:
         On reconnect, call `GET /sessions/{id}` first to recover full current
         state, then re-subscribe here to receive subsequent changes.
       parameters:
-        - $ref: '#/components/parameters/SessionId'
+        - $ref: "#/components/parameters/SessionId"
       responses:
-        '200':
+        "200":
           description: Event stream. Connection stays open until the session ends.
           content:
             text/event-stream:
               schema:
-                $ref: '#/components/schemas/SessionEvent'
-        '404':
+                $ref: "#/components/schemas/SessionEvent"
+        "404":
           description: Session not found.
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: "#/components/schemas/ProblemDetail"
               example:
                 type: "/problems/session-not-found"
                 title: "Session Not Found"
@@ -636,9 +635,7 @@ paths:
 # =============================================================================
 
 components:
-
   parameters:
-
     SessionId:
       name: sessionId
       in: path
@@ -658,7 +655,6 @@ components:
         enum: [q1, q2]
 
   schemas:
-
     # -------------------------------------------------------------------------
     # Players
     # -------------------------------------------------------------------------
@@ -725,7 +721,8 @@ components:
 
     SessionResponse:
       type: object
-      required: [sessionId, projectId, date, phase, hostId, players, photos, voting]
+      required:
+        [sessionId, projectId, date, phase, hostId, players, photos, voting]
       description: Full session document. Returned by all session state-changing endpoints.
       properties:
         sessionId:
@@ -757,11 +754,11 @@ components:
           type: array
           description: All players who have joined the session, including the host.
           items:
-            $ref: '#/components/schemas/SessionPlayer'
+            $ref: "#/components/schemas/SessionPlayer"
         photos:
-          $ref: '#/components/schemas/SessionPhotos'
+          $ref: "#/components/schemas/SessionPhotos"
         voting:
-          $ref: '#/components/schemas/VotingState'
+          $ref: "#/components/schemas/VotingState"
 
     SessionPlayer:
       type: object
@@ -793,9 +790,9 @@ components:
       required: [q1, q2]
       properties:
         q1:
-          $ref: '#/components/schemas/QuestionVoting'
+          $ref: "#/components/schemas/QuestionVoting"
         q2:
-          $ref: '#/components/schemas/QuestionVoting'
+          $ref: "#/components/schemas/QuestionVoting"
 
     QuestionVoting:
       type: object
@@ -820,7 +817,7 @@ components:
             Map of playerId → PlayerAnswer. Hidden from non-host clients while
             voting is Open. Revealed to all once the correct answer is set.
           additionalProperties:
-            $ref: '#/components/schemas/PlayerAnswer'
+            $ref: "#/components/schemas/PlayerAnswer"
 
     PlayerAnswer:
       type: object
@@ -887,7 +884,7 @@ components:
           type: array
           description: One entry per player. Correctness derived at read time from stored answers vs correct answers.
           items:
-            $ref: '#/components/schemas/PlayerResult'
+            $ref: "#/components/schemas/PlayerResult"
 
     PlayerResult:
       type: object
@@ -925,7 +922,7 @@ components:
           type: array
           description: All players who have participated in at least one session, ordered by totalPoints descending.
           items:
-            $ref: '#/components/schemas/LeaderboardEntry'
+            $ref: "#/components/schemas/LeaderboardEntry"
 
     LeaderboardEntry:
       type: object
@@ -962,17 +959,17 @@ components:
       discriminator:
         propertyName: event
         mapping:
-          player-joined: '#/components/schemas/PlayerJoinedEvent'
-          session-started: '#/components/schemas/SessionStartedEvent'
-          answer-count-updated: '#/components/schemas/AnswerCountUpdatedEvent'
-          question-scored: '#/components/schemas/QuestionScoredEvent'
-          session-ended: '#/components/schemas/SessionEndedEvent'
+          player-joined: "#/components/schemas/PlayerJoinedEvent"
+          session-started: "#/components/schemas/SessionStartedEvent"
+          answer-count-updated: "#/components/schemas/AnswerCountUpdatedEvent"
+          question-scored: "#/components/schemas/QuestionScoredEvent"
+          session-ended: "#/components/schemas/SessionEndedEvent"
       oneOf:
-        - $ref: '#/components/schemas/PlayerJoinedEvent'
-        - $ref: '#/components/schemas/SessionStartedEvent'
-        - $ref: '#/components/schemas/AnswerCountUpdatedEvent'
-        - $ref: '#/components/schemas/QuestionScoredEvent'
-        - $ref: '#/components/schemas/SessionEndedEvent'
+        - $ref: "#/components/schemas/PlayerJoinedEvent"
+        - $ref: "#/components/schemas/SessionStartedEvent"
+        - $ref: "#/components/schemas/AnswerCountUpdatedEvent"
+        - $ref: "#/components/schemas/QuestionScoredEvent"
+        - $ref: "#/components/schemas/SessionEndedEvent"
 
     PlayerJoinedEvent:
       description: A player joined the lobby. Broadcast to all clients so the player list updates live.
@@ -1071,7 +1068,7 @@ components:
               type: object
               description: Map of playerId → PlayerAnswer. All answers now visible to all clients.
               additionalProperties:
-                $ref: '#/components/schemas/PlayerAnswer'
+                $ref: "#/components/schemas/PlayerAnswer"
       example:
         event: "question-scored"
         data:
