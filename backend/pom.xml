@@ -206,6 +206,17 @@
 						</configuration>
 					</execution>
 				</executions>
+				<!-- openapi-generator 7.x ships caffeine 2.9.3, which calls
+				     sun.misc.Unsafe::objectFieldOffset — a terminally deprecated JVM API.
+				     Spring Boot manages caffeine at a newer version; pin it here so the
+				     plugin classpath gets the same upgrade. -->
+				<dependencies>
+					<dependency>
+						<groupId>com.github.ben-manes.caffeine</groupId>
+						<artifactId>caffeine</artifactId>
+						<version>${caffeine.version}</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 			<!-- ByteBuddy (Mockito) loads its agent dynamically on Java 21+, which
 			     triggers two JVM warnings without these flags:
