@@ -5,7 +5,9 @@ import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import java.time.LocalDate;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 
+@Service
 public class JoinSessionUseCase {
 
     private final SessionRepository sessionRepository;
