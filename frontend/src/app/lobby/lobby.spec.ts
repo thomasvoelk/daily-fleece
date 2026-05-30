@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
-import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Lobby } from './lobby';
+import { provideTestEnvironment } from '../../testing/providers';
 import { SessionResponse } from '../api/models';
 
 // localStorage polyfill — the Node test environment doesn't provide it
@@ -45,7 +45,7 @@ function makeSession(sessionId: string, players: SessionResponse['players'] = []
   };
 }
 
-const PROVIDERS = [provideHttpClient(), provideHttpClientTesting()];
+const PROVIDERS = provideTestEnvironment();
 
 // ─── tests ───────────────────────────────────────────────────────────────────
 
@@ -69,12 +69,10 @@ describe('Lobby – happy-path join', () => {
     await user.type(screen.getByRole('textbox', { name: /display name/i }), 'Alice');
     await user.click(screen.getByRole('button', { name: /join/i }));
 
-    http
-      .expectOne('/api/v1/players')
-      .flush({
-        playerId: 'p1',
-        displayName: 'Alice',
-      } satisfies import('../api/models').PlayerResponse);
+    http.expectOne('/api/v1/players').flush({
+      playerId: 'p1',
+      displayName: 'Alice',
+    } satisfies import('../api/models').PlayerResponse);
     await drainMicrotasks();
 
     http.expectOne('/api/v1/sessions/today').flush(makeSession('s1'));
@@ -99,12 +97,10 @@ describe('Lobby – 409 session already in progress', () => {
     await user.type(screen.getByRole('textbox', { name: /display name/i }), 'Alice');
     await user.click(screen.getByRole('button', { name: /join/i }));
 
-    http
-      .expectOne('/api/v1/players')
-      .flush({
-        playerId: 'p1',
-        displayName: 'Alice',
-      } satisfies import('../api/models').PlayerResponse);
+    http.expectOne('/api/v1/players').flush({
+      playerId: 'p1',
+      displayName: 'Alice',
+    } satisfies import('../api/models').PlayerResponse);
     await drainMicrotasks();
 
     http.expectOne('/api/v1/sessions/today').flush(makeSession('s1'));
@@ -130,12 +126,10 @@ describe('Lobby – refresh', () => {
     await user.type(screen.getByRole('textbox', { name: /display name/i }), 'Alice');
     await user.click(screen.getByRole('button', { name: /join/i }));
 
-    http
-      .expectOne('/api/v1/players')
-      .flush({
-        playerId: 'p1',
-        displayName: 'Alice',
-      } satisfies import('../api/models').PlayerResponse);
+    http.expectOne('/api/v1/players').flush({
+      playerId: 'p1',
+      displayName: 'Alice',
+    } satisfies import('../api/models').PlayerResponse);
     await drainMicrotasks();
     http.expectOne('/api/v1/sessions/today').flush(makeSession('s1'));
     await drainMicrotasks();
