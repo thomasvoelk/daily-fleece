@@ -33,4 +33,7 @@ so `/api/v1` is equivalent to `/api/1.0.0`.
   in the class are covered by one annotation.
 - `openapi.yaml` servers block reflects the versioned base path; when v2 is needed a
   second spec is added and both generators run twice into separate packages/output folders.
-- Unsupported or missing versions are rejected by Spring with 400.
+- Unsupported versions (e.g. `/api/v2/...` when only v1 is registered) are rejected
+  by Spring with 400. Missing versions (e.g. `/api/sessions/today`) return 404 because
+  the URL never matches any handler pattern — Spring's version error only fires after a
+  handler is found, which requires the version segment to be present.

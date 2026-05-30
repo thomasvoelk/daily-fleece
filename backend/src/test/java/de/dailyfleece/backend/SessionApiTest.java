@@ -103,6 +103,32 @@ class SessionApiTest {
     }
 
     @Test
+    void getTodaySession_unknown_api_version_returns_400() {
+        RestClient badVersion = RestClient.builder()
+                .baseUrl("http://localhost:" + port + "/api/v2")
+                .defaultStatusHandler(status -> true, (req, res) -> {})
+                .build();
+
+        ResponseEntity<Map<String, Object>> response =
+                badVersion.get().uri("/sessions/today").retrieve().toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void getTodaySession_missing_api_version_returns_404() {
+        RestClient noVersion = RestClient.builder()
+                .baseUrl("http://localhost:" + port + "/api")
+                .defaultStatusHandler(status -> true, (req, res) -> {})
+                .build();
+
+        ResponseEntity<Map<String, Object>> response =
+                noVersion.get().uri("/sessions/today").retrieve().toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     void joinSession_active_session_returns_409() {
         Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID);
         session.start();
