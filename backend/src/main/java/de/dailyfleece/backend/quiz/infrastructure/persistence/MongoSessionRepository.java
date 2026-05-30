@@ -33,7 +33,7 @@ class MongoSessionRepository implements SessionRepository {
 
     @Override
     public Optional<Session> findByDate(LocalDate date) {
-        Query query = Query.query(Criteria.where("date").is(date.toString()));
+        Query query = Query.query(Criteria.where("date").is(date));
         @Nullable SessionDocument doc = mongoTemplate.findOne(query, SessionDocument.class);
         return Optional.ofNullable(doc).map(SessionDocument::toDomain);
     }
