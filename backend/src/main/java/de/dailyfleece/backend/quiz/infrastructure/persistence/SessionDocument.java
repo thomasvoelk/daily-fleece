@@ -8,15 +8,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "sessions")
-record SessionDocument(
-        @Id String sessionId,
-        @Indexed(unique = true) LocalDate date,
-        String phase,
-        List<SessionPlayerDocument> players) {
+record SessionDocument(@Id String sessionId, LocalDate date, String phase, List<SessionPlayerDocument> players) {
 
     static SessionDocument fromDomain(Session session) {
         List<SessionPlayerDocument> players = session.players().stream()
