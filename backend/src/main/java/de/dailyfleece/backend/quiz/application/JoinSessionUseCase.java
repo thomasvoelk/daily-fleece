@@ -3,7 +3,6 @@ package de.dailyfleece.backend.quiz.application;
 import de.dailyfleece.backend.player.api.DisplayName;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
-import java.time.LocalDate;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +17,12 @@ public class JoinSessionUseCase {
     }
 
     /**
-     * Adds the Player to the Session Lobby for the given date. Throws {@link
-     * NoSessionForDate} if no Session exists for that date.
+     * Adds the Player to the Session Lobby identified by session ID. Throws {@link SessionNotFound}
+     * if no Session exists with that ID, or {@link
+     * de.dailyfleece.backend.quiz.domain.LobbyClosed} if the session is no longer in Lobby phase.
      */
-    public Session join(LocalDate date, UUID playerId, DisplayName displayName) {
-        Session session = sessionRepository.findByDate(date).orElseThrow(() -> new NoSessionForDate(date));
+    public Session join(UUID sessionId, UUID playerId, DisplayName displayName) {
+        Session session = sessionRepository.findById(sessionId).orElseThrow(() -> new SessionNotFound(sessionId));
         session.join(playerId, displayName);
         sessionRepository.save(session);
         return session;

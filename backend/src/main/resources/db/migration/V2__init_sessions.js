@@ -3,7 +3,7 @@ if (!db.getCollectionNames().includes("sessions")) {
         validator: {
             $jsonSchema: {
                 bsonType: "object",
-                required: ["_id", "date", "phase", "players"],
+                required: ["_id", "date", "phase", "players", "hostId"],
                 additionalProperties: false,
                 properties: {
                     _id: {
@@ -16,6 +16,10 @@ if (!db.getCollectionNames().includes("sessions")) {
                     phase: {
                         bsonType: "string",
                         enum: ["LOBBY", "ACTIVE", "ENDED"]
+                    },
+                    hostId: {
+                        bsonType: "string",
+                        pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
                     },
                     players: {
                         bsonType: "array",

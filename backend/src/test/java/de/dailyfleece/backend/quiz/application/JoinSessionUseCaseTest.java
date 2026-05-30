@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Import;
 @Import(TestcontainersConfiguration.class)
 class JoinSessionUseCaseTest {
 
+    private static final UUID HOST_ID = UUID.fromString("00000000-0000-0000-0000-000000000099");
     private static final UUID PLAYER_1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
     @Autowired
@@ -29,30 +30,29 @@ class JoinSessionUseCaseTest {
 
     @Test
     void join_adds_player_to_lobby_session() {
-        LocalDate date = LocalDate.of(2098, 1, 1);
-        sessionRepository.save(Session.create(date));
+        Session session = Session.create(LocalDate.of(2098, 1, 1), HOST_ID);
+        sessionRepository.save(session);
 
-        useCase.join(date, PLAYER_1, new DisplayName("Thomas"));
+        useCase.join(session.sessionId(), PLAYER_1, new DisplayName("Thomas"));
 
-        Session updated = sessionRepository.findByDate(date).orElseThrow();
+        Session updated = sessionRepository.findById(session.sessionId()).orElseThrow();
         assertThat(updated.players()).hasSize(1);
         assertThat(updated.players().get(0).displayName()).isEqualTo(new DisplayName("Thomas"));
     }
 
     @Test
-    void join_throws_when_no_session_exists_for_date() {
-        assertThatThrownBy(() -> useCase.join(LocalDate.of(2098, 1, 2), PLAYER_1, new DisplayName("Thomas")))
-                .isInstanceOf(NoSessionForDate.class);
+    void join_throws_when_session_id_unknown() {
+        assertThatThrownBy(() -> useCase.join(UUID.randomUUID(), PLAYER_1, new DisplayName("Thomas")))
+                .isInstanceOf(SessionNotFound.class);
     }
 
     @Test
     void join_propagates_domain_exception_when_session_not_in_lobby() {
-        LocalDate date = LocalDate.of(2098, 1, 3);
-        Session session = Session.create(date);
+        Session session = Session.create(LocalDate.of(2098, 1, 3), HOST_ID);
         session.start();
         sessionRepository.save(session);
 
-        assertThatThrownBy(() -> useCase.join(date, PLAYER_1, new DisplayName("Thomas")))
+        assertThatThrownBy(() -> useCase.join(session.sessionId(), PLAYER_1, new DisplayName("Thomas")))
                 .isInstanceOf(LobbyClosed.class);
     }
 }

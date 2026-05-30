@@ -11,7 +11,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "sessions")
-record SessionDocument(@Id String sessionId, LocalDate date, String phase, List<SessionPlayerDocument> players) {
+record SessionDocument(
+        @Id String sessionId, LocalDate date, String phase, List<SessionPlayerDocument> players, String hostId) {
 
     static SessionDocument fromDomain(Session session) {
         List<SessionPlayerDocument> players = session.players().stream()
@@ -19,13 +20,18 @@ record SessionDocument(@Id String sessionId, LocalDate date, String phase, List<
                         p.playerId().toString(), p.displayName().value()))
                 .toList();
         return new SessionDocument(
-                session.sessionId().toString(), session.date(), session.phase().name(), players);
+                session.sessionId().toString(),
+                session.date(),
+                session.phase().name(),
+                players,
+                session.hostId().toString());
     }
 
     Session toDomain() {
         List<SessionPlayer> domainPlayers = players.stream()
                 .map(p -> new SessionPlayer(UUID.fromString(p.playerId()), new DisplayName(p.displayName())))
                 .toList();
-        return Session.reconstitute(UUID.fromString(sessionId), date, SessionPhase.valueOf(phase), domainPlayers);
+        return Session.reconstitute(
+                UUID.fromString(sessionId), date, SessionPhase.valueOf(phase), domainPlayers, UUID.fromString(hostId));
     }
 }

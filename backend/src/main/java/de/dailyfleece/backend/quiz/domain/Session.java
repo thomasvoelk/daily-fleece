@@ -15,23 +15,32 @@ public final class Session {
 
     private final UUID sessionId;
     private final LocalDate date;
+
+    /**
+     * Identity reference to the Player who created this Session. Stored as a UUID to avoid
+     * embedding a Player object inside this aggregate; cross-aggregate navigation goes via the
+     * player module's repository.
+     */
+    private final UUID hostId;
+
     private SessionPhase phase;
     private final List<SessionPlayer> players;
 
-    private Session(UUID sessionId, LocalDate date) {
+    private Session(UUID sessionId, LocalDate date, UUID hostId) {
         this.sessionId = sessionId;
         this.date = date;
+        this.hostId = hostId;
         this.phase = SessionPhase.LOBBY;
         this.players = new ArrayList<>();
     }
 
-    public static Session create(LocalDate date) {
-        return new Session(UUID.randomUUID(), date);
+    public static Session create(LocalDate date, UUID hostId) {
+        return new Session(UUID.randomUUID(), date, hostId);
     }
 
     public static Session reconstitute(
-            UUID sessionId, LocalDate date, SessionPhase phase, List<SessionPlayer> players) {
-        Session session = new Session(sessionId, date);
+            UUID sessionId, LocalDate date, SessionPhase phase, List<SessionPlayer> players, UUID hostId) {
+        Session session = new Session(sessionId, date, hostId);
         session.phase = phase;
         session.players.addAll(players);
         return session;
@@ -58,6 +67,15 @@ public final class Session {
 
     public LocalDate date() {
         return date;
+    }
+
+    /**
+     * Returns the identity reference to the Player who created this Session.
+     *
+     * @see #hostId field for full explanation
+     */
+    public UUID hostId() {
+        return hostId;
     }
 
     public SessionPhase phase() {

@@ -80,7 +80,8 @@ class MongoSchemaTest {
         return new Document("_id", uuid())
                 .append("date", Instant.now())
                 .append("phase", "LOBBY")
-                .append("players", List.of());
+                .append("players", List.of())
+                .append("hostId", uuid());
     }
 
     private static String uuid() {
