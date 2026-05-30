@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "lint": "eslint src/",
+    "start": "NODE_OPTIONS=\"--throw-deprecation --require ./scripts/deprecation-filter.cjs\" ng serve",
+    "build": "NODE_OPTIONS=\"--throw-deprecation --require ./scripts/deprecation-filter.cjs\" ng build && npm run lint",
+    "watch": "NODE_OPTIONS=\"--throw-deprecation --require ./scripts/deprecation-filter.cjs\" ng build --watch --configuration development",
+    "test": "NODE_OPTIONS=\"--throw-deprecation --require ./scripts/deprecation-filter.cjs\" ng test",
+    "lint": "eslint src/ --max-warnings=0",
     "generate:api": "ng-openapi-gen"
   },
   "private": true,
