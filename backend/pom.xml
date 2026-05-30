@@ -35,6 +35,7 @@
 		<archunit.version>1.4.2</archunit.version>
 		<openapi-generator.version>7.22.0</openapi-generator.version>
 		<spotless.version>3.6.0</spotless.version>
+		<checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
 		<palantir-java-format.version>2.91.0</palantir-java-format.version>
 	</properties>
 	<dependencies>
@@ -245,6 +246,26 @@
 							<type>XML</type>
 						</eclipseWtp>
 					</xml>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${checkstyle.plugin.version}</version>
+				<executions>
+					<execution>
+						<id>checkstyle</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<configLocation>${project.basedir}/checkstyle.xml</configLocation>
+					<suppressionsLocation>${project.basedir}/checkstyle-suppressions.xml</suppressionsLocation>
+					<failsOnError>true</failsOnError>
+					<includeTestSourceDirectory>false</includeTestSourceDirectory>
 				</configuration>
 			</plugin>
 			<plugin>

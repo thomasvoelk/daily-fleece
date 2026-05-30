@@ -6,6 +6,7 @@ import de.dailyfleece.backend.player.domain.Player;
 import de.dailyfleece.backend.player.domain.PlayerRepository;
 import org.springframework.stereotype.Service;
 
+/** Registers a new Player or recovers an existing one by Company ID. */
 @Service
 public class RegisterPlayerUseCase {
 
@@ -15,6 +16,10 @@ public class RegisterPlayerUseCase {
         this.playerRepository = playerRepository;
     }
 
+    /**
+     * Finds the Player with the given Company ID, or creates and persists a new one. Idempotent —
+     * safe to call on every login.
+     */
     public Player register(CompanyId companyId, DisplayName displayName) {
         return playerRepository.getOrCreate(companyId, displayName);
     }

@@ -5,6 +5,7 @@ import de.dailyfleece.backend.player.api.DisplayName;
 import java.util.Optional;
 import java.util.UUID;
 
+/** Port for persisting and retrieving Players. */
 public interface PlayerRepository {
 
     Player getOrCreate(CompanyId companyId, DisplayName displayName);

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
+/** Port for persisting and retrieving Sessions. */
 public interface SessionRepository {
 
     void save(Session session);

@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
+/** Admits a Player to the Lobby of an existing Session. */
 @Service
 public class JoinSessionUseCase {
 
@@ -16,6 +17,10 @@ public class JoinSessionUseCase {
         this.sessionRepository = sessionRepository;
     }
 
+    /**
+     * Adds the Player to the Session Lobby for the given date. Throws {@link
+     * NoSessionForDateException} if no Session exists for that date.
+     */
     public Session join(LocalDate date, UUID playerId, DisplayName displayName) {
         Session session = sessionRepository.findByDate(date).orElseThrow(() -> new NoSessionForDateException(date));
         session.join(playerId, displayName);

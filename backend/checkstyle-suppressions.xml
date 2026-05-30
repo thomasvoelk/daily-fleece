@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+<suppressions>
+    <!-- Generated sources are not under our control -->
+    <suppress checks="MissingJavadoc.*" files="generated-sources"/>
+    <!-- Javadoc is required in api, domain (type-level), and application (type + method) -->
+    <suppress checks="MissingJavadoc.*" files="[/\\]infrastructure[/\\]"/>
+    <suppress checks="MissingJavadoc.*" files="package-info\.java"/>
+    <!-- Infrastructure/config classes in the backend root package -->
+    <suppress checks="MissingJavadoc.*" files="[/\\]backend[/\\][^/\\]+\.java$"/>
+    <!-- Module root packages (player, quiz) -->
+    <suppress checks="MissingJavadoc.*" files="[/\\](player|quiz)[/\\][^/\\]+\.java$"/>
+    <!-- api and domain need only class-level doc, not method-level -->
+    <suppress checks="MissingJavadocMethod" files="[/\\]api[/\\]"/>
+    <suppress checks="MissingJavadocMethod" files="[/\\]domain[/\\]"/>
+</suppressions>

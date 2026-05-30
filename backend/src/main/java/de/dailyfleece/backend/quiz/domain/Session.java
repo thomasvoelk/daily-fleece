@@ -7,6 +7,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * The Session aggregate. Owns the quiz lifecycle from Lobby through Active to Ended, and maintains
+ * the list of Players who joined before the Session started.
+ */
 public final class Session {
 
     private final UUID sessionId;
