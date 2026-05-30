@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="lobby.joinHeading" datatype="html">
+        <source>Join Today&apos;s Session</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
+          <context context-type="linenumber">8,11</context>
+        </context-group>
+        <note priority="1" from="description">Heading shown before the player has joined</note>
+        <note priority="1" from="meaning">lobby</note>
+      </trans-unit>
+      <trans-unit id="lobby.companyIdLabel" datatype="html">
+        <source>Company ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
+          <context context-type="linenumber">11,14</context>
+        </context-group>
+        <note priority="1" from="description">Label for the company ID input</note>
+        <note priority="1" from="meaning">lobby</note>
+      </trans-unit>
+      <trans-unit id="lobby.companyIdRequired" datatype="html">
+        <source>Required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
+          <context context-type="linenumber">20,25</context>
+        </context-group>
+        <note priority="1" from="description">Validation error when Company ID is empty</note>
+        <note priority="1" from="meaning">lobby</note>
+      </trans-unit>
+      <trans-unit id="lobby.displayNameLabel" datatype="html">
+        <source>Display name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
+          <context context-type="linenumber">25,28</context>
+        </context-group>
+        <note priority="1" from="description">Label for the display name input</note>
+        <note priority="1" from="meaning">lobby</note>
+      </trans-unit>
+      <trans-unit id="lobby.displayNameRequired" datatype="html">
+        <source>Required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
+          <context context-type="linenumber">34,36</context>
+        </context-group>
+        <note priority="1" from="description">Validation error when Display name is empty</note>
+        <note priority="1" from="meaning">lobby</note>
+      </trans-unit>
+      <trans-unit id="lobby.displayNameTooLong" datatype="html">
+        <source>Maximum 20 characters</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
+          <context context-type="linenumber">36,42</context>
+        </context-group>
+        <note priority="1" from="description">Validation error when Display name exceeds 20 characters</note>
+        <note priority="1" from="meaning">lobby</note>
+      </trans-unit>
+      <trans-unit id="lobby.joinButton" datatype="html">
+        <source> Join </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
+          <context context-type="linenumber">46,51</context>
+        </context-group>
+        <note priority="1" from="description">Button to submit the join form</note>
+        <note priority="1" from="meaning">lobby</note>
+      </trans-unit>
+      <trans-unit id="lobby.sessionInProgressAlert" datatype="html">
+        <source>Session is already in progress</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
+          <context context-type="linenumber">52,57</context>
+        </context-group>
+        <note priority="1" from="description">Error shown when a session is already running</note>
+        <note priority="1" from="meaning">lobby</note>
+      </trans-unit>
+      <trans-unit id="lobby.sessionHeading" datatype="html">
+        <source>Today&apos;s Session</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
+          <context context-type="linenumber">57,60</context>
+        </context-group>
+        <note priority="1" from="description">Heading shown after the player has joined</note>
+        <note priority="1" from="meaning">lobby</note>
+      </trans-unit>
+      <trans-unit id="lobby.playerListAriaLabel" datatype="html">
+        <source>Players in session</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
+          <context context-type="linenumber">61,63</context>
+        </context-group>
+        <note priority="1" from="description">Accessible label for the player list</note>
+        <note priority="1" from="meaning">lobby</note>
+      </trans-unit>
+      <trans-unit id="lobby.refreshButton" datatype="html">
+        <source>Refresh</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
+          <context context-type="linenumber">67,71</context>
+        </context-group>
+        <note priority="1" from="description">Button to reload the player list</note>
+        <note priority="1" from="meaning">lobby</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

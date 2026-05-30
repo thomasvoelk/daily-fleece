@@ -3,23 +3,73 @@
     <form
       class="flex flex-col gap-4 max-w-sm mx-auto mt-8"
       (submit)="onJoin(); $event.preventDefault()"
+      novalidate
     >
-      <h1 class="text-xl font-bold">Join Today's Session</h1>
+      <h1
+        class="text-xl font-bold"
+        i18n="lobby|Heading shown before the player has joined@@lobby.joinHeading"
+      >
+        Join Today's Session
+      </h1>
 
-      <label class="flex flex-col gap-1">
-        Company ID
-        <input [formField]="joinForm.companyId" class="border rounded px-3 py-2" />
-      </label>
+      <div class="flex flex-col gap-1">
+        <label for="companyId" i18n="lobby|Label for the company ID input@@lobby.companyIdLabel"
+          >Company ID</label
+        >
+        <input
+          id="companyId"
+          [formField]="joinForm.companyId"
+          class="border rounded px-3 py-2"
+          [attr.aria-describedby]="companyIdError() ? 'companyId-error' : null"
+          [attr.aria-invalid]="companyIdError() ? 'true' : null"
+        />
+        @if (companyIdError()) {
+          <span
+            id="companyId-error"
+            class="text-sm text-red-600"
+            i18n="lobby|Validation error when Company ID is empty@@lobby.companyIdRequired"
+            >Required</span
+          >
+        }
+      </div>
 
-      <label class="flex flex-col gap-1">
-        Display name
-        <input [formField]="joinForm.displayName" class="border rounded px-3 py-2" />
-      </label>
+      <div class="flex flex-col gap-1">
+        <label
+          for="displayName"
+          i18n="lobby|Label for the display name input@@lobby.displayNameLabel"
+          >Display name</label
+        >
+        <input
+          id="displayName"
+          [formField]="joinForm.displayName"
+          class="border rounded px-3 py-2"
+          [attr.aria-describedby]="displayNameError() ? 'displayName-error' : null"
+          [attr.aria-invalid]="displayNameError() ? 'true' : null"
+        />
+        @if (displayNameError() === 'required') {
+          <span
+            id="displayName-error"
+            class="text-sm text-red-600"
+            i18n="lobby|Validation error when Display name is empty@@lobby.displayNameRequired"
+            >Required</span
+          >
+        } @else if (displayNameError() === 'maxLength') {
+          <span
+            id="displayName-error"
+            class="text-sm text-red-600"
+            i18n="
+              lobby|Validation error when Display name exceeds 20
+              characters@@lobby.displayNameTooLong"
+            >Maximum 20 characters</span
+          >
+        }
+      </div>
 
       <button
         type="submit"
         [disabled]="store.phase() === 'loading'"
         class="bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-50"
+        i18n="lobby|Button to submit the join form@@lobby.joinButton"
       >
         Join
       </button>
@@ -27,18 +77,39 @@
   }
 
   @if (store.phase() === 'inProgress') {
-    <p class="text-center mt-8 text-red-600" role="alert">Session is already in progress</p>
+    <p
+      class="text-center mt-8 text-red-600"
+      role="alert"
+      i18n="lobby|Error shown when a session is already running@@lobby.sessionInProgressAlert"
+    >
+      Session is already in progress
+    </p>
   }
 
   @if (store.phase() === 'joined') {
     <div class="max-w-sm mx-auto mt-8">
-      <h1 class="text-xl font-bold mb-4">Today's Session</h1>
-      <ul class="divide-y" aria-label="Players in session">
+      <h1
+        class="text-xl font-bold mb-4"
+        i18n="lobby|Heading shown after the player has joined@@lobby.sessionHeading"
+      >
+        Today's Session
+      </h1>
+      <ul
+        class="divide-y"
+        i18n-aria-label="lobby|Accessible label for the player list@@lobby.playerListAriaLabel"
+        aria-label="Players in session"
+      >
         @for (player of store.session()!.players; track player.playerId) {
           <li class="py-2">{{ player.displayName }}</li>
         }
       </ul>
-      <button (click)="store.refresh()" class="mt-4 border rounded px-4 py-2">Refresh</button>
+      <button
+        (click)="store.refresh()"
+        class="mt-4 border rounded px-4 py-2"
+        i18n="lobby|Button to reload the player list@@lobby.refreshButton"
+      >
+        Refresh
+      </button>
     </div>
   }
 </main>
