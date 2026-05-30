@@ -1,5 +1,6 @@
 package de.dailyfleece.backend;
 
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.library.Architectures.onionArchitecture;
 
 import com.tngtech.archunit.core.importer.ImportOption;
@@ -17,4 +18,12 @@ class ArchitectureTest {
             .adapter("web", "..infrastructure.web..")
             .adapter("persistence", "..infrastructure.persistence..")
             .withOptionalLayers(true);
+
+    @ArchTest
+    static final ArchRule noExceptionSuffix = classes()
+            .that()
+            .areAssignableTo(Throwable.class)
+            .should()
+            .haveSimpleNameNotEndingWith("Exception")
+            .because("exception class names should not redundantly end in 'Exception'");
 }

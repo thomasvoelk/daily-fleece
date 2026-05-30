@@ -39,7 +39,7 @@ public final class Session {
 
     public void join(UUID playerId, DisplayName displayName) {
         if (phase != SessionPhase.LOBBY) {
-            throw new CannotJoinSessionException(sessionId, phase);
+            throw new LobbyClosed(sessionId, phase);
         }
         players.add(new SessionPlayer(playerId, displayName));
     }

@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import de.dailyfleece.backend.TestcontainersConfiguration;
 import de.dailyfleece.backend.player.api.DisplayName;
-import de.dailyfleece.backend.quiz.domain.CannotJoinSessionException;
+import de.dailyfleece.backend.quiz.domain.LobbyClosed;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import java.time.LocalDate;
@@ -42,7 +42,7 @@ class JoinSessionUseCaseTest {
     @Test
     void join_throws_when_no_session_exists_for_date() {
         assertThatThrownBy(() -> useCase.join(LocalDate.of(2098, 1, 2), PLAYER_1, new DisplayName("Thomas")))
-                .isInstanceOf(NoSessionForDateException.class);
+                .isInstanceOf(NoSessionForDate.class);
     }
 
     @Test
@@ -53,6 +53,6 @@ class JoinSessionUseCaseTest {
         sessionRepository.save(session);
 
         assertThatThrownBy(() -> useCase.join(date, PLAYER_1, new DisplayName("Thomas")))
-                .isInstanceOf(CannotJoinSessionException.class);
+                .isInstanceOf(LobbyClosed.class);
     }
 }

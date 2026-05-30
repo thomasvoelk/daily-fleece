@@ -55,7 +55,7 @@ class SessionTest {
         session.start();
 
         assertThatThrownBy(() -> session.join(PLAYER_1, new DisplayName("Thomas")))
-                .isInstanceOf(CannotJoinSessionException.class);
+                .isInstanceOf(LobbyClosed.class);
     }
 
     @Test
@@ -65,6 +65,6 @@ class SessionTest {
         session.end();
 
         assertThatThrownBy(() -> session.join(PLAYER_1, new DisplayName("Thomas")))
-                .isInstanceOf(CannotJoinSessionException.class);
+                .isInstanceOf(LobbyClosed.class);
     }
 }
