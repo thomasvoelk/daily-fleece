@@ -1,0 +1,44 @@
+<main class="min-h-screen p-4">
+  @if (store.phase() !== 'joined' && store.phase() !== 'inProgress') {
+    <form
+      class="flex flex-col gap-4 max-w-sm mx-auto mt-8"
+      (submit)="onJoin(); $event.preventDefault()"
+    >
+      <h1 class="text-xl font-bold">Join Today's Session</h1>
+
+      <label class="flex flex-col gap-1">
+        Company ID
+        <input [formField]="joinForm.companyId" class="border rounded px-3 py-2" />
+      </label>
+
+      <label class="flex flex-col gap-1">
+        Display name
+        <input [formField]="joinForm.displayName" class="border rounded px-3 py-2" />
+      </label>
+
+      <button
+        type="submit"
+        [disabled]="store.phase() === 'loading'"
+        class="bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-50"
+      >
+        Join
+      </button>
+    </form>
+  }
+
+  @if (store.phase() === 'inProgress') {
+    <p class="text-center mt-8 text-red-600" role="alert">Session is already in progress</p>
+  }
+
+  @if (store.phase() === 'joined') {
+    <div class="max-w-sm mx-auto mt-8">
+      <h1 class="text-xl font-bold mb-4">Today's Session</h1>
+      <ul class="divide-y" aria-label="Players in session">
+        @for (player of store.session()!.players; track player.playerId) {
+          <li class="py-2">{{ player.displayName }}</li>
+        }
+      </ul>
+      <button (click)="store.refresh()" class="mt-4 border rounded px-4 py-2">Refresh</button>
+    </div>
+  }
+</main>
