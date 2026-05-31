@@ -1,0 +1,64 @@
+<main class="min-h-screen p-4">
+  <form
+    class="flex flex-col gap-4 max-w-sm mx-auto mt-8"
+    (submit)="$event.preventDefault()"
+    novalidate
+  >
+    <h1 class="text-xl font-bold" i18n="entry|Heading on the entry screen@@entry.heading">
+      Daily Fleece
+    </h1>
+
+    <div class="flex flex-col gap-1">
+      <label for="companyId" i18n="entry|Label for the Company ID input@@entry.companyIdLabel"
+        >Company ID</label
+      >
+      <input
+        id="companyId"
+        [formField]="entryForm.companyId"
+        class="border rounded px-3 py-2"
+        [attr.aria-describedby]="companyIdInvalid() ? 'companyId-error' : null"
+        [attr.aria-invalid]="companyIdInvalid() ? 'true' : null"
+      />
+      <app-field-error id="companyId-error" [state]="entryForm.companyId()" />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="displayName" i18n="entry|Label for the Display name input@@entry.displayNameLabel"
+        >Display name</label
+      >
+      <input
+        id="displayName"
+        [formField]="entryForm.displayName"
+        class="border rounded px-3 py-2"
+        [attr.aria-describedby]="displayNameInvalid() ? 'displayName-error' : null"
+        [attr.aria-invalid]="displayNameInvalid() ? 'true' : null"
+      />
+      <app-field-error id="displayName-error" [state]="entryForm.displayName()" />
+    </div>
+
+    <p class="text-center text-red-600" role="alert" aria-live="assertive">
+      {{ store.phase() === 'error' ? store.errorMessage() : '' }}
+    </p>
+
+    <div class="flex gap-3">
+      <button
+        type="button"
+        (click)="onJoinLobby()"
+        [disabled]="store.phase() === 'loading'"
+        class="flex-1 bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-50"
+        i18n="entry|Button to join an existing lobby@@entry.joinLobbyButton"
+      >
+        Join Lobby
+      </button>
+      <button
+        type="button"
+        (click)="onCreateLobby()"
+        [disabled]="store.phase() === 'loading'"
+        class="flex-1 bg-green-600 text-white rounded px-4 py-2 disabled:opacity-50"
+        i18n="entry|Button to create a new lobby@@entry.createLobbyButton"
+      >
+        Create Lobby
+      </button>
+    </div>
+  </form>
+</main>
