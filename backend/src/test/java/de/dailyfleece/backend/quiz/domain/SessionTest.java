@@ -16,7 +16,7 @@ class SessionTest {
     private static final UUID PLAYER_1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private static final UUID PLAYER_2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
     private static final SessionPhotos PHOTOS =
-            new SessionPhotos("aaaaaaaaaaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbb");
+            new SessionPhotos(new PhotoId("aaaaaaaaaaaaaaaaaaaaaaaa"), new PhotoId("bbbbbbbbbbbbbbbbbbbbbbbb"));
 
     @Test
     void new_session_starts_in_lobby_phase() {

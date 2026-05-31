@@ -1,6 +1,7 @@
 package de.dailyfleece.backend.quiz.infrastructure.persistence;
 
 import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.quiz.domain.PhotoId;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionPhase;
 import de.dailyfleece.backend.quiz.domain.SessionPhotos;
@@ -18,7 +19,18 @@ record SessionDocument(
         String phase,
         List<SessionPlayerDocument> players,
         String hostId,
-        SessionPhotos photos) {
+        SessionPhotosDoc photos) {
+
+    record SessionPhotosDoc(String q1PhotoId, String q2PhotoId) {
+        static SessionPhotosDoc fromDomain(SessionPhotos photos) {
+            return new SessionPhotosDoc(
+                    photos.q1PhotoId().value(), photos.q2PhotoId().value());
+        }
+
+        SessionPhotos toDomain() {
+            return new SessionPhotos(new PhotoId(q1PhotoId), new PhotoId(q2PhotoId));
+        }
+    }
 
     static SessionDocument fromDomain(Session session) {
         List<SessionPlayerDocument> players = session.players().stream()
@@ -31,7 +43,7 @@ record SessionDocument(
                 session.phase().name(),
                 players,
                 session.hostId().toString(),
-                session.photos());
+                SessionPhotosDoc.fromDomain(session.photos()));
     }
 
     Session toDomain() {
@@ -44,6 +56,6 @@ record SessionDocument(
                 SessionPhase.valueOf(phase),
                 domainPlayers,
                 UUID.fromString(hostId),
-                photos);
+                photos.toDomain());
     }
 }

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import de.dailyfleece.backend.TestcontainersConfiguration;
 import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.domain.LobbyClosed;
+import de.dailyfleece.backend.quiz.domain.PhotoId;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionPhotos;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
@@ -23,7 +24,7 @@ class JoinSessionUseCaseTest {
     private static final UUID HOST_ID = UUID.fromString("00000000-0000-0000-0000-000000000099");
     private static final UUID PLAYER_1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private static final SessionPhotos PHOTOS =
-            new SessionPhotos("aaaaaaaaaaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbb");
+            new SessionPhotos(new PhotoId("aaaaaaaaaaaaaaaaaaaaaaaa"), new PhotoId("bbbbbbbbbbbbbbbbbbbbbbbb"));
 
     @Autowired
     private JoinSessionUseCase useCase;

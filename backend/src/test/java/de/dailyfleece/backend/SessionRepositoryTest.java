@@ -3,6 +3,7 @@ package de.dailyfleece.backend;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.quiz.domain.PhotoId;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionPhotos;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
@@ -22,7 +23,7 @@ class SessionRepositoryTest {
 
     private static final UUID HOST_ID = UUID.fromString("00000000-0000-0000-0000-000000000099");
     private static final SessionPhotos PHOTOS =
-            new SessionPhotos("aaaaaaaaaaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbb");
+            new SessionPhotos(new PhotoId("aaaaaaaaaaaaaaaaaaaaaaaa"), new PhotoId("bbbbbbbbbbbbbbbbbbbbbbbb"));
 
     @Test
     void save_and_findById_roundtrip() {
