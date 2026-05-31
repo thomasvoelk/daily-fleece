@@ -20,14 +20,8 @@
           id="companyId"
           [formField]="joinForm.companyId"
           class="border rounded px-3 py-2"
-          [attr.aria-describedby]="
-            joinForm.companyId().touched() && joinForm.companyId().invalid()
-              ? 'companyId-error'
-              : null
-          "
-          [attr.aria-invalid]="
-            joinForm.companyId().touched() && joinForm.companyId().invalid() ? 'true' : null
-          "
+          [attr.aria-describedby]="companyIdInvalid() ? 'companyId-error' : null"
+          [attr.aria-invalid]="companyIdInvalid() ? 'true' : null"
         />
         <app-field-error id="companyId-error" [state]="joinForm.companyId()" />
       </div>
@@ -42,14 +36,8 @@
           id="displayName"
           [formField]="joinForm.displayName"
           class="border rounded px-3 py-2"
-          [attr.aria-describedby]="
-            joinForm.displayName().touched() && joinForm.displayName().invalid()
-              ? 'displayName-error'
-              : null
-          "
-          [attr.aria-invalid]="
-            joinForm.displayName().touched() && joinForm.displayName().invalid() ? 'true' : null
-          "
+          [attr.aria-describedby]="displayNameInvalid() ? 'displayName-error' : null"
+          [attr.aria-invalid]="displayNameInvalid() ? 'true' : null"
         />
         <app-field-error id="displayName-error" [state]="joinForm.displayName()" />
       </div>
@@ -105,6 +93,11 @@
       >
         Refresh
       </button>
+      @if (store.refreshError()) {
+        <p class="mt-2 text-sm text-red-600" role="alert">
+          {{ store.refreshError() }}
+        </p>
+      }
     </div>
   }
 </main>

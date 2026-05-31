@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, linkedSignal } from '@angular/core';
 import { form, FormField, submit, required, maxLength } from '@angular/forms/signals';
 import { LobbyStore } from './lobby.store';
 import { FieldError } from '../shared/field-error';
@@ -8,15 +8,14 @@ import { FieldError } from '../shared/field-error';
   imports: [FormField, FieldError],
   templateUrl: './lobby.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: '',
 })
 export class Lobby {
   protected store = inject(LobbyStore);
 
-  private model = signal({
+  private model = linkedSignal(() => ({
     companyId: this.store.companyId() ?? '',
     displayName: this.store.displayName() ?? '',
-  });
+  }));
 
   protected joinForm = form(this.model, (s) => {
     required(s.companyId, {
@@ -29,6 +28,13 @@ export class Lobby {
       message: $localize`:lobby|Validation error when Display name exceeds 20 characters@@lobby.displayNameTooLong:Maximum 20 characters`,
     });
   });
+
+  protected companyIdInvalid = computed(
+    () => this.joinForm.companyId().touched() && this.joinForm.companyId().invalid(),
+  );
+  protected displayNameInvalid = computed(
+    () => this.joinForm.displayName().touched() && this.joinForm.displayName().invalid(),
+  );
 
   protected onJoin(): void {
     submit(this.joinForm, async () => {

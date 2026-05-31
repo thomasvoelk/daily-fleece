@@ -34,6 +34,10 @@
         <source> Refresh </source>
         <target> Aktualisieren </target>
       </trans-unit>
+      <trans-unit id="lobby.refreshError" datatype="html">
+        <source>Refresh failed. Please try again.</source>
+        <target>Aktualisierung fehlgeschlagen. Bitte erneut versuchen.</target>
+      </trans-unit>
       <trans-unit id="lobby.companyIdRequired" datatype="html">
         <source>Required</source>
         <target>Pflichtfeld</target>

@@ -5,7 +5,7 @@ import { FieldState } from '@angular/forms/signals';
   selector: 'app-field-error',
   template: `
     @if (state().touched() && state().invalid()) {
-      <span [id]="id()" class="text-sm text-red-600">{{ state().errors()[0].message }}</span>
+      <span [id]="id()" class="text-sm text-red-600">{{ state().errors()[0]?.message }}</span>
     }
   `,
   styles: ``,

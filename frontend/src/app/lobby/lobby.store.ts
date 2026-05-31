@@ -17,6 +17,7 @@ interface LobbyState {
   phase: LobbyPhase;
   session: SessionResponse | null;
   errorMessage: string | null;
+  refreshError: string | null;
 }
 
 export const LobbyStore = signalStore(
@@ -28,6 +29,7 @@ export const LobbyStore = signalStore(
     phase: 'idle',
     session: null,
     errorMessage: null,
+    refreshError: null,
   }),
   withStorageSync({
     key: 'lobby-player',
@@ -55,7 +57,10 @@ export const LobbyStore = signalStore(
 
           patchState(store, { phase: 'joined', session: updatedSession });
         } catch (err: unknown) {
-          if (err instanceof HttpErrorResponse && err.status === 409) {
+          if (
+            err instanceof HttpErrorResponse &&
+            (err.error as { type?: string })?.type === '/problems/session-already-active'
+          ) {
             patchState(store, { phase: 'inProgress' });
           } else {
             patchState(store, {
@@ -67,11 +72,14 @@ export const LobbyStore = signalStore(
       },
 
       async refresh(): Promise<void> {
+        patchState(store, { refreshError: null });
         try {
           const session = await api.invoke(getTodaySession);
           patchState(store, { session });
         } catch {
-          // silently ignore refresh errors
+          patchState(store, {
+            refreshError: $localize`:lobby|Error shown when the session refresh fails@@lobby.refreshError:Refresh failed. Please try again.`,
+          });
         }
       },
     };
