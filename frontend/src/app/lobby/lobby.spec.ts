@@ -6,28 +6,10 @@ import { Lobby } from './lobby';
 import { LobbyStore } from './lobby.store';
 import { provideTestEnvironment } from '../../testing/providers';
 import { expectNoA11yViolations } from '../../testing/a11y';
+import { mockLocalStorage } from '../../testing/local-storage';
 import { SessionResponse } from '../api/models';
 
-// localStorage polyfill — the Node test environment doesn't provide it
-const _store: Record<string, string> = {};
-const localStorageMock: Storage = {
-  getItem: (k) => _store[k] ?? null,
-  setItem: (k, v) => {
-    _store[k] = v;
-  },
-  removeItem: (k) => {
-    delete _store[k];
-  },
-  clear: () => {
-    for (const k of Object.keys(_store)) delete _store[k];
-  },
-  key: (i) => Object.keys(_store)[i] ?? null,
-  get length() {
-    return Object.keys(_store).length;
-  },
-};
-beforeAll(() => vi.stubGlobal('localStorage', localStorageMock));
-beforeEach(() => localStorageMock.clear());
+mockLocalStorage();
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -152,7 +134,7 @@ describe('Lobby – generic error', () => {
 
 describe('Lobby – form pre-fill from storage', () => {
   it('pre-fills inputs with previously stored player data', async () => {
-    localStorageMock.setItem(
+    localStorage.setItem(
       'lobby-player',
       JSON.stringify({ playerId: null, companyId: 'acme', displayName: 'Alice' }),
     );
