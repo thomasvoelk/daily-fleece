@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.domain.Session;
+import de.dailyfleece.backend.quiz.domain.SessionPhotos;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -20,10 +21,12 @@ class SessionRepositoryTest {
     private SessionRepository sessionRepository;
 
     private static final UUID HOST_ID = UUID.fromString("00000000-0000-0000-0000-000000000099");
+    private static final SessionPhotos PHOTOS =
+            new SessionPhotos("aaaaaaaaaaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbb");
 
     @Test
     void save_and_findById_roundtrip() {
-        Session session = Session.create(LocalDate.of(2099, 1, 1), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(LocalDate.of(2099, 1, 1), HOST_ID, new PlayerName("Host"), PHOTOS);
         sessionRepository.save(session);
 
         assertThat(sessionRepository.findById(session.sessionId()))
@@ -34,15 +37,24 @@ class SessionRepositoryTest {
     @Test
     void findByDate_returns_saved_session() {
         LocalDate date = LocalDate.of(2099, 1, 2);
-        Session session = Session.create(date, HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(date, HOST_ID, new PlayerName("Host"), PHOTOS);
         sessionRepository.save(session);
 
         assertThat(sessionRepository.findByDate(date)).map(Session::date).contains(date);
     }
 
     @Test
+    void save_and_findById_preserves_photo_ids() {
+        Session session = Session.create(LocalDate.of(2099, 1, 4), HOST_ID, new PlayerName("Host"), PHOTOS);
+        sessionRepository.save(session);
+
+        assertThat(sessionRepository.findById(session.sessionId()).orElseThrow().photos())
+                .isEqualTo(PHOTOS);
+    }
+
+    @Test
     void findById_returns_empty_for_unknown_session() {
-        assertThat(sessionRepository.findById(java.util.UUID.randomUUID())).isEmpty();
+        assertThat(sessionRepository.findById(UUID.randomUUID())).isEmpty();
     }
 
     @Test

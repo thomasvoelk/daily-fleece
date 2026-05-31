@@ -3,7 +3,7 @@
     "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 <suppressions>
     <!-- Generated sources are not under our control -->
-    <suppress checks="MissingJavadoc.*" files="generated-sources"/>
+    <suppress checks=".*" files="generated-sources"/>
     <!-- Javadoc is required in api, domain (type-level), and application (type + method) -->
     <suppress checks="MissingJavadoc.*" files="[/\\]infrastructure[/\\]"/>
     <suppress checks="MissingJavadoc.*" files="package-info\.java"/>
@@ -14,4 +14,6 @@
     <!-- api and domain need only class-level doc, not method-level -->
     <suppress checks="MissingJavadocMethod" files="[/\\]api[/\\]"/>
     <suppress checks="MissingJavadocMethod" files="[/\\]domain[/\\]"/>
+    <!-- Test classes need no Javadoc -->
+    <suppress checks="MissingJavadoc.*" files="[/\\]src[/\\]test[/\\]"/>
 </suppressions>

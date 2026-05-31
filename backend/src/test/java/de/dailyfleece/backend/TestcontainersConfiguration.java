@@ -25,7 +25,8 @@ public class TestcontainersConfiguration {
     @Bean
     ApplicationRunner schemaSetup(MongoDBContainer container) {
         return args -> {
-            for (var script : List.of("V1__init_players.js", "V2__init_sessions.js")) {
+            for (var script :
+                    List.of("V1__init_players.js", "V2__init_sessions.js", "V3__add_photo_ids_and_gridfs_ttl.js")) {
                 container.copyFileToContainer(
                         MountableFile.forClasspathResource("db/migration/" + script), "/tmp/" + script);
                 var result = container.execInContainer(

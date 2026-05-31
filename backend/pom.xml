@@ -265,7 +265,7 @@
 					<configLocation>${project.basedir}/checkstyle.xml</configLocation>
 					<suppressionsLocation>${project.basedir}/checkstyle-suppressions.xml</suppressionsLocation>
 					<failsOnError>true</failsOnError>
-					<includeTestSourceDirectory>false</includeTestSourceDirectory>
+					<includeTestSourceDirectory>true</includeTestSourceDirectory>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -1,5 +1,6 @@
 package de.dailyfleece.backend;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.mongodb.MongoWriteException;
@@ -70,6 +71,44 @@ class MongoSchemaTest {
                 .isInstanceOf(MongoWriteException.class);
     }
 
+    @Test
+    void sessions_rejects_missing_q1PhotoId() {
+        assertThatThrownBy(() -> mongoTemplate
+                        .getCollection("sessions")
+                        .insertOne(
+                                validSession().append("photos", new Document("q2PhotoId", "bbbbbbbbbbbbbbbbbbbbbbbb"))))
+                .isInstanceOf(MongoWriteException.class);
+    }
+
+    @Test
+    void sessions_rejects_missing_q2PhotoId() {
+        assertThatThrownBy(() -> mongoTemplate
+                        .getCollection("sessions")
+                        .insertOne(
+                                validSession().append("photos", new Document("q1PhotoId", "aaaaaaaaaaaaaaaaaaaaaaaa"))))
+                .isInstanceOf(MongoWriteException.class);
+    }
+
+    @Test
+    void sessions_rejects_missing_photos() {
+        assertThatThrownBy(() -> mongoTemplate.getCollection("sessions").insertOne(sessionWithoutPhotoIds()))
+                .isInstanceOf(MongoWriteException.class);
+    }
+
+    // --- fs.files ---
+
+    @Test
+    void fs_files_has_ttl_index_on_uploadDate_expiring_after_28_days() {
+        assertThat(mongoTemplate.getDb().getCollection("fs.files").listIndexes())
+                .filteredOn(idx -> {
+                    Document key = idx.get("key", Document.class);
+                    return key != null && key.containsKey("uploadDate");
+                })
+                .hasSize(1)
+                .allSatisfy(
+                        idx -> assertThat(idx.getInteger("expireAfterSeconds")).isEqualTo(2419200));
+    }
+
     // --- helpers ---
 
     private static Document validPlayer() {
@@ -81,7 +120,17 @@ class MongoSchemaTest {
                 .append("date", Instant.now())
                 .append("phase", "LOBBY")
                 .append("players", List.of())
-                .append("hostId", uuid());
+                .append("hostId", uuid())
+                .append(
+                        "photos",
+                        new Document("q1PhotoId", "aaaaaaaaaaaaaaaaaaaaaaaa")
+                                .append("q2PhotoId", "bbbbbbbbbbbbbbbbbbbbbbbb"));
+    }
+
+    private static Document sessionWithoutPhotoIds() {
+        Document doc = validSession();
+        doc.remove("photos");
+        return doc;
     }
 
     private static String uuid() {

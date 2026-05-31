@@ -25,24 +25,31 @@ public final class Session {
 
     private SessionPhase phase;
     private final List<SessionPlayer> players;
+    private final SessionPhotos photos;
 
-    private Session(UUID sessionId, LocalDate date, UUID hostId) {
+    private Session(UUID sessionId, LocalDate date, UUID hostId, SessionPhotos photos) {
         this.sessionId = sessionId;
         this.date = date;
         this.hostId = hostId;
         this.phase = SessionPhase.LOBBY;
         this.players = new ArrayList<>();
+        this.photos = photos;
     }
 
-    public static Session create(LocalDate date, UUID hostId, PlayerName hostDisplayName) {
-        Session session = new Session(UUID.randomUUID(), date, hostId);
+    public static Session create(LocalDate date, UUID hostId, PlayerName hostDisplayName, SessionPhotos photos) {
+        Session session = new Session(UUID.randomUUID(), date, hostId, photos);
         session.players.add(new SessionPlayer(hostId, hostDisplayName));
         return session;
     }
 
     public static Session reconstitute(
-            UUID sessionId, LocalDate date, SessionPhase phase, List<SessionPlayer> players, UUID hostId) {
-        Session session = new Session(sessionId, date, hostId);
+            UUID sessionId,
+            LocalDate date,
+            SessionPhase phase,
+            List<SessionPlayer> players,
+            UUID hostId,
+            SessionPhotos photos) {
+        Session session = new Session(sessionId, date, hostId, photos);
         session.phase = phase;
         session.players.addAll(players);
         return session;
@@ -86,5 +93,9 @@ public final class Session {
 
     public List<SessionPlayer> players() {
         return Collections.unmodifiableList(players);
+    }
+
+    public SessionPhotos photos() {
+        return photos;
     }
 }

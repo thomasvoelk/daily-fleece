@@ -7,6 +7,7 @@ import de.dailyfleece.backend.TestcontainersConfiguration;
 import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.domain.LobbyClosed;
 import de.dailyfleece.backend.quiz.domain.Session;
+import de.dailyfleece.backend.quiz.domain.SessionPhotos;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -21,6 +22,8 @@ class JoinSessionUseCaseTest {
 
     private static final UUID HOST_ID = UUID.fromString("00000000-0000-0000-0000-000000000099");
     private static final UUID PLAYER_1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private static final SessionPhotos PHOTOS =
+            new SessionPhotos("aaaaaaaaaaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbb");
 
     @Autowired
     private JoinSessionUseCase useCase;
@@ -30,7 +33,7 @@ class JoinSessionUseCaseTest {
 
     @Test
     void join_adds_player_to_lobby_session() {
-        Session session = Session.create(LocalDate.of(2098, 1, 1), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(LocalDate.of(2098, 1, 1), HOST_ID, new PlayerName("Host"), PHOTOS);
         sessionRepository.save(session);
 
         useCase.join(session.sessionId(), PLAYER_1, new PlayerName("Thomas"));
@@ -48,7 +51,7 @@ class JoinSessionUseCaseTest {
 
     @Test
     void join_propagates_domain_exception_when_session_not_in_lobby() {
-        Session session = Session.create(LocalDate.of(2098, 1, 3), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(LocalDate.of(2098, 1, 3), HOST_ID, new PlayerName("Host"), PHOTOS);
         session.start();
         sessionRepository.save(session);
 
