@@ -1,98 +1,37 @@
 <main class="min-h-screen p-4">
-  @if (store.phase() === 'idle' || store.phase() === 'loading' || store.phase() === 'error') {
-    <form
-      class="flex flex-col gap-4 max-w-sm mx-auto mt-8"
-      (submit)="onJoin(); $event.preventDefault()"
-      novalidate
+  <div class="max-w-sm mx-auto mt-8">
+    <h1 class="text-xl font-bold mb-4" i18n="lobby|Heading for the waiting room@@lobby.heading">
+      Today's Session
+    </h1>
+    <ul
+      class="divide-y"
+      i18n-aria-label="lobby|Accessible label for the player list@@lobby.playerListAriaLabel"
+      aria-label="Players in session"
     >
-      <h1
-        class="text-xl font-bold"
-        i18n="lobby|Heading shown before the player has joined@@lobby.joinHeading"
-      >
-        Join Today's Session
-      </h1>
-
-      <div class="flex flex-col gap-1">
-        <label for="companyId" i18n="lobby|Label for the company ID input@@lobby.companyIdLabel"
-          >Company ID</label
-        >
-        <input
-          id="companyId"
-          [formField]="joinForm.companyId"
-          class="border rounded px-3 py-2"
-          [attr.aria-describedby]="companyIdInvalid() ? 'companyId-error' : null"
-          [attr.aria-invalid]="companyIdInvalid() ? 'true' : null"
-        />
-        <app-field-error id="companyId-error" [state]="joinForm.companyId()" />
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <label
-          for="displayName"
-          i18n="lobby|Label for the display name input@@lobby.displayNameLabel"
-          >Display name</label
-        >
-        <input
-          id="displayName"
-          [formField]="joinForm.displayName"
-          class="border rounded px-3 py-2"
-          [attr.aria-describedby]="displayNameInvalid() ? 'displayName-error' : null"
-          [attr.aria-invalid]="displayNameInvalid() ? 'true' : null"
-        />
-        <app-field-error id="displayName-error" [state]="joinForm.displayName()" />
-      </div>
-
-      <button
-        type="submit"
-        [disabled]="store.phase() === 'loading'"
-        class="bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-50"
-        i18n="lobby|Button to submit the join form@@lobby.joinButton"
-      >
-        Join
-      </button>
-    </form>
-  }
-
-  <p
-    class="text-center mt-8 text-red-600"
-    role="alert"
-    aria-live="assertive"
-    i18n="lobby|Error shown when a session is already running@@lobby.sessionInProgressAlert"
-  >
-    {{ store.phase() === 'inProgress' ? 'Session is already in progress' : '' }}
-  </p>
-
-  <p class="text-center mt-8 text-red-600" role="alert" aria-live="assertive">
-    {{ store.phase() === 'error' ? store.errorMessage() : '' }}
-  </p>
-
-  @if (store.phase() === 'joined') {
-    <div class="max-w-sm mx-auto mt-8">
-      <h1
-        class="text-xl font-bold mb-4"
-        i18n="lobby|Heading shown after the player has joined@@lobby.sessionHeading"
-      >
-        Today's Session
-      </h1>
-      <ul
-        class="divide-y"
-        i18n-aria-label="lobby|Accessible label for the player list@@lobby.playerListAriaLabel"
-        aria-label="Players in session"
-      >
-        @for (player of store.session()!.players; track player.playerId) {
-          <li class="py-2">{{ player.displayName }}</li>
-        }
-      </ul>
+      @for (player of store.session()?.players ?? []; track player.playerId) {
+        <li class="py-2">{{ player.displayName }}</li>
+      }
+    </ul>
+    <div class="flex gap-2 mt-4">
       <button
         (click)="store.refresh()"
-        class="mt-4 border rounded px-4 py-2"
+        class="border rounded px-4 py-2"
         i18n="lobby|Button to reload the player list@@lobby.refreshButton"
       >
         Refresh
       </button>
-      <p class="mt-2 text-sm text-red-600" role="alert" aria-live="assertive">
-        {{ store.refreshError() ?? '' }}
-      </p>
+      @if (store.isHost()) {
+        <button
+          (click)="store.startQuiz()"
+          class="bg-blue-600 text-white rounded px-4 py-2"
+          i18n="lobby|Button for host to start the quiz@@lobby.startQuizButton"
+        >
+          Start Quiz
+        </button>
+      }
     </div>
-  }
+    <p class="mt-2 text-sm text-red-600" role="alert" aria-live="assertive">
+      {{ store.refreshError() ?? '' }}
+    </p>
+  </div>
 </main>

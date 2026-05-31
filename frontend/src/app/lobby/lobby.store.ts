@@ -1,74 +1,39 @@
-import { inject } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
-import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
-import { withStorageSync } from '@angular-architects/ngrx-toolkit';
+import { computed, inject } from '@angular/core';
+import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { Api } from '../api/api';
-import { registerPlayer } from '../api/fn/players/register-player';
-import { joinSession } from '../api/fn/sessions/join-session';
 import { getTodaySession } from '../api/fn/sessions/get-today-session';
+import { startSession } from '../api/fn/sessions/start-session';
+import { EntryStore } from '../entry/entry.store';
 import { SessionResponse } from '../api/models';
 
-type LobbyPhase = 'idle' | 'loading' | 'joined' | 'inProgress' | 'error';
-
 interface LobbyState {
-  playerId: string | null;
-  companyId: string | null;
-  displayName: string | null;
-  phase: LobbyPhase;
   session: SessionResponse | null;
-  errorMessage: string | null;
   refreshError: string | null;
 }
 
 export const LobbyStore = signalStore(
   { providedIn: 'root' },
   withState<LobbyState>({
-    playerId: null,
-    companyId: null,
-    displayName: null,
-    phase: 'idle',
     session: null,
-    errorMessage: null,
     refreshError: null,
   }),
-  withStorageSync({
-    key: 'lobby-player',
-    select: (state: LobbyState) => ({
-      playerId: state.playerId,
-      companyId: state.companyId,
-      displayName: state.displayName,
-    }),
+  withComputed((store) => {
+    const entryStore = inject(EntryStore);
+    return {
+      isHost: computed(
+        () =>
+          store.session() !== null &&
+          entryStore.playerId() !== null &&
+          store.session()!.hostId === entryStore.playerId(),
+      ),
+    };
   }),
   withMethods((store) => {
     const api = inject(Api);
+    const entryStore = inject(EntryStore);
     return {
-      async join(companyId: string, displayName: string): Promise<void> {
-        patchState(store, { phase: 'loading', errorMessage: null });
-        try {
-          const player = await api.invoke(registerPlayer, { body: { companyId, displayName } });
-          patchState(store, { playerId: player.playerId, companyId, displayName });
-
-          const session = await api.invoke(getTodaySession);
-
-          const updatedSession = await api.invoke(joinSession, {
-            sessionId: session.sessionId,
-            body: { playerId: player.playerId, displayName },
-          });
-
-          patchState(store, { phase: 'joined', session: updatedSession });
-        } catch (err: unknown) {
-          if (
-            err instanceof HttpErrorResponse &&
-            (err.error as { type?: string })?.type === '/problems/session-already-active'
-          ) {
-            patchState(store, { phase: 'inProgress' });
-          } else {
-            patchState(store, {
-              phase: 'error',
-              errorMessage: 'Something went wrong. Please try again.',
-            });
-          }
-        }
+      initializeSession(session: SessionResponse): void {
+        patchState(store, { session, refreshError: null });
       },
 
       async refresh(): Promise<void> {
@@ -78,9 +43,19 @@ export const LobbyStore = signalStore(
           patchState(store, { session });
         } catch {
           patchState(store, {
-            refreshError: $localize`:lobby|Error shown when the session refresh fails@@lobby.refreshError:Refresh failed. Please try again.`,
+            refreshError: $localize`:lobby|Error shown when session refresh fails@@lobby.refreshError:Refresh failed. Please try again.`,
           });
         }
+      },
+
+      async startQuiz(): Promise<void> {
+        const session = store.session();
+        const playerId = entryStore.playerId();
+        if (!session || !playerId) return;
+        await api.invoke(startSession, {
+          sessionId: session.sessionId,
+          body: { hostId: playerId },
+        });
       },
     };
   }),

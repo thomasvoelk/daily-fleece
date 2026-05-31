@@ -2,65 +2,20 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file source-language="en" datatype="plaintext" original="ng2.template">
     <body>
-      <trans-unit id="lobby.joinHeading" datatype="html">
-        <source> Join Today&apos;s Session </source>
+      <trans-unit id="lobby.heading" datatype="html">
+        <source>Today&apos;s Session</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/lobby/lobby.html</context>
-          <context context-type="linenumber">12,16</context>
+          <context context-type="linenumber">4,6</context>
         </context-group>
-        <note priority="1" from="description">Heading shown before the player has joined</note>
-        <note priority="1" from="meaning">lobby</note>
-      </trans-unit>
-      <trans-unit id="lobby.companyIdLabel" datatype="html">
-        <source>Company ID</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
-          <context context-type="linenumber">17,21</context>
-        </context-group>
-        <note priority="1" from="description">Label for the company ID input</note>
-        <note priority="1" from="meaning">lobby</note>
-      </trans-unit>
-      <trans-unit id="lobby.displayNameLabel" datatype="html">
-        <source>Display name</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
-          <context context-type="linenumber">33,37</context>
-        </context-group>
-        <note priority="1" from="description">Label for the display name input</note>
-        <note priority="1" from="meaning">lobby</note>
-      </trans-unit>
-      <trans-unit id="lobby.joinButton" datatype="html">
-        <source> Join </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
-          <context context-type="linenumber">51,56</context>
-        </context-group>
-        <note priority="1" from="description">Button to submit the join form</note>
-        <note priority="1" from="meaning">lobby</note>
-      </trans-unit>
-      <trans-unit id="lobby.sessionInProgressAlert" datatype="html">
-        <source> Session is already in progress </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
-          <context context-type="linenumber">62,67</context>
-        </context-group>
-        <note priority="1" from="description">Error shown when a session is already running</note>
-        <note priority="1" from="meaning">lobby</note>
-      </trans-unit>
-      <trans-unit id="lobby.sessionHeading" datatype="html">
-        <source> Today&apos;s Session </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
-          <context context-type="linenumber">72,76</context>
-        </context-group>
-        <note priority="1" from="description">Heading shown after the player has joined</note>
+        <note priority="1" from="description">Heading for the waiting room</note>
         <note priority="1" from="meaning">lobby</note>
       </trans-unit>
       <trans-unit id="lobby.playerListAriaLabel" datatype="html">
         <source>Players in session</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/lobby/lobby.html</context>
-          <context context-type="linenumber">77,79</context>
+          <context context-type="linenumber">9,11</context>
         </context-group>
         <note priority="1" from="description">Accessible label for the player list</note>
         <note priority="1" from="meaning">lobby</note>
@@ -69,45 +24,27 @@
         <source> Refresh </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/lobby/lobby.html</context>
-          <context context-type="linenumber">88,93</context>
+          <context context-type="linenumber">20,23</context>
         </context-group>
         <note priority="1" from="description">Button to reload the player list</note>
+        <note priority="1" from="meaning">lobby</note>
+      </trans-unit>
+      <trans-unit id="lobby.startQuizButton" datatype="html">
+        <source> Start Quiz </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/lobby/lobby.html</context>
+          <context context-type="linenumber">25,28</context>
+        </context-group>
+        <note priority="1" from="description">Button for host to start the quiz</note>
         <note priority="1" from="meaning">lobby</note>
       </trans-unit>
       <trans-unit id="lobby.refreshError" datatype="html">
         <source>Refresh failed. Please try again.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/lobby/lobby.store.ts</context>
-          <context context-type="linenumber">81</context>
+          <context context-type="linenumber">48</context>
         </context-group>
-        <note priority="1" from="description">Error shown when the session refresh fails</note>
-        <note priority="1" from="meaning">lobby</note>
-      </trans-unit>
-      <trans-unit id="lobby.companyIdRequired" datatype="html">
-        <source>Required</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/lobby/lobby.ts</context>
-          <context context-type="linenumber">23</context>
-        </context-group>
-        <note priority="1" from="description">Validation error when Company ID is empty</note>
-        <note priority="1" from="meaning">lobby</note>
-      </trans-unit>
-      <trans-unit id="lobby.displayNameRequired" datatype="html">
-        <source>Required</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/lobby/lobby.ts</context>
-          <context context-type="linenumber">26</context>
-        </context-group>
-        <note priority="1" from="description">Validation error when Display name is empty</note>
-        <note priority="1" from="meaning">lobby</note>
-      </trans-unit>
-      <trans-unit id="lobby.displayNameTooLong" datatype="html">
-        <source>Maximum 20 characters</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/lobby/lobby.ts</context>
-          <context context-type="linenumber">29</context>
-        </context-group>
-        <note priority="1" from="description">Validation error when Display name exceeds 20 characters</note>
+        <note priority="1" from="description">Error shown when session refresh fails</note>
         <note priority="1" from="meaning">lobby</note>
       </trans-unit>
     </body>
