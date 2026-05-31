@@ -43,8 +43,6 @@ class CreateSessionUseCaseTest {
         assertThat(session.hostId()).isEqualTo(HOST_ID);
         assertThat(session.players()).hasSize(1);
         assertThat(session.players().get(0).displayName()).isEqualTo(HOST_NAME);
-        assertThat(session.photos().q1PhotoId()).isNotNull();
-        assertThat(session.photos().q2PhotoId()).isNotNull();
         assertThat(sessionRepository.findByDate(date)).isPresent();
     }
 

@@ -1,9 +1,9 @@
 package de.dailyfleece.backend.quiz.application;
 
 import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.quiz.domain.Photo;
 import de.dailyfleece.backend.quiz.domain.PhotoRepository;
 import de.dailyfleece.backend.quiz.domain.Session;
-import de.dailyfleece.backend.quiz.domain.SessionPhotos;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -36,10 +36,9 @@ public class CreateSessionUseCase {
             throw new SessionAlreadyExists(date);
         }
 
-        var q1PhotoId = photoRepository.store(q1Data, q1ContentType, hostId, "q1");
-        var q2PhotoId = photoRepository.store(q2Data, q2ContentType, hostId, "q2");
-
-        Session session = Session.create(date, hostId, hostDisplayName, new SessionPhotos(q1PhotoId, q2PhotoId));
+        Session session = Session.create(date, hostId, hostDisplayName);
+        photoRepository.store(new Photo(session.sessionId(), "q1", q1Data, q1ContentType));
+        photoRepository.store(new Photo(session.sessionId(), "q2", q2Data, q2ContentType));
         sessionRepository.save(session);
         return session;
     }

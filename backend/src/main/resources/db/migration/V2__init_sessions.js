@@ -3,7 +3,7 @@ if (!db.getCollectionNames().includes("sessions")) {
         validator: {
             $jsonSchema: {
                 bsonType: "object",
-                required: ["_id", "date", "phase", "players", "hostId", "photos"],
+                required: ["_id", "date", "phase", "players", "hostId"],
                 additionalProperties: false,
                 properties: {
                     _id: {
@@ -20,21 +20,6 @@ if (!db.getCollectionNames().includes("sessions")) {
                     hostId: {
                         bsonType: "string",
                         pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-                    },
-                    photos: {
-                        bsonType: "object",
-                        required: ["q1PhotoId", "q2PhotoId"],
-                        additionalProperties: false,
-                        properties: {
-                            q1PhotoId: {
-                                bsonType: "string",
-                                pattern: "^[0-9a-f]{24}$"
-                            },
-                            q2PhotoId: {
-                                bsonType: "string",
-                                pattern: "^[0-9a-f]{24}$"
-                            }
-                        }
                     },
                     players: {
                         bsonType: "array",

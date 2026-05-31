@@ -71,30 +71,6 @@ class MongoSchemaTest {
                 .isInstanceOf(MongoWriteException.class);
     }
 
-    @Test
-    void sessions_rejects_missing_q1PhotoId() {
-        assertThatThrownBy(() -> mongoTemplate
-                        .getCollection("sessions")
-                        .insertOne(
-                                validSession().append("photos", new Document("q2PhotoId", "bbbbbbbbbbbbbbbbbbbbbbbb"))))
-                .isInstanceOf(MongoWriteException.class);
-    }
-
-    @Test
-    void sessions_rejects_missing_q2PhotoId() {
-        assertThatThrownBy(() -> mongoTemplate
-                        .getCollection("sessions")
-                        .insertOne(
-                                validSession().append("photos", new Document("q1PhotoId", "aaaaaaaaaaaaaaaaaaaaaaaa"))))
-                .isInstanceOf(MongoWriteException.class);
-    }
-
-    @Test
-    void sessions_rejects_missing_photos() {
-        assertThatThrownBy(() -> mongoTemplate.getCollection("sessions").insertOne(sessionWithoutPhotoIds()))
-                .isInstanceOf(MongoWriteException.class);
-    }
-
     // --- fs.files ---
 
     @Test
@@ -120,17 +96,7 @@ class MongoSchemaTest {
                 .append("date", Instant.now())
                 .append("phase", "LOBBY")
                 .append("players", List.of())
-                .append("hostId", uuid())
-                .append(
-                        "photos",
-                        new Document("q1PhotoId", "aaaaaaaaaaaaaaaaaaaaaaaa")
-                                .append("q2PhotoId", "bbbbbbbbbbbbbbbbbbbbbbbb"));
-    }
-
-    private static Document sessionWithoutPhotoIds() {
-        Document doc = validSession();
-        doc.remove("photos");
-        return doc;
+                .append("hostId", uuid());
     }
 
     private static String uuid() {

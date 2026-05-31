@@ -15,19 +15,17 @@ class SessionTest {
     private static final PlayerName HOST_NAME = new PlayerName("Host");
     private static final UUID PLAYER_1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private static final UUID PLAYER_2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
-    private static final SessionPhotos PHOTOS =
-            new SessionPhotos(new PhotoId("aaaaaaaaaaaaaaaaaaaaaaaa"), new PhotoId("bbbbbbbbbbbbbbbbbbbbbbbb"));
 
     @Test
     void new_session_starts_in_lobby_phase() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME, PHOTOS);
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
 
         assertThat(session.phase()).isEqualTo(SessionPhase.LOBBY);
     }
 
     @Test
     void create_adds_host_as_first_player() {
-        Session session = Session.create(DATE, HOST_ID, new PlayerName("Thomas"), PHOTOS);
+        Session session = Session.create(DATE, HOST_ID, new PlayerName("Thomas"));
 
         assertThat(session.players()).hasSize(1);
         assertThat(session.players().get(0).playerId()).isEqualTo(HOST_ID);
@@ -36,7 +34,7 @@ class SessionTest {
 
     @Test
     void player_can_join_a_lobby_session() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME, PHOTOS);
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
 
         session.join(PLAYER_1, new PlayerName("Thomas"));
 
@@ -47,7 +45,7 @@ class SessionTest {
 
     @Test
     void multiple_players_can_join_a_lobby_session() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME, PHOTOS);
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
 
         session.join(PLAYER_1, new PlayerName("Thomas"));
         session.join(PLAYER_2, new PlayerName("Anna"));
@@ -57,7 +55,7 @@ class SessionTest {
 
     @Test
     void joining_an_active_session_throws() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME, PHOTOS);
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
         session.start();
 
         assertThatThrownBy(() -> session.join(PLAYER_1, new PlayerName("Thomas")))
@@ -66,7 +64,7 @@ class SessionTest {
 
     @Test
     void joining_an_ended_session_throws() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME, PHOTOS);
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
         session.start();
         session.end();
 
