@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import de.dailyfleece.backend.TestcontainersConfiguration;
-import de.dailyfleece.backend.player.api.DisplayName;
+import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.domain.LobbyClosed;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
@@ -30,29 +30,29 @@ class JoinSessionUseCaseTest {
 
     @Test
     void join_adds_player_to_lobby_session() {
-        Session session = Session.create(LocalDate.of(2098, 1, 1), HOST_ID);
+        Session session = Session.create(LocalDate.of(2098, 1, 1), HOST_ID, new PlayerName("Host"));
         sessionRepository.save(session);
 
-        useCase.join(session.sessionId(), PLAYER_1, new DisplayName("Thomas"));
+        useCase.join(session.sessionId(), PLAYER_1, new PlayerName("Thomas"));
 
         Session updated = sessionRepository.findById(session.sessionId()).orElseThrow();
-        assertThat(updated.players()).hasSize(1);
-        assertThat(updated.players().get(0).displayName()).isEqualTo(new DisplayName("Thomas"));
+        assertThat(updated.players()).hasSize(2);
+        assertThat(updated.players().get(1).displayName()).isEqualTo(new PlayerName("Thomas"));
     }
 
     @Test
     void join_throws_when_session_id_unknown() {
-        assertThatThrownBy(() -> useCase.join(UUID.randomUUID(), PLAYER_1, new DisplayName("Thomas")))
+        assertThatThrownBy(() -> useCase.join(UUID.randomUUID(), PLAYER_1, new PlayerName("Thomas")))
                 .isInstanceOf(SessionNotFound.class);
     }
 
     @Test
     void join_propagates_domain_exception_when_session_not_in_lobby() {
-        Session session = Session.create(LocalDate.of(2098, 1, 3), HOST_ID);
+        Session session = Session.create(LocalDate.of(2098, 1, 3), HOST_ID, new PlayerName("Host"));
         session.start();
         sessionRepository.save(session);
 
-        assertThatThrownBy(() -> useCase.join(session.sessionId(), PLAYER_1, new DisplayName("Thomas")))
+        assertThatThrownBy(() -> useCase.join(session.sessionId(), PLAYER_1, new PlayerName("Thomas")))
                 .isInstanceOf(LobbyClosed.class);
     }
 }

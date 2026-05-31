@@ -1,6 +1,6 @@
 package de.dailyfleece.backend.quiz.domain;
 
-import de.dailyfleece.backend.player.api.DisplayName;
+import de.dailyfleece.backend.player.api.PlayerName;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,8 +34,10 @@ public final class Session {
         this.players = new ArrayList<>();
     }
 
-    public static Session create(LocalDate date, UUID hostId) {
-        return new Session(UUID.randomUUID(), date, hostId);
+    public static Session create(LocalDate date, UUID hostId, PlayerName hostDisplayName) {
+        Session session = new Session(UUID.randomUUID(), date, hostId);
+        session.players.add(new SessionPlayer(hostId, hostDisplayName));
+        return session;
     }
 
     public static Session reconstitute(
@@ -46,7 +48,7 @@ public final class Session {
         return session;
     }
 
-    public void join(UUID playerId, DisplayName displayName) {
+    public void join(UUID playerId, PlayerName displayName) {
         if (phase != SessionPhase.LOBBY) {
             throw new LobbyClosed(sessionId, phase);
         }

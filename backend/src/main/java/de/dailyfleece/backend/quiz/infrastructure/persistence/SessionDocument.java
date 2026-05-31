@@ -1,6 +1,6 @@
 package de.dailyfleece.backend.quiz.infrastructure.persistence;
 
-import de.dailyfleece.backend.player.api.DisplayName;
+import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionPhase;
 import de.dailyfleece.backend.quiz.domain.SessionPlayer;
@@ -29,7 +29,7 @@ record SessionDocument(
 
     Session toDomain() {
         List<SessionPlayer> domainPlayers = players.stream()
-                .map(p -> new SessionPlayer(UUID.fromString(p.playerId()), new DisplayName(p.displayName())))
+                .map(p -> new SessionPlayer(UUID.fromString(p.playerId()), new PlayerName(p.displayName())))
                 .toList();
         return Session.reconstitute(
                 UUID.fromString(sessionId), date, SessionPhase.valueOf(phase), domainPlayers, UUID.fromString(hostId));

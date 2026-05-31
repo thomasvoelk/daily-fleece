@@ -3,7 +3,7 @@ package de.dailyfleece.backend.quiz.infrastructure.web;
 import de.dailyfleece.api.SessionsApi;
 import de.dailyfleece.api.model.JoinSessionRequest;
 import de.dailyfleece.api.model.SessionResponse;
-import de.dailyfleece.backend.player.api.DisplayName;
+import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.application.JoinSessionUseCase;
 import de.dailyfleece.backend.quiz.application.LoadSessionUseCase;
 import de.dailyfleece.backend.quiz.application.NoSessionForDate;
@@ -46,7 +46,7 @@ class SessionController implements SessionsApi {
     public ResponseEntity<SessionResponse> joinSession(String sessionId, JoinSessionRequest request) {
         UUID sessionUuid = UUID.fromString(sessionId);
         UUID playerId = UUID.fromString(request.getPlayerId());
-        DisplayName displayName = new DisplayName(request.getDisplayName());
+        PlayerName displayName = new PlayerName(request.getDisplayName());
         Session session = joinSessionUseCase.join(sessionUuid, playerId, displayName);
         return ResponseEntity.ok(mapper.toResponse(session));
     }

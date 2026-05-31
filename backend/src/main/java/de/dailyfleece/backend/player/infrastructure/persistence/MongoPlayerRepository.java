@@ -1,7 +1,7 @@
 package de.dailyfleece.backend.player.infrastructure.persistence;
 
 import de.dailyfleece.backend.player.api.CompanyId;
-import de.dailyfleece.backend.player.api.DisplayName;
+import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.player.domain.Player;
 import de.dailyfleece.backend.player.domain.PlayerRepository;
 import java.util.Optional;
@@ -23,7 +23,7 @@ class MongoPlayerRepository implements PlayerRepository {
     }
 
     @Override
-    public Player getOrCreate(CompanyId companyId, DisplayName displayName) {
+    public Player getOrCreate(CompanyId companyId, PlayerName displayName) {
         Query query = Query.query(Criteria.where("companyId").is(companyId.value()));
         @Nullable PlayerDocument existing = mongoTemplate.findOne(query, PlayerDocument.class);
         if (existing != null) {

@@ -4,7 +4,7 @@ import de.dailyfleece.api.PlayersApi;
 import de.dailyfleece.api.model.PlayerResponse;
 import de.dailyfleece.api.model.RegisterPlayerRequest;
 import de.dailyfleece.backend.player.api.CompanyId;
-import de.dailyfleece.backend.player.api.DisplayName;
+import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.player.application.RegisterPlayerUseCase;
 import de.dailyfleece.backend.player.domain.Player;
 import org.springframework.http.HttpStatus;
@@ -25,7 +25,7 @@ class PlayerController implements PlayersApi {
     @Override
     public ResponseEntity<PlayerResponse> registerPlayer(RegisterPlayerRequest request) {
         CompanyId companyId = new CompanyId(request.getCompanyId());
-        DisplayName displayName = new DisplayName(request.getDisplayName());
+        PlayerName displayName = new PlayerName(request.getDisplayName());
         Player player = registerPlayerUseCase.register(companyId, displayName);
         PlayerResponse response = new PlayerResponse(
                 player.playerId().toString(), player.displayName().value());

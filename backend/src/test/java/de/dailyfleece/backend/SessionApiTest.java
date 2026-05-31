@@ -2,6 +2,7 @@ package de.dailyfleece.backend;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import java.time.LocalDate;
@@ -58,7 +59,7 @@ class SessionApiTest {
 
     @Test
     void getTodaySession_returns_200_with_session() {
-        sessionRepository.save(Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID));
+        sessionRepository.save(Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host")));
 
         ResponseEntity<Map<String, Object>> response =
                 http.get().uri("/sessions/today").retrieve().toEntity(responseType());
@@ -78,7 +79,7 @@ class SessionApiTest {
         String playerId =
                 (String) Objects.requireNonNull(registerResponse.getBody()).get("playerId");
 
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID);
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
         sessionRepository.save(session);
 
         ResponseEntity<Map<String, Object>> response = http.post()
@@ -130,7 +131,7 @@ class SessionApiTest {
 
     @Test
     void joinSession_active_session_returns_409() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID);
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
         session.start();
         sessionRepository.save(session);
 

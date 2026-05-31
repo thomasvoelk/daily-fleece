@@ -2,6 +2,7 @@ package de.dailyfleece.backend;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import java.time.LocalDate;
@@ -22,7 +23,7 @@ class SessionRepositoryTest {
 
     @Test
     void save_and_findById_roundtrip() {
-        Session session = Session.create(LocalDate.of(2099, 1, 1), HOST_ID);
+        Session session = Session.create(LocalDate.of(2099, 1, 1), HOST_ID, new PlayerName("Host"));
         sessionRepository.save(session);
 
         assertThat(sessionRepository.findById(session.sessionId()))
@@ -33,7 +34,7 @@ class SessionRepositoryTest {
     @Test
     void findByDate_returns_saved_session() {
         LocalDate date = LocalDate.of(2099, 1, 2);
-        Session session = Session.create(date, HOST_ID);
+        Session session = Session.create(date, HOST_ID, new PlayerName("Host"));
         sessionRepository.save(session);
 
         assertThat(sessionRepository.findByDate(date)).map(Session::date).contains(date);

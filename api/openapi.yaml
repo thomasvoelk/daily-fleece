@@ -161,11 +161,14 @@ paths:
       tags: [Sessions]
       summary: Create today's session
       description: |
-        Creates a new session for today in the Lobby phase. Both photos are
-        uploaded in a single multipart request together with the host's player ID.
+        Creates a new session for today in the Lobby phase. Both photos and
+        the host's identity are submitted in a single multipart request. The
+        host is automatically added as the first player.
 
-        Photos are stored in MongoDB GridFS with a 28-day TTL. The session
-        document holds references to the GridFS IDs.
+        Photos are stored in MongoDB GridFS with a 28-day TTL (see ADR-0005,
+        ADR-0015). The session document holds the GridFS references internally;
+        they are not exposed in the response. Clients retrieve photos via
+        `GET /sessions/{id}/photos/{question}`.
 
         Returns 409 if a session already exists for today — the client should
         redirect the host to `GET /sessions/today` instead.
@@ -214,6 +217,38 @@ paths:
                 $ref: "#/components/schemas/SessionResponse"
         "404":
           description: Session not found.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+              example:
+                type: "/problems/session-not-found"
+                title: "Session Not Found"
+                status: 404
+                detail: "No session found with ID s-7c2d1e."
+
+  /sessions/{sessionId}/photos/{question}:
+    get:
+      operationId: getSessionPhoto
+      tags: [Sessions]
+      summary: Get a session photo
+      description: |
+        Returns the raw image bytes for the Q1 or Q2 photo uploaded when the
+        session was created. Available in any session phase. The `Content-Type`
+        header reflects the original upload format.
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/Question"
+      responses:
+        "200":
+          description: Photo image bytes.
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Session not found or photo expired (28-day TTL).
           content:
             application/problem+json:
               schema:
@@ -699,12 +734,17 @@ components:
 
     CreateSessionRequest:
       type: object
-      required: [hostId, q1, q2]
+      required: [hostId, hostDisplayName, q1, q2]
       properties:
         hostId:
           type: string
-          description: The playerId of the player creating the session. They become the host.
+          description: The playerId of the player creating the session. They become the host and are automatically added to the player list.
           example: "p-4f3a9b"
+        hostDisplayName:
+          type: string
+          maxLength: 20
+          description: Display name of the host. Denormalised for rendering without a player lookup, consistent with JoinSessionRequest.
+          example: "Thomas"
         q1:
           type: string
           format: binary
@@ -740,7 +780,7 @@ components:
     SessionResponse:
       type: object
       required:
-        [sessionId, projectId, date, phase, hostId, players, photos, voting]
+        [sessionId, projectId, date, phase, hostId, players, voting]
       description: Full session document. Returned by all session state-changing endpoints.
       properties:
         sessionId:
@@ -773,8 +813,6 @@ components:
           description: All players who have joined the session, including the host.
           items:
             $ref: "#/components/schemas/SessionPlayer"
-        photos:
-          $ref: "#/components/schemas/SessionPhotos"
         voting:
           $ref: "#/components/schemas/VotingState"
 
@@ -789,19 +827,6 @@ components:
         displayName:
           type: string
           example: "Thomas"
-
-    SessionPhotos:
-      type: object
-      required: [q1, q2]
-      properties:
-        q1:
-          type: string
-          description: GridFS ID of the Q1 photo.
-          example: "gridfs-a1b2c3"
-        q2:
-          type: string
-          description: GridFS ID of the Q2 photo.
-          example: "gridfs-d4e5f6"
 
     VotingState:
       type: object

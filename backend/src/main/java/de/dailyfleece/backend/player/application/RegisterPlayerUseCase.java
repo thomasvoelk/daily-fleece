@@ -1,7 +1,7 @@
 package de.dailyfleece.backend.player.application;
 
 import de.dailyfleece.backend.player.api.CompanyId;
-import de.dailyfleece.backend.player.api.DisplayName;
+import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.player.domain.Player;
 import de.dailyfleece.backend.player.domain.PlayerRepository;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class RegisterPlayerUseCase {
      * Finds the Player with the given Company ID, or creates and persists a new one. Idempotent —
      * safe to call on every login.
      */
-    public Player register(CompanyId companyId, DisplayName displayName) {
+    public Player register(CompanyId companyId, PlayerName displayName) {
         return playerRepository.getOrCreate(companyId, displayName);
     }
 }

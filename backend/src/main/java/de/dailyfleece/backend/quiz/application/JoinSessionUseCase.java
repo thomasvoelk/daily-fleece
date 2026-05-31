@@ -1,6 +1,6 @@
 package de.dailyfleece.backend.quiz.application;
 
-import de.dailyfleece.backend.player.api.DisplayName;
+import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import java.util.UUID;
@@ -21,7 +21,7 @@ public class JoinSessionUseCase {
      * if no Session exists with that ID, or {@link
      * de.dailyfleece.backend.quiz.domain.LobbyClosed} if the session is no longer in Lobby phase.
      */
-    public Session join(UUID sessionId, UUID playerId, DisplayName displayName) {
+    public Session join(UUID sessionId, UUID playerId, PlayerName displayName) {
         Session session = sessionRepository.findById(sessionId).orElseThrow(() -> new SessionNotFound(sessionId));
         session.join(playerId, displayName);
         sessionRepository.save(session);

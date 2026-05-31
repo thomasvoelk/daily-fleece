@@ -1,7 +1,7 @@
 package de.dailyfleece.backend.player.infrastructure.persistence;
 
 import de.dailyfleece.backend.player.api.CompanyId;
-import de.dailyfleece.backend.player.api.DisplayName;
+import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.player.domain.Player;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
@@ -18,6 +18,6 @@ record PlayerDocument(@Id String playerId, String companyId, String displayName)
     }
 
     Player toDomain() {
-        return Player.reconstitute(UUID.fromString(playerId), new CompanyId(companyId), new DisplayName(displayName));
+        return Player.reconstitute(UUID.fromString(playerId), new CompanyId(companyId), new PlayerName(displayName));
     }
 }

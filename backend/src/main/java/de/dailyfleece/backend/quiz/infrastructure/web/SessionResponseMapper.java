@@ -1,7 +1,6 @@
 package de.dailyfleece.backend.quiz.infrastructure.web;
 
 import de.dailyfleece.api.model.QuestionVoting;
-import de.dailyfleece.api.model.SessionPhotos;
 import de.dailyfleece.api.model.SessionPlayer;
 import de.dailyfleece.api.model.SessionResponse;
 import de.dailyfleece.api.model.SessionResponse.PhaseEnum;
@@ -13,9 +12,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 class SessionResponseMapper {
-
-    // Stub photos until UC-01 (photo upload) is implemented.
-    private static final SessionPhotos STUB_PHOTOS = new SessionPhotos("", "");
 
     // Stub voting state for Lobby phase — no questions open yet.
     private static final VotingState STUB_VOTING = new VotingState(
@@ -33,7 +29,6 @@ class SessionResponseMapper {
                 toPhaseEnum(session.phase()),
                 session.hostId().toString(),
                 players,
-                STUB_PHOTOS,
                 STUB_VOTING);
     }
 
