@@ -2,9 +2,69 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file source-language="en" target-language="de" datatype="plaintext" original="ng2.template">
     <body>
+      <trans-unit id="entry.heading" datatype="html">
+        <source> Daily Fleece </source>
+        <target> Daily Fleece </target>
+      </trans-unit>
+      <trans-unit id="entry.companyIdLabel" datatype="html">
+        <source>Company ID</source>
+        <target>Firmen-ID</target>
+      </trans-unit>
+      <trans-unit id="entry.displayNameLabel" datatype="html">
+        <source>Display name</source>
+        <target>Anzeigename</target>
+      </trans-unit>
+      <trans-unit id="entry.joinLobbyButton" datatype="html">
+        <source> Join Lobby </source>
+        <target> Lobby beitreten </target>
+      </trans-unit>
+      <trans-unit id="entry.createLobbyButton" datatype="html">
+        <source> Create Lobby </source>
+        <target> Lobby erstellen </target>
+      </trans-unit>
+      <trans-unit id="entry.createError" datatype="html">
+        <source>Something went wrong. Please try again.</source>
+        <target>Etwas ist schiefgelaufen. Bitte erneut versuchen.</target>
+      </trans-unit>
+      <trans-unit id="entry.joinError" datatype="html">
+        <source>Something went wrong. Please try again.</source>
+        <target>Etwas ist schiefgelaufen. Bitte erneut versuchen.</target>
+      </trans-unit>
+      <trans-unit id="entry.companyIdRequired" datatype="html">
+        <source>Required</source>
+        <target>Pflichtfeld</target>
+      </trans-unit>
+      <trans-unit id="entry.displayNameRequired" datatype="html">
+        <source>Required</source>
+        <target>Pflichtfeld</target>
+      </trans-unit>
+      <trans-unit id="entry.displayNameTooLong" datatype="html">
+        <source>Maximum 20 characters</source>
+        <target>Maximal 20 Zeichen</target>
+      </trans-unit>
+      <trans-unit id="hostSetup.heading" datatype="html">
+        <source> Host Setup </source>
+        <target> Host-Setup </target>
+      </trans-unit>
+      <trans-unit id="hostSetup.q1Label" datatype="html">
+        <source> Q1 — Knowledge (calendar page) </source>
+        <target> F1 — Wissen (Kalenderblatt) </target>
+      </trans-unit>
+      <trans-unit id="hostSetup.q2Label" datatype="html">
+        <source> Q2 — Geography (location) </source>
+        <target> F2 — Geografie (Ort) </target>
+      </trans-unit>
+      <trans-unit id="hostSetup.createSessionButton" datatype="html">
+        <source> Create Session </source>
+        <target> Session erstellen </target>
+      </trans-unit>
+      <trans-unit id="hostSetup.createError" datatype="html">
+        <source>Something went wrong. Please try again.</source>
+        <target>Etwas ist schiefgelaufen. Bitte erneut versuchen.</target>
+      </trans-unit>
       <trans-unit id="lobby.heading" datatype="html">
-        <source>Today&apos;s Session</source>
-        <target>Heutige Session</target>
+        <source> Today&apos;s Session </source>
+        <target> Heutige Session </target>
       </trans-unit>
       <trans-unit id="lobby.playerListAriaLabel" datatype="html">
         <source>Players in session</source>
