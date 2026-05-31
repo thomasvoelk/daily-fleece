@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
+import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.modulith.test.ApplicationModuleTest;
 import org.springframework.util.MimeType;
 
@@ -30,7 +30,7 @@ class GridFsPhotoRepositoryTest {
     PhotoRepository photoRepository;
 
     @Autowired
-    GridFsTemplate gridFsTemplate;
+    GridFsOperations operations;
 
     @Test
     void store_returns_valid_photo_id() {
@@ -58,10 +58,10 @@ class GridFsPhotoRepositoryTest {
 
         PhotoId photoId = photoRepository.store(data, IMAGE_JPEG, SESSION_ID, "q1");
 
-        var file = gridFsTemplate.findOne(
+        var file = operations.findOne(
                 Query.query(Criteria.where("metadata.photoId").is(photoId.value())));
-        assertThat(file).isNotNull();
-        var metadata = Objects.requireNonNull(file.getMetadata());
+        var nonNullFile = Objects.requireNonNull(file);
+        var metadata = Objects.requireNonNull(nonNullFile.getMetadata());
         assertThat(metadata.getString("sessionId")).isEqualTo(SESSION_ID.toString());
         assertThat(metadata.getString("question")).isEqualTo("q1");
     }

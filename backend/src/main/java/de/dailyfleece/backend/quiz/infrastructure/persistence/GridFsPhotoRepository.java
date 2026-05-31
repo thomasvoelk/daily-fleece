@@ -11,7 +11,7 @@ import java.util.UUID;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
+import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.MimeType;
 
@@ -20,10 +20,10 @@ class GridFsPhotoRepository implements PhotoRepository {
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    private final GridFsTemplate gridFsTemplate;
+    private final GridFsOperations operations;
 
-    GridFsPhotoRepository(GridFsTemplate gridFsTemplate) {
-        this.gridFsTemplate = gridFsTemplate;
+    GridFsPhotoRepository(GridFsOperations operations) {
+        this.operations = operations;
     }
 
     @Override
@@ -33,13 +33,13 @@ class GridFsPhotoRepository implements PhotoRepository {
                 .append("_contentType", mimeType.toString())
                 .append("sessionId", sessionId.toString())
                 .append("question", question);
-        gridFsTemplate.store(data, sessionId + "_" + question, mimeType.toString(), metadata);
+        operations.store(data, sessionId + "_" + question, mimeType.toString(), metadata);
         return photoId;
     }
 
     @Override
     public Photo load(PhotoId photoId) {
-        var file = gridFsTemplate.findOne(
+        var file = operations.findOne(
                 Query.query(Criteria.where("metadata.photoId").is(photoId.value())));
         if (file == null) {
             throw new IllegalArgumentException("No photo found for id: " + photoId.value());
@@ -50,7 +50,7 @@ class GridFsPhotoRepository implements PhotoRepository {
                 throw new IllegalStateException("GridFS file has no metadata for id: " + photoId.value());
             }
             var mimeType = MimeType.valueOf(metadata.getString("_contentType"));
-            return new Photo(gridFsTemplate.getResource(file).getInputStream(), mimeType);
+            return new Photo(operations.getResource(file).getInputStream(), mimeType);
         } catch (IOException e) {
             throw new IllegalStateException("Failed to load photo: " + photoId.value(), e);
         }
