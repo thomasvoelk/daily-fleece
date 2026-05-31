@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 class SessionTest {
 
-    private static final LocalDate DATE = LocalDate.of(2026, 5, 29);
+    private static final LocalDate DATE = LocalDate.parse("2026-05-29");
     private static final UUID HOST_ID = UUID.fromString("00000000-0000-0000-0000-000000000099");
     private static final PlayerName HOST_NAME = new PlayerName("Host");
     private static final UUID PLAYER_1 = UUID.fromString("00000000-0000-0000-0000-000000000001");

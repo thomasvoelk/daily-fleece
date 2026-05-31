@@ -28,7 +28,7 @@ class SessionRepositoryTest {
 
     @Test
     void save_and_findById_roundtrip() {
-        Session session = Session.create(LocalDate.of(2099, 1, 1), HOST_ID, new PlayerName("Host"), PHOTOS);
+        Session session = Session.create(LocalDate.parse("2099-01-01"), HOST_ID, new PlayerName("Host"), PHOTOS);
         sessionRepository.save(session);
 
         assertThat(sessionRepository.findById(session.sessionId()))
@@ -38,7 +38,7 @@ class SessionRepositoryTest {
 
     @Test
     void findByDate_returns_saved_session() {
-        LocalDate date = LocalDate.of(2099, 1, 2);
+        LocalDate date = LocalDate.parse("2099-01-02");
         Session session = Session.create(date, HOST_ID, new PlayerName("Host"), PHOTOS);
         sessionRepository.save(session);
 
@@ -47,7 +47,7 @@ class SessionRepositoryTest {
 
     @Test
     void save_and_findById_preserves_photo_ids() {
-        Session session = Session.create(LocalDate.of(2099, 1, 4), HOST_ID, new PlayerName("Host"), PHOTOS);
+        Session session = Session.create(LocalDate.parse("2099-01-04"), HOST_ID, new PlayerName("Host"), PHOTOS);
         sessionRepository.save(session);
 
         assertThat(sessionRepository.findById(session.sessionId()).orElseThrow().photos())
@@ -61,6 +61,6 @@ class SessionRepositoryTest {
 
     @Test
     void findByDate_returns_empty_when_no_session_for_date() {
-        assertThat(sessionRepository.findByDate(LocalDate.of(2099, 1, 3))).isEmpty();
+        assertThat(sessionRepository.findByDate(LocalDate.parse("2099-01-03"))).isEmpty();
     }
 }

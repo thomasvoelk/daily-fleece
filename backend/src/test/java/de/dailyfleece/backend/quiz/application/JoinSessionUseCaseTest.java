@@ -34,7 +34,7 @@ class JoinSessionUseCaseTest {
 
     @Test
     void join_adds_player_to_lobby_session() {
-        Session session = Session.create(LocalDate.of(2098, 1, 1), HOST_ID, new PlayerName("Host"), PHOTOS);
+        Session session = Session.create(LocalDate.parse("2098-01-01"), HOST_ID, new PlayerName("Host"), PHOTOS);
         sessionRepository.save(session);
 
         useCase.join(session.sessionId(), PLAYER_1, new PlayerName("Thomas"));
@@ -52,7 +52,7 @@ class JoinSessionUseCaseTest {
 
     @Test
     void join_propagates_domain_exception_when_session_not_in_lobby() {
-        Session session = Session.create(LocalDate.of(2098, 1, 3), HOST_ID, new PlayerName("Host"), PHOTOS);
+        Session session = Session.create(LocalDate.parse("2098-01-03"), HOST_ID, new PlayerName("Host"), PHOTOS);
         session.start();
         sessionRepository.save(session);
 
