@@ -24,7 +24,6 @@ function makeSession(sessionId: string, players: SessionResponse['players'] = []
     phase: 'Lobby',
     projectId: 'default',
     players,
-    photos: { q1: '', q2: '' },
     voting: { q1: { status: 'Open' }, q2: { status: 'Open' } },
   };
 }
