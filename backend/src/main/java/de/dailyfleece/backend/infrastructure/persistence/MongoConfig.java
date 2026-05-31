@@ -1,4 +1,4 @@
-package de.dailyfleece.backend;
+package de.dailyfleece.backend.infrastructure.persistence;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

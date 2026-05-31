@@ -1,4 +1,4 @@
-package de.dailyfleece.backend;
+package de.dailyfleece.backend.infrastructure.web;
 
 import java.net.URI;
 import org.springframework.http.HttpStatus;

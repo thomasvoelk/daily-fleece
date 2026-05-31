@@ -1,4 +1,4 @@
-package de.dailyfleece.backend;
+package de.dailyfleece.backend.infrastructure.web;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ApiVersionConfigurer;
