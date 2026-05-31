@@ -4,6 +4,7 @@ import { HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Lobby } from './lobby';
 import { provideTestEnvironment } from '../../testing/providers';
+import { expectNoA11yViolations } from '../../testing/a11y';
 import { SessionResponse } from '../api/models';
 
 // localStorage polyfill — the Node test environment doesn't provide it
@@ -48,6 +49,13 @@ function makeSession(sessionId: string, players: SessionResponse['players'] = []
 const PROVIDERS = provideTestEnvironment();
 
 // ─── tests ───────────────────────────────────────────────────────────────────
+
+describe('Lobby – a11y', () => {
+  it('has no axe violations in idle state', async () => {
+    const { container } = await render(Lobby, { providers: PROVIDERS });
+    await expectNoA11yViolations(container);
+  });
+});
 
 describe('Lobby – idle state', () => {
   it('shows Company ID and Display name inputs and a Join button', async () => {
@@ -111,6 +119,25 @@ describe('Lobby – 409 session already in progress', () => {
       .flush({ type: '/problems/session-already-active' }, { status: 409, statusText: 'Conflict' });
 
     await screen.findByText(/session is already in progress/i);
+    expect(screen.queryByRole('button', { name: /join/i })).toBeNull();
+  });
+});
+
+describe('Lobby – generic error', () => {
+  it('shows error message and hides the form on a non-409 error', async () => {
+    const user = userEvent.setup();
+    await render(Lobby, { providers: PROVIDERS });
+    const http = TestBed.inject(HttpTestingController);
+
+    await user.type(screen.getByRole('textbox', { name: /company id/i }), 'acme');
+    await user.type(screen.getByRole('textbox', { name: /display name/i }), 'Alice');
+    await user.click(screen.getByRole('button', { name: /join/i }));
+
+    http
+      .expectOne('/api/v1/players')
+      .flush({ message: 'Internal Server Error' }, { status: 500, statusText: 'Server Error' });
+
+    await screen.findByText(/something went wrong/i);
     expect(screen.queryByRole('button', { name: /join/i })).toBeNull();
   });
 });

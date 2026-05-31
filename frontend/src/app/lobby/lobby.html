@@ -1,5 +1,5 @@
 <main class="min-h-screen p-4">
-  @if (store.phase() !== 'joined' && store.phase() !== 'inProgress') {
+  @if (store.phase() === 'idle' || store.phase() === 'loading') {
     <form
       class="flex flex-col gap-4 max-w-sm mx-auto mt-8"
       (submit)="onJoin(); $event.preventDefault()"
@@ -72,6 +72,12 @@
       i18n="lobby|Error shown when a session is already running@@lobby.sessionInProgressAlert"
     >
       Session is already in progress
+    </p>
+  }
+
+  @if (store.phase() === 'error') {
+    <p class="text-center mt-8 text-red-600" role="alert">
+      {{ store.errorMessage() }}
     </p>
   }
 
