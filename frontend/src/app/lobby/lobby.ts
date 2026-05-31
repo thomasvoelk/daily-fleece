@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, inject, linkedSignal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { form, FormField, submit, required, maxLength } from '@angular/forms/signals';
 import { LobbyStore } from './lobby.store';
 import { FieldError } from '../shared/field-error';
@@ -12,10 +12,10 @@ import { FieldError } from '../shared/field-error';
 export class Lobby {
   protected store = inject(LobbyStore);
 
-  private model = linkedSignal(() => ({
+  private model = signal({
     companyId: this.store.companyId() ?? '',
     displayName: this.store.displayName() ?? '',
-  }));
+  });
 
   protected joinForm = form(this.model, (s) => {
     required(s.companyId, {
