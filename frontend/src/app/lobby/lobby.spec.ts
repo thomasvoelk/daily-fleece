@@ -140,12 +140,8 @@ describe('Lobby – form pre-fill from storage', () => {
     );
     await render(Lobby, { providers: PROVIDERS });
 
-    expect((screen.getByRole('textbox', { name: /company id/i }) as HTMLInputElement).value).toBe(
-      'acme',
-    );
-    expect((screen.getByRole('textbox', { name: /display name/i }) as HTMLInputElement).value).toBe(
-      'Alice',
-    );
+    expect(screen.getByRole('textbox', { name: /company id/i })).toHaveValue('acme');
+    expect(screen.getByRole('textbox', { name: /display name/i })).toHaveValue('Alice');
   });
 });
 
@@ -196,12 +192,8 @@ describe('Lobby – cross-tab storage write', () => {
       }),
     );
 
-    expect((screen.getByRole('textbox', { name: /company id/i }) as HTMLInputElement).value).toBe(
-      'acme',
-    );
-    expect((screen.getByRole('textbox', { name: /display name/i }) as HTMLInputElement).value).toBe(
-      'Alice',
-    );
+    expect(screen.getByRole('textbox', { name: /company id/i })).toHaveValue('acme');
+    expect(screen.getByRole('textbox', { name: /display name/i })).toHaveValue('Alice');
   });
 });
 
@@ -242,7 +234,7 @@ describe('Lobby – error retry', () => {
       }),
     );
 
-    expect((companyIdInput as HTMLInputElement).value).toBe('acme-v2');
+    expect(companyIdInput).toHaveValue('acme-v2');
 
     // Retry — the server should receive the edited company ID
     await user.click(screen.getByRole('button', { name: /join/i }));
