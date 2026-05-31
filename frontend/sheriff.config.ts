@@ -9,7 +9,9 @@ export const sheriffConfig: SheriffConfig = {
   },
   depRules: {
     root: ['domain:*'],
-    'domain:*': [{ from: 'domain:*', to: 'domain:*' }],
+    'domain:shared': [],
+    'domain:api': [],
+    'domain:*': ['domain:shared', 'domain:api'],
     'type:api': [],
   },
 };
