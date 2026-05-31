@@ -1,7 +1,8 @@
-package de.dailyfleece.backend;
+package de.dailyfleece.backend.quiz.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.dailyfleece.backend.TestcontainersConfiguration;
 import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.domain.PhotoId;
 import de.dailyfleece.backend.quiz.domain.Session;
@@ -11,10 +12,10 @@ import java.time.LocalDate;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.modulith.test.ApplicationModuleTest;
 
-@SpringBootTest
+@ApplicationModuleTest
 @Import(TestcontainersConfiguration.class)
 class SessionRepositoryTest {
 

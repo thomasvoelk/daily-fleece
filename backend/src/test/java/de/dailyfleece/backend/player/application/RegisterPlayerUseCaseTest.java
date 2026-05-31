@@ -9,10 +9,10 @@ import de.dailyfleece.backend.player.domain.Player;
 import de.dailyfleece.backend.player.domain.PlayerRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.modulith.test.ApplicationModuleTest;
 
-@SpringBootTest
+@ApplicationModuleTest
 @Import(TestcontainersConfiguration.class)
 class RegisterPlayerUseCaseTest {
 

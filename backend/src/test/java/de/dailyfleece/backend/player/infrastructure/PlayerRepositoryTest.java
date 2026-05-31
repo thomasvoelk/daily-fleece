@@ -1,17 +1,18 @@
-package de.dailyfleece.backend;
+package de.dailyfleece.backend.player.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.dailyfleece.backend.TestcontainersConfiguration;
 import de.dailyfleece.backend.player.api.CompanyId;
 import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.player.domain.Player;
 import de.dailyfleece.backend.player.domain.PlayerRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.modulith.test.ApplicationModuleTest;
 
-@SpringBootTest
+@ApplicationModuleTest
 @Import(TestcontainersConfiguration.class)
 class PlayerRepositoryTest {
 
