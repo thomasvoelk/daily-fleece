@@ -20,17 +20,16 @@
           id="companyId"
           [formField]="joinForm.companyId"
           class="border rounded px-3 py-2"
-          [attr.aria-describedby]="companyIdError() ? 'companyId-error' : null"
-          [attr.aria-invalid]="companyIdError() ? 'true' : null"
+          [attr.aria-describedby]="
+            joinForm.companyId().touched() && joinForm.companyId().invalid()
+              ? 'companyId-error'
+              : null
+          "
+          [attr.aria-invalid]="
+            joinForm.companyId().touched() && joinForm.companyId().invalid() ? 'true' : null
+          "
         />
-        @if (companyIdError()) {
-          <span
-            id="companyId-error"
-            class="text-sm text-red-600"
-            i18n="lobby|Validation error when Company ID is empty@@lobby.companyIdRequired"
-            >Required</span
-          >
-        }
+        <app-field-error id="companyId-error" [state]="joinForm.companyId()" />
       </div>
 
       <div class="flex flex-col gap-1">
@@ -43,26 +42,16 @@
           id="displayName"
           [formField]="joinForm.displayName"
           class="border rounded px-3 py-2"
-          [attr.aria-describedby]="displayNameError() ? 'displayName-error' : null"
-          [attr.aria-invalid]="displayNameError() ? 'true' : null"
+          [attr.aria-describedby]="
+            joinForm.displayName().touched() && joinForm.displayName().invalid()
+              ? 'displayName-error'
+              : null
+          "
+          [attr.aria-invalid]="
+            joinForm.displayName().touched() && joinForm.displayName().invalid() ? 'true' : null
+          "
         />
-        @if (displayNameError() === 'required') {
-          <span
-            id="displayName-error"
-            class="text-sm text-red-600"
-            i18n="lobby|Validation error when Display name is empty@@lobby.displayNameRequired"
-            >Required</span
-          >
-        } @else if (displayNameError() === 'maxLength') {
-          <span
-            id="displayName-error"
-            class="text-sm text-red-600"
-            i18n="
-              lobby|Validation error when Display name exceeds 20
-              characters@@lobby.displayNameTooLong"
-            >Maximum 20 characters</span
-          >
-        }
+        <app-field-error id="displayName-error" [state]="joinForm.displayName()" />
       </div>
 
       <button
