@@ -1,6 +1,7 @@
 package de.dailyfleece.backend.quiz.infrastructure.web;
 
 import de.dailyfleece.backend.quiz.application.NoSessionForDate;
+import de.dailyfleece.backend.quiz.application.SessionAlreadyExists;
 import de.dailyfleece.backend.quiz.application.SessionNotFound;
 import de.dailyfleece.backend.quiz.domain.LobbyClosed;
 import java.net.URI;
@@ -17,6 +18,15 @@ class QuizExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         problem.setType(URI.create("/problems/session-not-found"));
         problem.setTitle("Session Not Found");
+        problem.setDetail(ex.getMessage());
+        return problem;
+    }
+
+    @ExceptionHandler(SessionAlreadyExists.class)
+    ProblemDetail handleSessionAlreadyExists(SessionAlreadyExists ex) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        problem.setType(URI.create("/problems/session-already-exists"));
+        problem.setTitle("Session Already Exists");
         problem.setDetail(ex.getMessage());
         return problem;
     }

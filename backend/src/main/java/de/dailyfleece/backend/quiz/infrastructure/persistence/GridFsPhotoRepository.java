@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
 import java.util.HexFormat;
+import java.util.Optional;
 import java.util.UUID;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -38,11 +39,11 @@ class GridFsPhotoRepository implements PhotoRepository {
     }
 
     @Override
-    public Photo load(PhotoId photoId) {
+    public Optional<Photo> load(PhotoId photoId) {
         var file = operations.findOne(
                 Query.query(Criteria.where("metadata.photoId").is(photoId.value())));
         if (file == null) {
-            throw new IllegalArgumentException("No photo found for id: " + photoId.value());
+            return Optional.empty();
         }
         try {
             var metadata = file.getMetadata();
@@ -50,7 +51,7 @@ class GridFsPhotoRepository implements PhotoRepository {
                 throw new IllegalStateException("GridFS file has no metadata for id: " + photoId.value());
             }
             var mimeType = MimeType.valueOf(metadata.getString("_contentType"));
-            return new Photo(operations.getResource(file).getInputStream(), mimeType);
+            return Optional.of(new Photo(operations.getResource(file).getInputStream(), mimeType));
         } catch (IOException e) {
             throw new IllegalStateException("Failed to load photo: " + photoId.value(), e);
         }

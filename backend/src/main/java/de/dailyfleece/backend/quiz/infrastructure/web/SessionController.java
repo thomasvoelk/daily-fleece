@@ -4,32 +4,73 @@ import de.dailyfleece.api.SessionsApi;
 import de.dailyfleece.api.model.JoinSessionRequest;
 import de.dailyfleece.api.model.SessionResponse;
 import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.quiz.application.CreateSessionUseCase;
 import de.dailyfleece.backend.quiz.application.JoinSessionUseCase;
+import de.dailyfleece.backend.quiz.application.LoadSessionPhotoUseCase;
 import de.dailyfleece.backend.quiz.application.LoadSessionUseCase;
 import de.dailyfleece.backend.quiz.application.NoSessionForDate;
+import de.dailyfleece.backend.quiz.domain.Photo;
 import de.dailyfleece.backend.quiz.domain.Session;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.UUID;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MimeType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(value = "/api/{version}", version = "1.0+")
 class SessionController implements SessionsApi {
 
+    private final CreateSessionUseCase createSessionUseCase;
     private final LoadSessionUseCase loadSessionUseCase;
+    private final LoadSessionPhotoUseCase loadSessionPhotoUseCase;
     private final JoinSessionUseCase joinSessionUseCase;
     private final SessionResponseMapper mapper;
 
     SessionController(
+            CreateSessionUseCase createSessionUseCase,
             LoadSessionUseCase loadSessionUseCase,
+            LoadSessionPhotoUseCase loadSessionPhotoUseCase,
             JoinSessionUseCase joinSessionUseCase,
             SessionResponseMapper mapper) {
+        this.createSessionUseCase = createSessionUseCase;
         this.loadSessionUseCase = loadSessionUseCase;
+        this.loadSessionPhotoUseCase = loadSessionPhotoUseCase;
         this.joinSessionUseCase = joinSessionUseCase;
         this.mapper = mapper;
+    }
+
+    @Override
+    public ResponseEntity<SessionResponse> createSession(
+            String hostId, String hostDisplayName, MultipartFile q1, MultipartFile q2) {
+        try {
+            LocalDate today = LocalDate.now(ZoneId.systemDefault());
+            UUID hostUuid = UUID.fromString(hostId);
+            PlayerName name = new PlayerName(hostDisplayName);
+            MimeType q1Type =
+                    MimeType.valueOf(q1.getContentType() != null ? q1.getContentType() : "application/octet-stream");
+            MimeType q2Type =
+                    MimeType.valueOf(q2.getContentType() != null ? q2.getContentType() : "application/octet-stream");
+            Session session = createSessionUseCase.create(
+                    today, hostUuid, name, q1.getInputStream(), q1Type, q2.getInputStream(), q2Type);
+            return ResponseEntity.status(201).body(mapper.toResponse(session));
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to read uploaded photo", e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Resource> getSessionPhoto(String sessionId, String question) {
+        Photo photo = loadSessionPhotoUseCase.load(UUID.fromString(sessionId), question);
+        MediaType contentType = MediaType.parseMediaType(photo.mimeType().toString());
+        return ResponseEntity.ok().contentType(contentType).body(new InputStreamResource(photo.data()));
     }
 
     @Override

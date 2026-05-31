@@ -46,7 +46,7 @@ class GridFsPhotoRepositoryTest {
         byte[] original = "fake-image-bytes".getBytes(StandardCharsets.UTF_8);
         PhotoId photoId = photoRepository.store(new ByteArrayInputStream(original), IMAGE_JPEG, SESSION_ID, "q1");
 
-        var photo = photoRepository.load(photoId);
+        var photo = photoRepository.load(photoId).orElseThrow();
 
         assertThat(photo.data().readAllBytes()).isEqualTo(original);
         assertThat(photo.mimeType()).isEqualTo(IMAGE_JPEG);
