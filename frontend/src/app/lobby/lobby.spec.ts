@@ -56,6 +56,13 @@ describe('Lobby – a11y', () => {
     const { container } = await render(Lobby, { providers: PROVIDERS });
     await expectNoA11yViolations(container);
   });
+
+  it('has persistent live regions in the DOM before any error occurs', async () => {
+    await render(Lobby, { providers: PROVIDERS });
+    // role=alert elements must be in the DOM before text is injected so screen
+    // readers fire the change announcement rather than reading static content
+    expect(screen.queryAllByRole('alert').length).toBeGreaterThan(0);
+  });
 });
 
 describe('Lobby – idle state', () => {
@@ -125,7 +132,7 @@ describe('Lobby – 409 session already in progress', () => {
 });
 
 describe('Lobby – generic error', () => {
-  it('shows error message and hides the form on a non-409 error', async () => {
+  it('shows error message and keeps the form visible so users can retry', async () => {
     const user = userEvent.setup();
     await render(Lobby, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
@@ -139,7 +146,7 @@ describe('Lobby – generic error', () => {
       .flush({ message: 'Internal Server Error' }, { status: 500, statusText: 'Server Error' });
 
     await screen.findByText(/something went wrong/i);
-    expect(screen.queryByRole('button', { name: /join/i })).toBeNull();
+    screen.getByRole('button', { name: /join/i });
   });
 });
 
@@ -185,6 +192,87 @@ describe('Lobby – 409 with unrelated body', () => {
 
     await screen.findByText(/something went wrong/i);
     expect(screen.queryByText(/session is already in progress/i)).toBeNull();
+  });
+});
+
+describe('Lobby – cross-tab storage write', () => {
+  it('preserves typed values when another tab updates storage', async () => {
+    const user = userEvent.setup();
+    await render(Lobby, { providers: PROVIDERS });
+
+    await user.type(screen.getByRole('textbox', { name: /company id/i }), 'acme');
+    await user.type(screen.getByRole('textbox', { name: /display name/i }), 'Alice');
+
+    window.dispatchEvent(
+      new StorageEvent('storage', {
+        key: 'lobby-player',
+        newValue: JSON.stringify({
+          playerId: null,
+          companyId: 'other-company',
+          displayName: 'Other',
+        }),
+      }),
+    );
+
+    expect((screen.getByRole('textbox', { name: /company id/i }) as HTMLInputElement).value).toBe(
+      'acme',
+    );
+    expect((screen.getByRole('textbox', { name: /display name/i }) as HTMLInputElement).value).toBe(
+      'Alice',
+    );
+  });
+});
+
+describe('Lobby – error retry', () => {
+  it('preserves edited values when retrying after a join error', async () => {
+    const user = userEvent.setup();
+    await render(Lobby, { providers: PROVIDERS });
+    const http = TestBed.inject(HttpTestingController);
+
+    // First join attempt — registerPlayer succeeds, getTodaySession fails
+    await user.type(screen.getByRole('textbox', { name: /company id/i }), 'acme');
+    await user.type(screen.getByRole('textbox', { name: /display name/i }), 'Alice');
+    await user.click(screen.getByRole('button', { name: /join/i }));
+
+    http.expectOne('/api/v1/players').flush({
+      playerId: 'p1',
+      displayName: 'Alice',
+    } satisfies import('../api/models').PlayerResponse);
+    await drainMicrotasks();
+
+    http
+      .expectOne('/api/v1/sessions/today')
+      .flush({ message: 'Internal Server Error' }, { status: 500, statusText: 'Server Error' });
+
+    await screen.findByText(/something went wrong/i);
+    screen.getByRole('button', { name: /join/i }); // form is visible (df-0hq fix)
+
+    // User edits the company ID for retry
+    const companyIdInput = screen.getByRole('textbox', { name: /company id/i });
+    await user.clear(companyIdInput);
+    await user.type(companyIdInput, 'acme-v2');
+
+    // Another tab writes the original values back — should not clobber the edit
+    window.dispatchEvent(
+      new StorageEvent('storage', {
+        key: 'lobby-player',
+        newValue: JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
+      }),
+    );
+
+    expect((companyIdInput as HTMLInputElement).value).toBe('acme-v2');
+
+    // Retry — the server should receive the edited company ID
+    await user.click(screen.getByRole('button', { name: /join/i }));
+    const req = http.expectOne('/api/v1/players');
+    expect(req.request.body).toMatchObject({ companyId: 'acme-v2' });
+    req.flush({
+      playerId: 'p2',
+      displayName: 'Alice',
+    } satisfies import('../api/models').PlayerResponse);
+    // drain remaining requests to avoid open-request warnings
+    await drainMicrotasks();
+    http.expectOne('/api/v1/sessions/today').flush(makeSession('s1'));
   });
 });
 
@@ -251,8 +339,7 @@ describe('Lobby – refresh', () => {
       .expectOne('/api/v1/sessions/today')
       .flush({ message: 'Internal Server Error' }, { status: 500, statusText: 'Server Error' });
 
-    const alert = await screen.findByRole('alert');
-    expect(alert.textContent).toMatch(/refresh failed/i);
+    await screen.findByText(/refresh failed/i);
     expect(screen.getByText('Alice')).toBeTruthy();
   });
 });

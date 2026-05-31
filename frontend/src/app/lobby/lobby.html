@@ -1,5 +1,5 @@
 <main class="min-h-screen p-4">
-  @if (store.phase() === 'idle' || store.phase() === 'loading') {
+  @if (store.phase() === 'idle' || store.phase() === 'loading' || store.phase() === 'error') {
     <form
       class="flex flex-col gap-4 max-w-sm mx-auto mt-8"
       (submit)="onJoin(); $event.preventDefault()"
@@ -53,21 +53,18 @@
     </form>
   }
 
-  @if (store.phase() === 'inProgress') {
-    <p
-      class="text-center mt-8 text-red-600"
-      role="alert"
-      i18n="lobby|Error shown when a session is already running@@lobby.sessionInProgressAlert"
-    >
-      Session is already in progress
-    </p>
-  }
+  <p
+    class="text-center mt-8 text-red-600"
+    role="alert"
+    aria-live="assertive"
+    i18n="lobby|Error shown when a session is already running@@lobby.sessionInProgressAlert"
+  >
+    {{ store.phase() === 'inProgress' ? 'Session is already in progress' : '' }}
+  </p>
 
-  @if (store.phase() === 'error') {
-    <p class="text-center mt-8 text-red-600" role="alert">
-      {{ store.errorMessage() }}
-    </p>
-  }
+  <p class="text-center mt-8 text-red-600" role="alert" aria-live="assertive">
+    {{ store.phase() === 'error' ? store.errorMessage() : '' }}
+  </p>
 
   @if (store.phase() === 'joined') {
     <div class="max-w-sm mx-auto mt-8">
@@ -93,11 +90,9 @@
       >
         Refresh
       </button>
-      @if (store.refreshError()) {
-        <p class="mt-2 text-sm text-red-600" role="alert">
-          {{ store.refreshError() }}
-        </p>
-      }
+      <p class="mt-2 text-sm text-red-600" role="alert" aria-live="assertive">
+        {{ store.refreshError() ?? '' }}
+      </p>
     </div>
   }
 </main>
