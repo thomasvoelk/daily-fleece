@@ -1,6 +1,7 @@
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { LobbyStore } from './lobby.store';
 import { EntryStore } from '../entry/entry.store';
 import { provideTestEnvironment } from '../../testing/providers';
@@ -9,7 +10,15 @@ import { SessionResponse } from '../api/models';
 
 mockLocalStorage();
 
-const PROVIDERS = [...provideTestEnvironment(), provideRouter([]), EntryStore, LobbyStore];
+@Component({ template: '' })
+class QuizStub {}
+
+const PROVIDERS = [
+  ...provideTestEnvironment(),
+  provideRouter([{ path: 'quiz', component: QuizStub }]),
+  EntryStore,
+  LobbyStore,
+];
 
 function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse {
   return {
@@ -24,45 +33,40 @@ function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse 
   };
 }
 
-// ─── refresh ─────────────────────────────────────────────────────────────────
+// ─── goToQuiz ────────────────────────────────────────────────────────────────
 
-describe('LobbyStore – refresh', () => {
-  it('updates session on success', async () => {
+describe('LobbyStore – goToQuiz', () => {
+  it('navigates to /quiz when fetched session is Active', async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(LobbyStore);
     const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate');
 
-    store.initializeSession(makeSession({ players: [{ playerId: 'p1', displayName: 'Alice' }] }));
+    store.initializeSession(makeSession({ phase: 'Lobby' }));
 
-    const promise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(
-      makeSession({
-        players: [
-          { playerId: 'p1', displayName: 'Alice' },
-          { playerId: 'p2', displayName: 'Bob' },
-        ],
-      }),
-    );
+    const promise = store.goToQuiz();
+    http.expectOne('/api/v1/sessions/today').flush(makeSession({ phase: 'Active' }));
     await promise;
 
-    expect(store.session()?.players).toHaveLength(2);
+    expect(navigateSpy).toHaveBeenCalledWith(['/quiz']);
   });
 
-  it('sets refreshError on failure without clearing the session', async () => {
+  it('sets error when session is still in Lobby phase', async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(LobbyStore);
     const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate');
 
-    store.initializeSession(makeSession({ players: [{ playerId: 'p1', displayName: 'Alice' }] }));
+    store.initializeSession(makeSession({ phase: 'Lobby' }));
 
-    const promise = store.refresh();
-    http
-      .expectOne('/api/v1/sessions/today')
-      .flush({ message: 'Internal Server Error' }, { status: 500, statusText: 'Server Error' });
+    const promise = store.goToQuiz();
+    http.expectOne('/api/v1/sessions/today').flush(makeSession({ phase: 'Lobby' }));
     await promise;
 
-    expect(store.refreshError()).toMatch(/refresh failed/i);
-    expect(store.session()?.players).toHaveLength(1);
+    expect(store.error()).toMatch(/not started/i);
+    expect(navigateSpy).not.toHaveBeenCalled();
   });
 });
 
@@ -116,5 +120,25 @@ describe('LobbyStore – startQuiz', () => {
     expect(req.request.body).toMatchObject({ hostId: 'host-1' });
     req.flush(makeSession({ sessionId: 's42', phase: 'Active' }));
     await promise;
+  });
+
+  it('navigates to /quiz on success', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'host-1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(LobbyStore);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate');
+
+    store.initializeSession(makeSession({ sessionId: 's42', hostId: 'host-1' }));
+
+    const promise = store.startQuiz();
+    http.expectOne('/api/v1/sessions/s42/start').flush(makeSession({ phase: 'Active' }));
+    await promise;
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/quiz']);
   });
 });

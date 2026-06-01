@@ -1,4 +1,5 @@
 import { computed, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { Api } from '../api/api';
 import { getTodaySession } from '../api/fn/sessions/get-today-session';
@@ -8,14 +9,14 @@ import { SessionResponse } from '../api/models';
 
 interface LobbyState {
   session: SessionResponse | null;
-  refreshError: string | null;
+  error: string | null;
 }
 
 export const LobbyStore = signalStore(
   { providedIn: 'root' },
   withState<LobbyState>({
     session: null,
-    refreshError: null,
+    error: null,
   }),
   withComputed((store) => {
     const entryStore = inject(EntryStore);
@@ -30,20 +31,22 @@ export const LobbyStore = signalStore(
   }),
   withMethods((store) => {
     const api = inject(Api);
+    const router = inject(Router);
     const entryStore = inject(EntryStore);
     return {
       initializeSession(session: SessionResponse): void {
-        patchState(store, { session, refreshError: null });
+        patchState(store, { session, error: null });
       },
 
-      async refresh(): Promise<void> {
-        patchState(store, { refreshError: null });
-        try {
-          const session = await api.invoke(getTodaySession);
-          patchState(store, { session });
-        } catch {
+      async goToQuiz(): Promise<void> {
+        patchState(store, { error: null });
+        const session = await api.invoke(getTodaySession);
+        patchState(store, { session });
+        if (session.phase === 'Active') {
+          await router.navigate(['/quiz']);
+        } else {
           patchState(store, {
-            refreshError: $localize`:lobby|Error shown when session refresh fails@@lobby.refreshError:Refresh failed. Please try again.`,
+            error: $localize`:lobby|Error shown when quiz has not started yet@@lobby.quizNotStarted:Quiz not started yet. Please wait.`,
           });
         }
       },
@@ -56,6 +59,7 @@ export const LobbyStore = signalStore(
           sessionId: session.sessionId,
           body: { hostId: playerId },
         });
+        await router.navigate(['/quiz']);
       },
     };
   }),

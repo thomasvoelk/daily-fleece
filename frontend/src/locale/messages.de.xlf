@@ -70,17 +70,17 @@
         <source>Players in session</source>
         <target>Spieler in der Session</target>
       </trans-unit>
-      <trans-unit id="lobby.refreshButton" datatype="html">
-        <source> Refresh </source>
-        <target> Aktualisieren </target>
+      <trans-unit id="lobby.goToQuizButton" datatype="html">
+        <source> Go to Quiz </source>
+        <target> Zum Quiz </target>
       </trans-unit>
       <trans-unit id="lobby.startQuizButton" datatype="html">
         <source> Start Quiz </source>
         <target> Quiz starten </target>
       </trans-unit>
-      <trans-unit id="lobby.refreshError" datatype="html">
-        <source>Refresh failed. Please try again.</source>
-        <target>Aktualisierung fehlgeschlagen. Bitte erneut versuchen.</target>
+      <trans-unit id="lobby.quizNotStarted" datatype="html">
+        <source>Quiz not started yet. Please wait.</source>
+        <target>Quiz noch nicht gestartet. Bitte warten.</target>
       </trans-unit>
     </body>
   </file>

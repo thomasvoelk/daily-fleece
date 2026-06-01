@@ -1,7 +1,9 @@
+import { Component } from '@angular/core';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { Lobby } from './lobby';
 import { LobbyStore } from './lobby.store';
 import { EntryStore } from '../entry/entry.store';
@@ -11,6 +13,9 @@ import { mockLocalStorage } from '../../testing/local-storage';
 import { SessionResponse } from '../api/models';
 
 mockLocalStorage();
+
+@Component({ template: '' })
+class QuizStub {}
 
 function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse {
   return {
@@ -25,7 +30,12 @@ function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse 
   };
 }
 
-const PROVIDERS = [...provideTestEnvironment(), EntryStore, LobbyStore];
+const PROVIDERS = [
+  ...provideTestEnvironment(),
+  provideRouter([{ path: 'quiz', component: QuizStub }]),
+  EntryStore,
+  LobbyStore,
+];
 
 // ─── a11y ────────────────────────────────────────────────────────────────────
 
@@ -39,7 +49,7 @@ describe('Lobby – a11y', () => {
     await expectNoA11yViolations(container);
   });
 
-  it('has a persistent live region for refresh errors', async () => {
+  it('has a persistent live region for errors', async () => {
     await render(Lobby, { providers: PROVIDERS });
     expect(screen.queryAllByRole('alert').length).toBeGreaterThan(0);
   });
@@ -93,34 +103,22 @@ describe('Lobby – Start Quiz button', () => {
   });
 });
 
-// ─── Refresh ──────────────────────────────────────────────────────────────────
+// ─── Go to Quiz button ────────────────────────────────────────────────────────
 
-describe('Lobby – Refresh', () => {
-  it('updates the player list on success', async () => {
-    const user = userEvent.setup();
+describe('Lobby – Go to Quiz button', () => {
+  it('is visible to all players including non-host', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'player-2', companyId: 'acme', displayName: 'Bob' }),
+    );
     const { fixture } = await render(Lobby, { providers: PROVIDERS });
-    const store = TestBed.inject(LobbyStore);
-    const http = TestBed.inject(HttpTestingController);
-
-    store.initializeSession(makeSession({ players: [{ playerId: 'p1', displayName: 'Alice' }] }));
+    TestBed.inject(LobbyStore).initializeSession(makeSession({ hostId: 'host-1' }));
     fixture.detectChanges();
 
-    await screen.findByText('Alice');
-
-    await user.click(screen.getByRole('button', { name: /refresh/i }));
-    http.expectOne('/api/v1/sessions/today').flush(
-      makeSession({
-        players: [
-          { playerId: 'p1', displayName: 'Alice' },
-          { playerId: 'p2', displayName: 'Bob' },
-        ],
-      }),
-    );
-
-    await screen.findByText('Bob');
+    screen.getByRole('button', { name: /go to quiz/i });
   });
 
-  it('shows error alert on failure without clearing the player list', async () => {
+  it('shows error when session is still in Lobby phase', async () => {
     const user = userEvent.setup();
     const { fixture } = await render(Lobby, { providers: PROVIDERS });
     const store = TestBed.inject(LobbyStore);
@@ -129,12 +127,12 @@ describe('Lobby – Refresh', () => {
     store.initializeSession(makeSession({ players: [{ playerId: 'p1', displayName: 'Alice' }] }));
     fixture.detectChanges();
 
-    await user.click(screen.getByRole('button', { name: /refresh/i }));
+    await user.click(screen.getByRole('button', { name: /go to quiz/i }));
     http
       .expectOne('/api/v1/sessions/today')
-      .flush({ message: 'Internal Server Error' }, { status: 500, statusText: 'Server Error' });
+      .flush(makeSession({ phase: 'Lobby', players: [{ playerId: 'p1', displayName: 'Alice' }] }));
 
-    await screen.findByText(/refresh failed/i);
+    await screen.findByText(/not started/i);
     expect(screen.getByText('Alice')).toBeTruthy();
   });
 });

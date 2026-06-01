@@ -14,11 +14,11 @@
     </ul>
     <div class="flex gap-2 mt-4">
       <button
-        (click)="store.refresh()"
+        (click)="store.goToQuiz()"
         class="border rounded px-4 py-2"
-        i18n="lobby|Button to reload the player list@@lobby.refreshButton"
+        i18n="lobby|Button to navigate to the quiz@@lobby.goToQuizButton"
       >
-        Refresh
+        Go to Quiz
       </button>
       @if (store.isHost()) {
         <button
@@ -31,7 +31,7 @@
       }
     </div>
     <p class="mt-2 text-sm text-red-600" role="alert" aria-live="assertive">
-      {{ store.refreshError() ?? '' }}
+      {{ store.error() ?? '' }}
     </p>
   </div>
 </main>
