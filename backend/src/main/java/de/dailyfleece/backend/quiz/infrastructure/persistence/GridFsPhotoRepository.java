@@ -28,6 +28,11 @@ class GridFsPhotoRepository implements PhotoRepository {
     }
 
     @Override
+    public void deleteBySessionId(UUID sessionId) {
+        operations.delete(Query.query(Criteria.where("filename").regex("^" + sessionId + "_")));
+    }
+
+    @Override
     public Optional<Photo> load(UUID sessionId, String question) {
         var file =
                 operations.findOne(Query.query(Criteria.where("filename").is(Photo.filenameFor(sessionId, question))));

@@ -1,7 +1,14 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, request } from '@playwright/test';
 import path from 'path';
 
 const FIXTURES = path.join(__dirname, '..', 'fixtures');
+const BACKEND = 'http://localhost:8080';
+
+test.beforeEach(async () => {
+  const api = await request.newContext({ baseURL: BACKEND });
+  await api.delete('/api/v1/sessions/today');
+  await api.dispose();
+});
 
 test('host creates lobby, player joins, and host sees player after refresh', async ({ page, browser }) => {
   await page.goto('/');

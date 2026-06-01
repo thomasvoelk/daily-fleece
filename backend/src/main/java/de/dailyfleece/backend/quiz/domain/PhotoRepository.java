@@ -9,4 +9,6 @@ public interface PhotoRepository {
     void store(Photo photo);
 
     Optional<Photo> load(UUID sessionId, String question);
+
+    void deleteBySessionId(UUID sessionId);
 }

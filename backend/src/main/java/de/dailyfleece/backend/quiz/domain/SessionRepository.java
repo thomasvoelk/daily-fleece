@@ -12,4 +12,6 @@ public interface SessionRepository {
     Optional<Session> findById(UUID sessionId);
 
     Optional<Session> findByDate(LocalDate date);
+
+    void deleteByDate(LocalDate date);
 }

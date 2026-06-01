@@ -5,6 +5,7 @@ import de.dailyfleece.api.model.JoinSessionRequest;
 import de.dailyfleece.api.model.SessionResponse;
 import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.application.CreateSessionUseCase;
+import de.dailyfleece.backend.quiz.application.DeleteSessionUseCase;
 import de.dailyfleece.backend.quiz.application.JoinSessionUseCase;
 import de.dailyfleece.backend.quiz.application.LoadSessionPhotoUseCase;
 import de.dailyfleece.backend.quiz.application.LoadSessionUseCase;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 class SessionController implements SessionsApi {
 
     private final CreateSessionUseCase createSessionUseCase;
+    private final DeleteSessionUseCase deleteSessionUseCase;
     private final LoadSessionUseCase loadSessionUseCase;
     private final LoadSessionPhotoUseCase loadSessionPhotoUseCase;
     private final JoinSessionUseCase joinSessionUseCase;
@@ -36,11 +38,13 @@ class SessionController implements SessionsApi {
 
     SessionController(
             CreateSessionUseCase createSessionUseCase,
+            DeleteSessionUseCase deleteSessionUseCase,
             LoadSessionUseCase loadSessionUseCase,
             LoadSessionPhotoUseCase loadSessionPhotoUseCase,
             JoinSessionUseCase joinSessionUseCase,
             SessionResponseMapper mapper) {
         this.createSessionUseCase = createSessionUseCase;
+        this.deleteSessionUseCase = deleteSessionUseCase;
         this.loadSessionUseCase = loadSessionUseCase;
         this.loadSessionPhotoUseCase = loadSessionPhotoUseCase;
         this.joinSessionUseCase = joinSessionUseCase;
@@ -69,6 +73,13 @@ class SessionController implements SessionsApi {
         Photo photo = loadSessionPhotoUseCase.load(UUID.fromString(sessionId), question);
         MediaType contentType = PhotoTypeRegistry.toMediaType(photo.photoType());
         return ResponseEntity.ok().contentType(contentType).body(new InputStreamResource(photo.data()));
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteTodaySession() {
+        LocalDate today = LocalDate.now(ZoneId.systemDefault());
+        deleteSessionUseCase.delete(today);
+        return ResponseEntity.noContent().build();
     }
 
     @Override

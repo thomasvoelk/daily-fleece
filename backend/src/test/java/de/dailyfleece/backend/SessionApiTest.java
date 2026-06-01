@@ -58,6 +58,36 @@ class SessionApiTest {
     }
 
     @Test
+    void deleteTodaySession_returns_204_when_no_session_exists() {
+        ResponseEntity<Void> response =
+                http.delete().uri("/sessions/today").retrieve().toBodilessEntity();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void deleteTodaySession_returns_204_and_removes_session() {
+        sessionRepository.save(Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host")));
+
+        ResponseEntity<Void> response =
+                http.delete().uri("/sessions/today").retrieve().toBodilessEntity();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(sessionRepository.findByDate(LocalDate.now(ZoneId.systemDefault())))
+                .isEmpty();
+    }
+
+    @Test
+    void deleteTodaySession_cascade_deletes_photos() {
+        postSession();
+
+        http.delete().uri("/sessions/today").retrieve().toBodilessEntity();
+
+        assertThat(mongoTemplate.getDb().getCollection("fs.files").countDocuments())
+                .isZero();
+    }
+
+    @Test
     void getTodaySession_returns_404_when_no_session_today() {
         ResponseEntity<Map<String, Object>> response =
                 http.get().uri("/sessions/today").retrieve().toEntity(responseType());

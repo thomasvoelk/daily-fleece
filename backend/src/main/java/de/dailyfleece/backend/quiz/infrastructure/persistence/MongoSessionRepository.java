@@ -37,4 +37,10 @@ class MongoSessionRepository implements SessionRepository {
         @Nullable SessionDocument doc = mongoTemplate.findOne(query, SessionDocument.class);
         return Optional.ofNullable(doc).map(SessionDocument::toDomain);
     }
+
+    @Override
+    public void deleteByDate(LocalDate date) {
+        Query query = Query.query(Criteria.where("date").is(date));
+        mongoTemplate.remove(query, SessionDocument.class);
+    }
 }

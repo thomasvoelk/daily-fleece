@@ -154,6 +154,17 @@ paths:
                 title: "Session Not Found"
                 status: 404
                 detail: "No session exists for today."
+    delete:
+      operationId: deleteTodaySession
+      tags: [Sessions]
+      summary: Delete today's session
+      description: |
+        Deletes the session for today's date (server timezone), including its
+        GridFS photos (cascade). Idempotent: returns 204 even if no session
+        exists for today. Used by the e2e test suite to reset state between runs.
+      responses:
+        "204":
+          description: Session deleted (or did not exist).
 
   /sessions:
     post:
