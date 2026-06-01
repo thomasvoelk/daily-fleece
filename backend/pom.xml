@@ -264,7 +264,7 @@
 				<executions>
 					<execution>
 						<id>checkstyle</id>
-						<phase>verify</phase>
+						<phase>validate</phase>
 						<goals>
 							<goal>check</goal>
 						</goals>
@@ -273,6 +273,7 @@
 				<configuration>
 					<configLocation>${project.basedir}/checkstyle.xml</configLocation>
 					<suppressionsLocation>${project.basedir}/checkstyle-suppressions.xml</suppressionsLocation>
+					<consoleOutput>true</consoleOutput>
 					<failsOnError>true</failsOnError>
 					<includeTestSourceDirectory>true</includeTestSourceDirectory>
 				</configuration>

@@ -23,6 +23,7 @@ public class CreateSessionUseCase {
         this.sessionRepository = sessionRepository;
     }
 
+    /** Creates and persists a new session with two host-supplied photos; throws if one already exists for the date. */
     public Session create(
             LocalDate date,
             UUID hostId,

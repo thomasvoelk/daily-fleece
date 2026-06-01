@@ -2,6 +2,7 @@ package de.dailyfleece.backend.quiz.application;
 
 import java.time.LocalDate;
 
+/** Thrown when a session for the requested date already exists. */
 public final class SessionAlreadyExists extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
