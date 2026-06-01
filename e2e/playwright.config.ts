@@ -56,12 +56,20 @@ export default defineConfig({
     // },
   ],
 
-  webServer: {
-    command: 'npm start',
-    url: 'http://localhost:4200',
-    reuseExistingServer: !process.env['CI'],
-    timeout: 120_000,
-    cwd: '../frontend',
-    // TODO: add backend webServer entry (Spring Boot + MongoDB) when wiring up CI
-  },
+  webServer: [
+    {
+      command: 'npm start',
+      url: 'http://localhost:4200',
+      reuseExistingServer: !process.env['CI'],
+      timeout: 120_000,
+      cwd: '../frontend',
+    },
+    {
+      command: 'DOCKER_HOST=unix:///var/run/docker.sock ./mvnw -q spring-boot:run -Dspring-boot.run.profiles=e2e',
+      url: 'http://localhost:8080/actuator/health',
+      reuseExistingServer: !process.env['CI'],
+      timeout: 180_000,
+      cwd: '../backend',
+    },
+  ],
 });

@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "backend:start": "DOCKER_HOST=unix:///var/run/docker.sock ../backend/mvnw -f ../backend/pom.xml spring-boot:start -Dspring-boot.run.profiles=e2e",
+    "backend:stop": "../backend/mvnw -f ../backend/pom.xml spring-boot:stop"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
