@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import de.dailyfleece.backend.TestcontainersConfiguration;
 import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.quiz.domain.PhotoType;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import java.io.ByteArrayInputStream;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.modulith.test.ApplicationModuleTest;
-import org.springframework.util.MimeType;
 
 @ApplicationModuleTest
 @Import(TestcontainersConfiguration.class)
@@ -23,7 +23,6 @@ class CreateSessionUseCaseTest {
 
     private static final UUID HOST_ID = UUID.fromString("00000000-0000-0000-0000-000000000099");
     private static final PlayerName HOST_NAME = new PlayerName("Host");
-    private static final MimeType IMAGE_JPEG = MimeType.valueOf("image/jpeg");
 
     @Autowired
     private CreateSessionUseCase useCase;
@@ -37,7 +36,7 @@ class CreateSessionUseCaseTest {
         var q1 = new ByteArrayInputStream("photo1".getBytes(StandardCharsets.UTF_8));
         var q2 = new ByteArrayInputStream("photo2".getBytes(StandardCharsets.UTF_8));
 
-        Session session = useCase.create(date, HOST_ID, HOST_NAME, q1, IMAGE_JPEG, q2, IMAGE_JPEG);
+        Session session = useCase.create(date, HOST_ID, HOST_NAME, q1, PhotoType.JPEG, q2, PhotoType.JPEG);
 
         assertThat(session.date()).isEqualTo(date);
         assertThat(session.hostId()).isEqualTo(HOST_ID);
@@ -51,11 +50,11 @@ class CreateSessionUseCaseTest {
         LocalDate date = LocalDate.parse("2097-01-02");
         var q1 = new ByteArrayInputStream("photo1".getBytes(StandardCharsets.UTF_8));
         var q2 = new ByteArrayInputStream("photo2".getBytes(StandardCharsets.UTF_8));
-        useCase.create(date, HOST_ID, HOST_NAME, q1, IMAGE_JPEG, q2, IMAGE_JPEG);
+        useCase.create(date, HOST_ID, HOST_NAME, q1, PhotoType.JPEG, q2, PhotoType.JPEG);
 
         var q1b = new ByteArrayInputStream("photo1".getBytes(StandardCharsets.UTF_8));
         var q2b = new ByteArrayInputStream("photo2".getBytes(StandardCharsets.UTF_8));
-        assertThatThrownBy(() -> useCase.create(date, HOST_ID, HOST_NAME, q1b, IMAGE_JPEG, q2b, IMAGE_JPEG))
+        assertThatThrownBy(() -> useCase.create(date, HOST_ID, HOST_NAME, q1b, PhotoType.JPEG, q2b, PhotoType.JPEG))
                 .isInstanceOf(SessionAlreadyExists.class);
     }
 }

@@ -84,3 +84,4 @@
 {"id":"int-4f9134b5555c8dc3314b98d588f8cfeb","kind":"field_change","created_at":"2026-05-31T19:00:44.419146Z","actor":"thomas","issue_id":"df-bic","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-1065da5461fb984558f65b09795af14e","kind":"field_change","created_at":"2026-05-31T19:28:22.160273Z","actor":"thomas","issue_id":"df-s63","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-12c0cbd05926314651c3044bee93d915","kind":"field_change","created_at":"2026-05-31T19:54:58.621283Z","actor":"thomas","issue_id":"df-5f0","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
+{"id":"int-a8f1a7db679a37b8b19e0b0b4882d7ed","kind":"field_change","created_at":"2026-06-01T15:12:17.07428Z","actor":"thomas","issue_id":"df-fff","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}

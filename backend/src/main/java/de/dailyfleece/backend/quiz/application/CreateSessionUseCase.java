@@ -3,13 +3,13 @@ package de.dailyfleece.backend.quiz.application;
 import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.domain.Photo;
 import de.dailyfleece.backend.quiz.domain.PhotoRepository;
+import de.dailyfleece.backend.quiz.domain.PhotoType;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MimeType;
 
 /** Creates a new Session for today with two host-supplied photos. */
 @Service
@@ -29,17 +29,17 @@ public class CreateSessionUseCase {
             UUID hostId,
             PlayerName hostDisplayName,
             InputStream q1Data,
-            MimeType q1ContentType,
+            PhotoType q1PhotoType,
             InputStream q2Data,
-            MimeType q2ContentType) {
+            PhotoType q2PhotoType) {
 
         if (sessionRepository.findByDate(date).isPresent()) {
             throw new SessionAlreadyExists(date);
         }
 
         Session session = Session.create(date, hostId, hostDisplayName);
-        photoRepository.store(new Photo(session.sessionId(), "q1", q1Data, q1ContentType));
-        photoRepository.store(new Photo(session.sessionId(), "q2", q2Data, q2ContentType));
+        photoRepository.store(new Photo(session.sessionId(), "q1", q1Data, q1PhotoType));
+        photoRepository.store(new Photo(session.sessionId(), "q2", q2Data, q2PhotoType));
         sessionRepository.save(session);
         return session;
     }

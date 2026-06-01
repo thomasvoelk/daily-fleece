@@ -2,6 +2,7 @@ package de.dailyfleece.backend.quiz.infrastructure.persistence;
 
 import de.dailyfleece.backend.quiz.domain.Photo;
 import de.dailyfleece.backend.quiz.domain.PhotoRepository;
+import de.dailyfleece.backend.quiz.domain.PhotoType;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,7 +11,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.MimeType;
 
 @Repository
 class GridFsPhotoRepository implements PhotoRepository {
@@ -23,8 +23,8 @@ class GridFsPhotoRepository implements PhotoRepository {
 
     @Override
     public void store(Photo photo) {
-        var metadata = new Document("_contentType", photo.mimeType().toString());
-        operations.store(photo.data(), photo.filename(), photo.mimeType().toString(), metadata);
+        var metadata = new Document("_photoType", photo.photoType().name());
+        operations.store(photo.data(), photo.filename(), null, metadata);
     }
 
     @Override
@@ -40,9 +40,9 @@ class GridFsPhotoRepository implements PhotoRepository {
                 throw new IllegalStateException(
                         "GridFS file has no metadata for: " + Photo.filenameFor(sessionId, question));
             }
-            var mimeType = MimeType.valueOf(metadata.getString("_contentType"));
+            var photoType = PhotoType.valueOf(metadata.getString("_photoType"));
             return Optional.of(
-                    new Photo(sessionId, question, operations.getResource(file).getInputStream(), mimeType));
+                    new Photo(sessionId, question, operations.getResource(file).getInputStream(), photoType));
         } catch (IOException e) {
             throw new IllegalStateException("Failed to load photo: " + Photo.filenameFor(sessionId, question), e);
         }

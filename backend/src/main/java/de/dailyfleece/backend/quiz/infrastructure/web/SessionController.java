@@ -10,6 +10,7 @@ import de.dailyfleece.backend.quiz.application.LoadSessionPhotoUseCase;
 import de.dailyfleece.backend.quiz.application.LoadSessionUseCase;
 import de.dailyfleece.backend.quiz.application.NoSessionForDate;
 import de.dailyfleece.backend.quiz.domain.Photo;
+import de.dailyfleece.backend.quiz.domain.PhotoType;
 import de.dailyfleece.backend.quiz.domain.Session;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -19,7 +20,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MimeType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,10 +54,8 @@ class SessionController implements SessionsApi {
             LocalDate today = LocalDate.now(ZoneId.systemDefault());
             UUID hostUuid = UUID.fromString(hostId);
             PlayerName name = new PlayerName(hostDisplayName);
-            MimeType q1Type =
-                    MimeType.valueOf(q1.getContentType() != null ? q1.getContentType() : "application/octet-stream");
-            MimeType q2Type =
-                    MimeType.valueOf(q2.getContentType() != null ? q2.getContentType() : "application/octet-stream");
+            PhotoType q1Type = PhotoTypeRegistry.toEnum(q1.getContentType());
+            PhotoType q2Type = PhotoTypeRegistry.toEnum(q2.getContentType());
             Session session = createSessionUseCase.create(
                     today, hostUuid, name, q1.getInputStream(), q1Type, q2.getInputStream(), q2Type);
             return ResponseEntity.status(201).body(mapper.toResponse(session));
@@ -69,7 +67,7 @@ class SessionController implements SessionsApi {
     @Override
     public ResponseEntity<Resource> getSessionPhoto(String sessionId, String question) {
         Photo photo = loadSessionPhotoUseCase.load(UUID.fromString(sessionId), question);
-        MediaType contentType = MediaType.parseMediaType(photo.mimeType().toString());
+        MediaType contentType = PhotoTypeRegistry.toMediaType(photo.photoType());
         return ResponseEntity.ok().contentType(contentType).body(new InputStreamResource(photo.data()));
     }
 
