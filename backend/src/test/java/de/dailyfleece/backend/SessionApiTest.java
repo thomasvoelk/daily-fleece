@@ -195,6 +195,61 @@ class SessionApiTest {
     }
 
     @Test
+    void startSession_returns_200_with_active_phase() {
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        sessionRepository.save(session);
+
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/" + session.sessionId() + "/start")
+                .body(Map.of("hostId", HOST_ID.toString()))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).containsEntry("phase", "Active");
+    }
+
+    @Test
+    void startSession_returns_403_when_caller_is_not_the_host() {
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        sessionRepository.save(session);
+
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/" + session.sessionId() + "/start")
+                .body(Map.of("hostId", UUID.randomUUID().toString()))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void startSession_returns_409_when_session_already_started() {
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/" + session.sessionId() + "/start")
+                .body(Map.of("hostId", HOST_ID.toString()))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void startSession_returns_404_when_session_not_found() {
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/" + UUID.randomUUID() + "/start")
+                .body(Map.of("hostId", HOST_ID.toString()))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     void createSession_duplicate_day_returns_409() {
         postSession();
 

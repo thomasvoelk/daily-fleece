@@ -71,4 +71,30 @@ class SessionTest {
         assertThatThrownBy(() -> session.join(PLAYER_1, new PlayerName("Thomas")))
                 .isInstanceOf(LobbyClosed.class);
     }
+
+    @Test
+    void starting_an_active_session_throws() {
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        session.start();
+
+        assertThatThrownBy(session::start).isInstanceOf(InvalidPhaseTransition.class);
+    }
+
+    @Test
+    void starting_an_ended_session_throws() {
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        session.start();
+        session.end();
+
+        assertThatThrownBy(session::start).isInstanceOf(InvalidPhaseTransition.class);
+    }
+
+    @Test
+    void start_transitions_lobby_session_to_active() {
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+
+        session.start();
+
+        assertThat(session.phase()).isEqualTo(SessionPhase.ACTIVE);
+    }
 }

@@ -10,7 +10,7 @@ test.beforeEach(async () => {
   await api.dispose();
 });
 
-test('host creates lobby, player joins, and host sees player after refresh', async ({ page, browser }) => {
+test('full pre-game flow: lobby creation, player join, and quiz start', async ({ page, browser }) => {
   await page.goto('/');
 
   // Step 1: Entry — fill in Company ID + Display Name, click Create Lobby
@@ -33,7 +33,7 @@ test('host creates lobby, player joins, and host sees player after refresh', asy
   const playerContext = await browser.newContext({ baseURL: 'http://localhost:4200' });
   const playerPage = await playerContext.newPage();
   await playerPage.goto('/');
-  await playerPage.locator('#companyId').fill('test-company');
+  await playerPage.locator('#companyId').fill('test-company-player');
   await playerPage.locator('#displayName').fill('Bob Spieler');
   await playerPage.getByRole('button', { name: 'Lobby beitreten' }).click();
 
@@ -42,9 +42,25 @@ test('host creates lobby, player joins, and host sees player after refresh', asy
   const playerLobbyList = playerPage.getByRole('list', { name: 'Spieler in der Session' });
   await expect(playerLobbyList.getByRole('listitem').filter({ hasText: 'Bob Spieler' })).toBeVisible();
 
-  // Step 6: Host clicks Refresh — player's display name now appears in host's Lobby
-  await page.getByRole('button', { name: 'Aktualisieren' }).click();
+  // Step 6: "Quiz starten" button is not visible in the Player's Lobby (player is not the host)
+  await expect(playerPage.getByRole('button', { name: 'Quiz starten' })).not.toBeVisible();
+
+  // Step 7: Host clicks "Zum Quiz" — fetches latest session; Bob now visible in host's list
+  await page.getByRole('button', { name: 'Zum Quiz' }).click();
   await expect(hostPlayerList.getByRole('listitem').filter({ hasText: 'Bob Spieler' })).toBeVisible();
+
+  // UC-03 Scenario 2: Player clicks "Zum Quiz" before host starts → inline error, stays on Lobby
+  await playerPage.getByRole('button', { name: 'Zum Quiz' }).click();
+  await expect(playerPage.getByRole('alert')).toHaveText('Quiz noch nicht gestartet. Bitte warten.');
+  await expect(playerPage).toHaveURL(/\/lobby/);
+
+  // UC-03 Scenario 1: Host clicks "Quiz starten" → session Active, host auto-navigates to /quiz
+  await page.getByRole('button', { name: 'Quiz starten' }).click();
+  await expect(page).toHaveURL(/\/quiz/);
+
+  // UC-03 Scenario 3: Player clicks "Zum Quiz" after host started → navigates to /quiz
+  await playerPage.getByRole('button', { name: 'Zum Quiz' }).click();
+  await expect(playerPage).toHaveURL(/\/quiz/);
 
   await playerContext.close();
 });

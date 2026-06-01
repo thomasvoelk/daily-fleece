@@ -56,11 +56,11 @@ public final class Session {
     }
 
     public void start() {
-        phase = SessionPhase.ACTIVE;
+        phase = SessionAction.START.apply(phase, sessionId);
     }
 
     public void end() {
-        phase = SessionPhase.ENDED;
+        phase = SessionAction.END.apply(phase, sessionId);
     }
 
     public UUID sessionId() {

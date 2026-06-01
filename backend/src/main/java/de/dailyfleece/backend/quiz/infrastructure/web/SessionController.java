@@ -1,6 +1,7 @@
 package de.dailyfleece.backend.quiz.infrastructure.web;
 
 import de.dailyfleece.api.SessionsApi;
+import de.dailyfleece.api.model.HostActionRequest;
 import de.dailyfleece.api.model.JoinSessionRequest;
 import de.dailyfleece.api.model.SessionResponse;
 import de.dailyfleece.backend.player.api.PlayerName;
@@ -10,6 +11,7 @@ import de.dailyfleece.backend.quiz.application.JoinSessionUseCase;
 import de.dailyfleece.backend.quiz.application.LoadSessionPhotoUseCase;
 import de.dailyfleece.backend.quiz.application.LoadSessionUseCase;
 import de.dailyfleece.backend.quiz.application.NoSessionForDate;
+import de.dailyfleece.backend.quiz.application.StartSessionUseCase;
 import de.dailyfleece.backend.quiz.domain.Photo;
 import de.dailyfleece.backend.quiz.domain.PhotoType;
 import de.dailyfleece.backend.quiz.domain.Session;
@@ -34,6 +36,7 @@ class SessionController implements SessionsApi {
     private final LoadSessionUseCase loadSessionUseCase;
     private final LoadSessionPhotoUseCase loadSessionPhotoUseCase;
     private final JoinSessionUseCase joinSessionUseCase;
+    private final StartSessionUseCase startSessionUseCase;
     private final SessionResponseMapper mapper;
 
     SessionController(
@@ -42,12 +45,14 @@ class SessionController implements SessionsApi {
             LoadSessionUseCase loadSessionUseCase,
             LoadSessionPhotoUseCase loadSessionPhotoUseCase,
             JoinSessionUseCase joinSessionUseCase,
+            StartSessionUseCase startSessionUseCase,
             SessionResponseMapper mapper) {
         this.createSessionUseCase = createSessionUseCase;
         this.deleteSessionUseCase = deleteSessionUseCase;
         this.loadSessionUseCase = loadSessionUseCase;
         this.loadSessionPhotoUseCase = loadSessionPhotoUseCase;
         this.joinSessionUseCase = joinSessionUseCase;
+        this.startSessionUseCase = startSessionUseCase;
         this.mapper = mapper;
     }
 
@@ -98,6 +103,14 @@ class SessionController implements SessionsApi {
         UUID playerId = UUID.fromString(request.getPlayerId());
         PlayerName displayName = new PlayerName(request.getDisplayName());
         Session session = joinSessionUseCase.join(sessionUuid, playerId, displayName);
+        return ResponseEntity.ok(mapper.toResponse(session));
+    }
+
+    @Override
+    public ResponseEntity<SessionResponse> startSession(String sessionId, HostActionRequest request) {
+        UUID sessionUuid = UUID.fromString(sessionId);
+        UUID hostId = UUID.fromString(request.getHostId());
+        Session session = startSessionUseCase.start(sessionUuid, hostId);
         return ResponseEntity.ok(mapper.toResponse(session));
     }
 }
