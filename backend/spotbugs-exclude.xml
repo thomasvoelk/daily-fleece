@@ -1,0 +1,6 @@
+<FindBugsFilter>
+    <!-- Generated OpenAPI sources -->
+    <Match>
+        <Package name="~de\.dailyfleece\.api.*"/>
+    </Match>
+</FindBugsFilter>
