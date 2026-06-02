@@ -6,6 +6,7 @@ import de.dailyfleece.backend.quiz.domain.PhotoRepository;
 import de.dailyfleece.backend.quiz.domain.PhotoType;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -18,6 +19,7 @@ public class CreateSessionUseCase {
     private final PhotoRepository photoRepository;
     private final SessionRepository sessionRepository;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CreateSessionUseCase(PhotoRepository photoRepository, SessionRepository sessionRepository) {
         this.photoRepository = photoRepository;
         this.sessionRepository = sessionRepository;

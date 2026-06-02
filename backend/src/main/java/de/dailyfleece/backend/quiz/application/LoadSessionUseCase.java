@@ -2,6 +2,7 @@ package de.dailyfleece.backend.quiz.application;
 
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ public class LoadSessionUseCase {
 
     private final SessionRepository sessionRepository;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public LoadSessionUseCase(SessionRepository sessionRepository) {
         this.sessionRepository = sessionRepository;
     }

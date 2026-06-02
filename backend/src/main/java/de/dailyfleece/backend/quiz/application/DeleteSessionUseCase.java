@@ -2,6 +2,7 @@ package de.dailyfleece.backend.quiz.application;
 
 import de.dailyfleece.backend.quiz.domain.PhotoRepository;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ public class DeleteSessionUseCase {
     private final SessionRepository sessionRepository;
     private final PhotoRepository photoRepository;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public DeleteSessionUseCase(SessionRepository sessionRepository, PhotoRepository photoRepository) {
         this.sessionRepository = sessionRepository;
         this.photoRepository = photoRepository;

@@ -37,6 +37,7 @@
 		<spotless.version>3.6.0</spotless.version>
 		<checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
 		<spotbugs.plugin.version>4.9.8.0</spotbugs.plugin.version>
+		<spotbugs.annotations.version>4.9.3</spotbugs.annotations.version>
 		<findsecbugs.version>1.14.0</findsecbugs.version>
 		<palantir-java-format.version>2.91.0</palantir-java-format.version>
 	</properties>
@@ -72,6 +73,12 @@
 			<groupId>com.google.code.findbugs</groupId>
 			<artifactId>jsr305</artifactId>
 			<version>3.0.2</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.github.spotbugs</groupId>
+			<artifactId>spotbugs-annotations</artifactId>
+			<version>${spotbugs.annotations.version}</version>
 			<optional>true</optional>
 		</dependency>
 

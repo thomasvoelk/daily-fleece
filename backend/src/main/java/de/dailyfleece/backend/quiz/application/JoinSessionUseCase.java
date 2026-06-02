@@ -3,6 +3,7 @@ package de.dailyfleece.backend.quiz.application;
 import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ public class JoinSessionUseCase {
 
     private final SessionRepository sessionRepository;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public JoinSessionUseCase(SessionRepository sessionRepository) {
         this.sessionRepository = sessionRepository;
     }
