@@ -1,0 +1,74 @@
+import { test, expect, request } from '@playwright/test';
+import path from 'path';
+
+const FIXTURES = path.join(__dirname, '..', 'fixtures');
+const BACKEND = 'http://localhost:8080';
+
+test.beforeEach(async () => {
+  const api = await request.newContext({ baseURL: BACKEND });
+  await api.delete('/api/v1/sessions/today');
+  await api.dispose();
+});
+
+test('UC-04+05: Q1 voting — answer submission, refresh, close voting, reveal', async ({ page, browser }) => {
+  // ── Setup: bring host and player to /quiz ───────────────────────────────
+  await page.goto('/');
+  await page.locator('#companyId').fill('test-company');
+  await page.locator('#displayName').fill('Alice Host');
+  await page.getByRole('button', { name: 'Lobby erstellen' }).click();
+  await expect(page).toHaveURL(/\/host/);
+  await page.locator('#q1').setInputFiles(path.join(FIXTURES, 'photo-q1.jpg'));
+  await page.locator('#q2').setInputFiles(path.join(FIXTURES, 'photo-q2.jpg'));
+  await page.getByRole('button', { name: 'Session erstellen' }).click();
+  await expect(page).toHaveURL(/\/lobby/);
+
+  const playerContext = await browser.newContext({ baseURL: 'http://localhost:4200' });
+  const playerPage = await playerContext.newPage();
+  await playerPage.goto('/');
+  await playerPage.locator('#companyId').fill('test-company-player');
+  await playerPage.locator('#displayName').fill('Bob Spieler');
+  await playerPage.getByRole('button', { name: 'Lobby beitreten' }).click();
+  await expect(playerPage).toHaveURL(/\/lobby/);
+
+  // Navigate both to /quiz
+  await page.getByRole('button', { name: 'Zum Quiz' }).click();
+  await page.getByRole('button', { name: 'Quiz starten' }).click();
+  await expect(page).toHaveURL(/\/quiz/);
+  await playerPage.getByRole('button', { name: 'Zum Quiz' }).click();
+  await expect(playerPage).toHaveURL(/\/quiz/);
+
+  // ── UC-04 Scenario 1: both see Q1 photo ─────────────────────────────────
+  await expect(page.locator('img[alt="Frage 1"]')).toBeVisible();
+  await expect(playerPage.locator('img[alt="Frage 1"]')).toBeVisible();
+
+  // ── UC-04 Scenario 2: player selects A — button highlighted ────────────
+  const playerAnswers = playerPage.locator('.answers');
+  await playerAnswers.getByRole('button', { name: 'A', exact: true }).click();
+  await expect(playerAnswers.getByRole('button', { name: 'A', exact: true })).toHaveClass(/selected/);
+
+  // ── UC-04 Scenario 3: player changes to B — B highlighted, A not ───────
+  await playerAnswers.getByRole('button', { name: 'B', exact: true }).click();
+  await expect(playerAnswers.getByRole('button', { name: 'B', exact: true })).toHaveClass(/selected/);
+  await expect(playerAnswers.getByRole('button', { name: 'A', exact: true })).not.toHaveClass(/selected/);
+
+  // ── UC-04 Scenario 4: host refreshes — answer count shows 1/2 ──────────
+  await page.getByRole('button', { name: 'Aktualisieren' }).click();
+  await expect(page.getByText('1/2 beantwortet')).toBeVisible();
+
+  // ── UC-05 Scenario 1: host picks correct answer A and closes voting ──────
+  await page.getByRole('radio', { name: 'A' }).check();
+  await page.getByRole('button', { name: 'Abstimmung schließen' }).click();
+
+  // ── UC-05 Scenario 2: host sees reveal — correct answer and all answers ──
+  await expect(page.getByText(/Richtige Antwort:.*A/)).toBeVisible();
+  await expect(page.getByText('Bob Spieler')).toBeVisible();
+  await expect(page.locator('.reveal li').filter({ hasText: 'Bob Spieler' })).toContainText('B');
+  await expect(page.getByRole('button', { name: 'Abstimmung schließen' })).not.toBeVisible();
+
+  // ── UC-05 Scenario 3: player refreshes — sees same revealed state ────────
+  await playerPage.getByRole('button', { name: 'Aktualisieren' }).click();
+  await expect(playerPage.getByText(/Richtige Antwort:.*A/)).toBeVisible();
+  await expect(playerPage.locator('.reveal li').filter({ hasText: 'Bob Spieler' })).toContainText('B');
+
+  await playerContext.close();
+});

@@ -263,6 +263,7 @@ class SessionApiTest {
     void setCorrectAnswer_returns_200_with_q1_closed_and_q2_open() {
         Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
         session.start();
+        session.submitAnswer(QuestionKey.Q1, HOST_ID, "A");
         sessionRepository.save(session);
 
         ResponseEntity<Map<String, Object>> response = http.post()
@@ -280,6 +281,11 @@ class SessionApiTest {
         @SuppressWarnings("unchecked")
         Map<String, Object> q2 = Objects.requireNonNull((Map<String, Object>) voting.get("q2"));
         assertThat(q1).containsEntry("status", "Closed").containsEntry("correctAnswer", "B");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> answers = Objects.requireNonNull((Map<String, Object>) q1.get("answers"));
+        @SuppressWarnings("unchecked")
+        Map<String, Object> hostAnswer = Objects.requireNonNull((Map<String, Object>) answers.get(HOST_ID.toString()));
+        assertThat(hostAnswer).containsEntry("displayName", "Host").containsEntry("answer", "A");
         assertThat(q2).containsEntry("status", "Open");
     }
 
@@ -328,6 +334,25 @@ class SessionApiTest {
                 .toBodilessEntity();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void getTodaySession_answerCount_reflects_submitted_answers() {
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        session.start();
+        session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
+        sessionRepository.save(session);
+
+        ResponseEntity<Map<String, Object>> response =
+                http.get().uri("/sessions/today").retrieve().toEntity(responseType());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> voting =
+                (Map<String, Object>) Objects.requireNonNull(response.getBody()).get("voting");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> q1 =
+                (Map<String, Object>) Objects.requireNonNull(voting).get("q1");
+        assertThat(q1).containsEntry("answerCount", 1);
     }
 
     @Test

@@ -1,1 +1,66 @@
-<p>quiz works!</p>
+<main class="quiz">
+  @if (quizStore.session(); as session) {
+    <img
+      [src]="'/api/v1/sessions/' + session.sessionId + '/photos/q1'"
+      alt="Frage 1"
+      class="q1-photo"
+    />
+
+    <div class="answer-count">
+      {{ quizStore.answerCount().answered }}/{{ quizStore.answerCount().total }} beantwortet
+    </div>
+
+    @if (quizStore.q1Status() === 'Open' && !quizStore.myQ1Answer()) {
+      <p class="prompt">Bitte wähle deine Antwort</p>
+    }
+
+    <div class="answers">
+      @for (option of ['A', 'B', 'C']; track option) {
+        <button [class.selected]="quizStore.myQ1Answer() === option" (click)="submit($any(option))">
+          {{ option }}
+        </button>
+      }
+    </div>
+
+    @if (quizStore.q1Status() === 'Closed') {
+      <div class="reveal">
+        <p>
+          Richtige Antwort: <strong>{{ session.voting.q1.correctAnswer }}</strong>
+        </p>
+        <ul>
+          @for (entry of session.voting.q1.answers | keyvalue; track entry.key) {
+            <li>
+              <span>{{ entry.value.displayName }}</span
+              >: {{ entry.value.answer }}
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    @if (quizStore.isHost()) {
+      <section class="host-controls" aria-label="Host-Steuerung">
+        @if (quizStore.q1Status() === 'Open') {
+          <div class="correct-picker">
+            @for (option of ['A', 'B', 'C']; track option) {
+              <label>
+                <input
+                  type="radio"
+                  name="correctAnswer"
+                  [value]="option"
+                  (change)="selectedCorrectAnswer.set($any(option))"
+                />
+                {{ option }}
+              </label>
+            }
+          </div>
+          <button [disabled]="!selectedCorrectAnswer()" (click)="closeVoting()">
+            Abstimmung schließen
+          </button>
+        }
+      </section>
+    }
+
+    <button class="refresh" (click)="refresh()">Aktualisieren</button>
+  }
+</main>

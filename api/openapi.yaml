@@ -865,11 +865,17 @@ components:
             Set when the host declares the correct answer. Null while voting is open.
             A/B/C for Q1; ISO 3166-1 alpha-2 for Q2.
           example: "B"
+        answerCount:
+          type: integer
+          description: |
+            Number of players who have submitted an answer. Always present,
+            regardless of voting status.
+          example: 3
         answers:
           type: object
           description: |
-            Map of playerId → PlayerAnswer. Hidden from non-host clients while
-            voting is Open. Revealed to all once the correct answer is set.
+            Map of playerId → PlayerAnswer. Hidden from all clients while voting
+            is Open. Revealed to all once the correct answer is set.
           additionalProperties:
             $ref: "#/components/schemas/PlayerAnswer"
 
