@@ -1,12 +1,12 @@
 import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
-import { Api } from './api/api';
-import { getTodaySession } from './api/fn/sessions/get-today-session';
-import { submitAnswer } from './api/fn/voting/submit-answer';
-import { setCorrectAnswer } from './api/fn/voting/set-correct-answer';
-import { EntryStore } from './entry/entry.store';
-import { SessionResponse } from './api/models';
+import { Api } from '../api/api';
+import { getTodaySession } from '../api/fn/sessions/get-today-session';
+import { submitAnswer } from '../api/fn/voting/submit-answer';
+import { setCorrectAnswer } from '../api/fn/voting/set-correct-answer';
+import { EntryStore } from '../entry/entry.store';
+import { SessionResponse } from '../api/models';
 
 interface QuizState {
   session: SessionResponse | null;

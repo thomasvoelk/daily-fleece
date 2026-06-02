@@ -3,10 +3,10 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { provideRouter, Router } from '@angular/router';
 import { QuizStore } from './quiz.store';
-import { EntryStore } from './entry/entry.store';
-import { provideTestEnvironment } from '../testing/providers';
-import { mockLocalStorage } from '../testing/local-storage';
-import { SessionResponse } from './api/models';
+import { EntryStore } from '../entry/entry.store';
+import { provideTestEnvironment } from '../../testing/providers';
+import { mockLocalStorage } from '../../testing/local-storage';
+import { SessionResponse } from '../api/models';
 
 mockLocalStorage();
 
