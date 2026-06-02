@@ -6,6 +6,7 @@ import de.dailyfleece.backend.quiz.application.SessionAlreadyExists;
 import de.dailyfleece.backend.quiz.application.SessionNotFound;
 import de.dailyfleece.backend.quiz.domain.InvalidPhaseTransition;
 import de.dailyfleece.backend.quiz.domain.LobbyClosed;
+import de.dailyfleece.backend.quiz.domain.VotingClosed;
 import java.net.URI;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -56,6 +57,24 @@ class QuizExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
         problem.setType(URI.create("/problems/invalid-phase-transition"));
         problem.setTitle("Invalid Phase Transition");
+        problem.setDetail(ex.getMessage());
+        return problem;
+    }
+
+    @ExceptionHandler(VotingClosed.class)
+    ProblemDetail handleVotingClosed(VotingClosed ex) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        problem.setType(URI.create("/problems/voting-closed"));
+        problem.setTitle("Voting Closed");
+        problem.setDetail(ex.getMessage());
+        return problem;
+    }
+
+    @ExceptionHandler(InvalidQuestionKey.class)
+    ProblemDetail handleInvalidQuestionKey(InvalidQuestionKey ex) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problem.setType(URI.create("/problems/invalid-question-key"));
+        problem.setTitle("Invalid Question Key");
         problem.setDetail(ex.getMessage());
         return problem;
     }

@@ -38,6 +38,26 @@ if (!db.getCollectionNames().includes("sessions")) {
                                 }
                             }
                         }
+                    },
+                    q1Voting: {
+                        bsonType: "object",
+                        required: ["status", "answers"],
+                        additionalProperties: false,
+                        properties: {
+                            status: { bsonType: "string", enum: ["OPEN", "CLOSED"] },
+                            answers: { bsonType: "object" },
+                            correctAnswer: { bsonType: "string" }
+                        }
+                    },
+                    q2Voting: {
+                        bsonType: "object",
+                        required: ["status", "answers"],
+                        additionalProperties: false,
+                        properties: {
+                            status: { bsonType: "string", enum: ["OPEN", "CLOSED"] },
+                            answers: { bsonType: "object" },
+                            correctAnswer: { bsonType: "string" }
+                        }
                     }
                 }
             }

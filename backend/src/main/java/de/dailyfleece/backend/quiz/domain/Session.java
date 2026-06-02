@@ -5,7 +5,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The Session aggregate. Owns the quiz lifecycle from Lobby through Active to Ended, and maintains
@@ -26,6 +28,12 @@ public final class Session {
     private SessionPhase phase;
     private final List<SessionPlayer> players;
 
+    @Nullable
+    private QuestionVoting q1Voting;
+
+    @Nullable
+    private QuestionVoting q2Voting;
+
     private Session(UUID sessionId, LocalDate date, UUID hostId) {
         this.sessionId = sessionId;
         this.date = date;
@@ -41,10 +49,18 @@ public final class Session {
     }
 
     public static Session reconstitute(
-            UUID sessionId, LocalDate date, SessionPhase phase, List<SessionPlayer> players, UUID hostId) {
+            UUID sessionId,
+            LocalDate date,
+            SessionPhase phase,
+            List<SessionPlayer> players,
+            UUID hostId,
+            @Nullable QuestionVoting q1Voting,
+            @Nullable QuestionVoting q2Voting) {
         Session session = new Session(sessionId, date, hostId);
         session.phase = phase;
         session.players.addAll(players);
+        session.q1Voting = q1Voting;
+        session.q2Voting = q2Voting;
         return session;
     }
 
@@ -57,10 +73,36 @@ public final class Session {
 
     public void start() {
         phase = SessionAction.START.apply(phase, sessionId);
+        q1Voting = QuestionVoting.open();
     }
 
     public void end() {
         phase = SessionAction.END.apply(phase, sessionId);
+    }
+
+    public void submitAnswer(QuestionKey question, UUID playerId, String answer) {
+        QuestionVoting voting = votingFor(question);
+        if (voting.status() == VotingStatus.CLOSED) {
+            throw new VotingClosed(question, sessionId);
+        }
+        voting.submitAnswer(playerId.toString(), answer);
+    }
+
+    public void setCorrectAnswer(QuestionKey question, UUID hostId, String correctAnswer) {
+        votingFor(question).close(correctAnswer);
+        if (question == QuestionKey.Q1) {
+            q2Voting = QuestionVoting.open();
+        } else {
+            end();
+        }
+    }
+
+    private QuestionVoting votingFor(QuestionKey question) {
+        QuestionVoting voting = question == QuestionKey.Q1 ? q1Voting : q2Voting;
+        if (voting == null) {
+            throw new VotingClosed(question, sessionId);
+        }
+        return voting;
     }
 
     public UUID sessionId() {
@@ -86,5 +128,13 @@ public final class Session {
 
     public List<SessionPlayer> players() {
         return Collections.unmodifiableList(players);
+    }
+
+    public Optional<QuestionVoting> q1Voting() {
+        return Optional.ofNullable(q1Voting);
+    }
+
+    public Optional<QuestionVoting> q2Voting() {
+        return Optional.ofNullable(q2Voting);
     }
 }

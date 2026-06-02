@@ -97,4 +97,72 @@ class SessionTest {
 
         assertThat(session.phase()).isEqualTo(SessionPhase.ACTIVE);
     }
+
+    @Test
+    void start_opens_q1_voting() {
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+
+        session.start();
+
+        assertThat(session.q1Voting()).isPresent();
+        assertThat(session.q1Voting().get().status()).isEqualTo(VotingStatus.OPEN);
+    }
+
+    @Test
+    void player_can_submit_answer_for_open_q1_voting() {
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        session.start();
+
+        session.submitAnswer(QuestionKey.Q1, PLAYER_1, "A");
+
+        assertThat(session.q1Voting().get().answers()).containsEntry(PLAYER_1.toString(), "A");
+    }
+
+    @Test
+    void player_can_change_answer_while_voting_is_open() {
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        session.start();
+        session.submitAnswer(QuestionKey.Q1, PLAYER_1, "A");
+
+        session.submitAnswer(QuestionKey.Q1, PLAYER_1, "B");
+
+        assertThat(session.q1Voting().get().answers()).containsEntry(PLAYER_1.toString(), "B");
+    }
+
+    @Test
+    void submitting_answer_to_closed_voting_throws() {
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        session.start();
+        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "A");
+
+        assertThatThrownBy(() -> session.submitAnswer(QuestionKey.Q1, PLAYER_1, "B"))
+                .isInstanceOf(VotingClosed.class);
+    }
+
+    @Test
+    void setCorrectAnswer_on_q1_closes_q1_and_opens_q2() {
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        session.start();
+
+        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
+
+        assertThat(session.q1Voting().get().status()).isEqualTo(VotingStatus.CLOSED);
+        assertThat(session.q1Voting().get().correctAnswer()).isEqualTo("B");
+        assertThat(session.q2Voting()).isPresent();
+        assertThat(session.q2Voting().get().status()).isEqualTo(VotingStatus.OPEN);
+        assertThat(session.phase()).isEqualTo(SessionPhase.ACTIVE);
+    }
+
+    @Test
+    void setCorrectAnswer_on_q2_closes_q2_and_ends_session() {
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        session.start();
+        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "A");
+
+        session.setCorrectAnswer(QuestionKey.Q2, HOST_ID, "DE");
+
+        assertThat(session.q2Voting().get().status()).isEqualTo(VotingStatus.CLOSED);
+        assertThat(session.q2Voting().get().correctAnswer()).isEqualTo("DE");
+        assertThat(session.phase()).isEqualTo(SessionPhase.ENDED);
+    }
 }

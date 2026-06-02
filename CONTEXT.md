@@ -54,10 +54,13 @@ An image uploaded by the Host before a Session starts. Each Session requires exa
 ## Voting
 
 **Voting**
-The period during which a Question is active and Players can submit or change their answer. Voting is opened and closed manually by the Host. During Voting, individual answers are hidden from all participants. The Host sees only a count of how many Players have answered (e.g. "4/6 answered").
+The period during which a Question is active and Players can submit or change their answer. Voting is opened and closed manually by the Host. During Voting, individual answers are hidden from **all** participants — including the Host. The Host sees only a count of how many Players have answered (e.g. "4/6 answered"). Individual answers are revealed simultaneously to all Players when the Host sets the Correct Answer.
 
 **Answer**
 A Player's response to a Question. For Q1: one of A, B, or C. For Q2: a country selected on a map. A Player may change their Answer while Voting is open. If Voting closes before a Player answers, they receive 0 points for that Question.
+
+**Question Voting**
+The per-question voting record held within a Session. Tracks the voting status (open or closed), all Player Answers submitted so far, and the Correct Answer once declared. Serves three consumers: accepting/replacing Answers during Voting; computing winners when the Host sets the Correct Answer; deriving per-player correctness for Session Results at read time.
 
 ---
 

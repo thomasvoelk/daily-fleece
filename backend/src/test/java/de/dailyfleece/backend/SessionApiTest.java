@@ -3,6 +3,7 @@ package de.dailyfleece.backend;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.quiz.domain.QuestionKey;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import java.nio.charset.StandardCharsets;
@@ -256,6 +257,108 @@ class SessionApiTest {
         ResponseEntity<Map<String, Object>> response = postSession();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void setCorrectAnswer_returns_200_with_q1_closed_and_q2_open() {
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/" + session.sessionId() + "/questions/q1/correct")
+                .body(Map.of("hostId", HOST_ID.toString(), "correctAnswer", "B"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> voting = Objects.requireNonNull(
+                (Map<String, Object>) Objects.requireNonNull(response.getBody()).get("voting"));
+        @SuppressWarnings("unchecked")
+        Map<String, Object> q1 = Objects.requireNonNull((Map<String, Object>) voting.get("q1"));
+        @SuppressWarnings("unchecked")
+        Map<String, Object> q2 = Objects.requireNonNull((Map<String, Object>) voting.get("q2"));
+        assertThat(q1).containsEntry("status", "Closed").containsEntry("correctAnswer", "B");
+        assertThat(q2).containsEntry("status", "Open");
+    }
+
+    @Test
+    void setCorrectAnswer_on_q2_returns_200_with_session_ended() {
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        session.start();
+        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "A");
+        sessionRepository.save(session);
+
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/" + session.sessionId() + "/questions/q2/correct")
+                .body(Map.of("hostId", HOST_ID.toString(), "correctAnswer", "DE"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).containsEntry("phase", "Ended");
+    }
+
+    @Test
+    void setCorrectAnswer_returns_403_when_caller_is_not_host() {
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/" + session.sessionId() + "/questions/q1/correct")
+                .body(Map.of("hostId", UUID.randomUUID().toString(), "correctAnswer", "A"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void submitAnswer_returns_200_for_open_voting() {
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        ResponseEntity<Void> response = http.put()
+                .uri("/sessions/" + session.sessionId() + "/questions/q1/answers")
+                .body(Map.of("playerId", HOST_ID.toString(), "answer", "A"))
+                .retrieve()
+                .toBodilessEntity();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void submitAnswer_returns_409_when_voting_is_closed() {
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        session.start();
+        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "A");
+        sessionRepository.save(session);
+
+        ResponseEntity<Map<String, Object>> response = http.put()
+                .uri("/sessions/" + session.sessionId() + "/questions/q1/answers")
+                .body(Map.of("playerId", HOST_ID.toString(), "answer", "B"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void submitAnswer_returns_400_for_invalid_question_key() {
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        ResponseEntity<Map<String, Object>> response = http.put()
+                .uri("/sessions/" + session.sessionId() + "/questions/q9/answers")
+                .body(Map.of("playerId", HOST_ID.toString(), "answer", "A"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     private ResponseEntity<Map<String, Object>> postSession() {
