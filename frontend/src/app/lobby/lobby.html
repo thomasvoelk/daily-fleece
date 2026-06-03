@@ -4,11 +4,12 @@
       Today's Session
     </h1>
     <mat-list
+      role="list"
       aria-label="Players in session"
       i18n-aria-label="lobby|Accessible label for the player list@@lobby.playerListAriaLabel"
     >
       @for (player of store.session()?.players ?? []; track player.playerId) {
-        <mat-list-item>{{ player.displayName }}</mat-list-item>
+        <mat-list-item role="listitem">{{ player.displayName }}</mat-list-item>
       }
     </mat-list>
     <div class="flex gap-2 mt-4">

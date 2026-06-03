@@ -14,14 +14,14 @@ test('full pre-game flow: lobby creation, player join, and quiz start', async ({
   await page.goto('/');
 
   // Step 1: Entry — fill in Company ID + Display Name, click Create Lobby
-  await page.locator('#companyId').fill('test-company');
-  await page.locator('#displayName').fill('Alice Host');
+  await page.getByRole('textbox', { name: 'Firmen-ID' }).fill('test-company');
+  await page.getByRole('textbox', { name: 'Anzeigename' }).fill('Alice Host');
   await page.getByRole('button', { name: 'Lobby erstellen' }).click();
 
   // Step 2: HostSetup — upload Q1 and Q2 photos, click Create Session
   await expect(page).toHaveURL(/\/host/);
-  await page.locator('#q1').setInputFiles(path.join(FIXTURES, 'photo-q1.jpg'));
-  await page.locator('#q2').setInputFiles(path.join(FIXTURES, 'photo-q2.jpg'));
+  await page.getByLabel('F1 — Wissen (Kalenderblatt)').setInputFiles(path.join(FIXTURES, 'photo-q1.jpg'));
+  await page.getByLabel('F2 — Geografie (Ort)').setInputFiles(path.join(FIXTURES, 'photo-q2.jpg'));
   await page.getByRole('button', { name: 'Session erstellen' }).click();
 
   // Step 3: Lobby — host's display name appears in the player list
@@ -33,8 +33,8 @@ test('full pre-game flow: lobby creation, player join, and quiz start', async ({
   const playerContext = await browser.newContext({ baseURL: 'http://localhost:4200' });
   const playerPage = await playerContext.newPage();
   await playerPage.goto('/');
-  await playerPage.locator('#companyId').fill('test-company-player');
-  await playerPage.locator('#displayName').fill('Bob Spieler');
+  await playerPage.getByRole('textbox', { name: 'Firmen-ID' }).fill('test-company-player');
+  await playerPage.getByRole('textbox', { name: 'Anzeigename' }).fill('Bob Spieler');
   await playerPage.getByRole('button', { name: 'Lobby beitreten' }).click();
 
   // Step 5: Player lands on Lobby and their display name appears in the player list
