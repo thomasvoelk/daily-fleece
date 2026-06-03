@@ -5,6 +5,7 @@ services:
       - '27017:27017'
     environment:
       MONGO_INITDB_DATABASE: daily_fleece_e2e
+      GLIBC_TUNABLES: glibc.cpu.hwcaps=-SHSTK
     volumes:
       - type: tmpfs
         target: /data/db
