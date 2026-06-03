@@ -4,7 +4,7 @@ import { signalStore, withState, withComputed, withMethods, patchState } from '@
 import { Api } from '../api/api';
 import { getTodaySession } from '../api/fn/sessions/get-today-session';
 import { startSession } from '../api/fn/sessions/start-session';
-import { EntryStore } from '../entry/entry.store';
+import { EntryStore } from '../entry';
 import { SessionResponse } from '../api/models';
 
 interface LobbyState {

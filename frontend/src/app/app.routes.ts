@@ -1,11 +1,8 @@
 import { Routes } from '@angular/router';
-import { Entry } from './entry/entry';
-import { Lobby } from './lobby/lobby';
-import { HostSetup } from './host-setup/host-setup';
-import { Quiz } from './quiz/quiz';
-import { hasPlayerIdGuard } from './host-setup/host-setup.guard';
-import { lobbyGuard } from './lobby/lobby.guard';
-import { quizGuard } from './quiz/quiz.guard';
+import { Entry } from './entry';
+import { Lobby, lobbyGuard } from './lobby';
+import { HostSetup, hasPlayerIdGuard } from './host-setup';
+import { Quiz, quizGuard } from './quiz';
 
 export const routes: Routes = [
   { path: '', component: Entry },

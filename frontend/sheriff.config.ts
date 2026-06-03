@@ -2,16 +2,18 @@ import type { SheriffConfig } from '@softarc/sheriff-core';
 
 export const sheriffConfig: SheriffConfig = {
   version: 1,
-  tagging: {
-    'src/app': 'root',
-    'src/app/<domain>': 'domain:<domain>',
-    'src/app/<domain>/<type>': ['domain:<domain>', 'type:<type>'],
+  excludeRoot: true,
+  modules: {
+    'src/app/entry': 'domain:entry',
+    'src/app/host-setup': 'domain:host-setup',
+    'src/app/lobby': 'domain:lobby',
+    'src/app/quiz': 'domain:quiz',
+    'src/app/shared': 'domain:shared',
   },
   depRules: {
     root: ['domain:*'],
     'domain:shared': [],
-    'domain:api': [],
-    'domain:*': ['domain:shared', 'domain:api'],
-    'type:api': [],
+    'domain:entry': ['domain:shared', 'root'],
+    'domain:*': ['domain:shared', 'domain:entry', 'root'],
   },
 };

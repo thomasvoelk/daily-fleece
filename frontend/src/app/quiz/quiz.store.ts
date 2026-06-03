@@ -5,7 +5,7 @@ import { Api } from '../api/api';
 import { getTodaySession } from '../api/fn/sessions/get-today-session';
 import { submitAnswer } from '../api/fn/voting/submit-answer';
 import { setCorrectAnswer } from '../api/fn/voting/set-correct-answer';
-import { EntryStore } from '../entry/entry.store';
+import { EntryStore } from '../entry';
 import { SessionResponse } from '../api/models';
 
 interface QuizState {

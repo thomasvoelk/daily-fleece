@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Quiz } from './quiz';
 import { QuizStore } from './quiz.store';
-import { EntryStore } from '../entry/entry.store';
+import { EntryStore } from '../entry';
 import { provideTestEnvironment } from '../../testing/providers';
 import { mockLocalStorage } from '../../testing/local-storage';
 import { SessionResponse } from '../api/models';

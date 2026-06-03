@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { Api } from '../api/api';
 import { createSession } from '../api/fn/sessions/create-session';
-import { EntryStore } from '../entry/entry.store';
+import { EntryStore } from '../entry';
 
 interface HostSetupState {
   q1: File | null;

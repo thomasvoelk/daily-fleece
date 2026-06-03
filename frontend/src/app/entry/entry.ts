@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { form, FormField, submit, required, maxLength } from '@angular/forms/signals';
 import { EntryStore } from './entry.store';
-import { FieldError } from '../shared/field-error';
+import { FieldError } from '../shared';
 
 @Component({
   selector: 'app-entry',

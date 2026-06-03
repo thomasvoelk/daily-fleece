@@ -3,7 +3,7 @@ import { MaybeAsync, GuardResult, Router, UrlTree, provideRouter } from '@angula
 import { HttpTestingController } from '@angular/common/http/testing';
 import { lobbyGuard } from './lobby.guard';
 import { LobbyStore } from './lobby.store';
-import { EntryStore } from '../entry/entry.store';
+import { EntryStore } from '../entry';
 import { provideTestEnvironment } from '../../testing/providers';
 import { mockLocalStorage } from '../../testing/local-storage';
 import { SessionResponse } from '../api/models';
