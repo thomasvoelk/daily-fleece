@@ -2,7 +2,7 @@ import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { Api, getTodaySession, startSession, SessionResponse } from '../api';
-import { EntryStore } from '../entry';
+import { EntryContext } from '../entry';
 
 interface LobbyState {
   session: SessionResponse | null;
@@ -16,7 +16,7 @@ export const LobbyStore = signalStore(
     error: null,
   }),
   withComputed((store) => {
-    const entryStore = inject(EntryStore);
+    const entryStore = inject(EntryContext);
     return {
       isHost: computed(
         () =>
@@ -29,7 +29,7 @@ export const LobbyStore = signalStore(
   withMethods((store) => {
     const api = inject(Api);
     const router = inject(Router);
-    const entryStore = inject(EntryStore);
+    const entryStore = inject(EntryContext);
     return {
       initializeSession(session: SessionResponse): void {
         patchState(store, { session, error: null });

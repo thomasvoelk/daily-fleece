@@ -4,7 +4,6 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Quiz } from './quiz';
 import { QuizStore } from './quiz.store';
-import { EntryStore } from '../entry';
 import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
 import { SessionResponse } from '../api';
 
@@ -23,7 +22,7 @@ function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse 
   };
 }
 
-const PROVIDERS = [...provideTestEnvironment(), provideRouter([]), EntryStore, QuizStore];
+const PROVIDERS = [...provideTestEnvironment(), provideRouter([]), QuizStore];
 
 // ─── Q1 photo ────────────────────────────────────────────────────────────────
 

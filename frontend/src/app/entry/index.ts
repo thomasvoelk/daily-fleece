@@ -1,2 +1,2 @@
 export { Entry } from './entry';
-export { EntryStore } from './entry.store';
+export { EntryContext } from './entry-context';

@@ -2,7 +2,7 @@ import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { Api, createSession } from '../api';
-import { EntryStore } from '../entry';
+import { EntryContext } from '../entry';
 
 interface HostSetupState {
   q1: File | null;
@@ -27,7 +27,7 @@ export const HostSetupStore = signalStore(
   withMethods((store) => {
     const api = inject(Api);
     const router = inject(Router);
-    const entryStore = inject(EntryStore);
+    const entryStore = inject(EntryContext);
     return {
       selectQ1(file: File): void {
         patchState(store, { q1: file });

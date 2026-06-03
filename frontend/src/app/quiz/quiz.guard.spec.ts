@@ -3,13 +3,12 @@ import { MaybeAsync, GuardResult, Router, UrlTree, provideRouter } from '@angula
 import { HttpTestingController } from '@angular/common/http/testing';
 import { quizGuard } from './quiz.guard';
 import { QuizStore } from './quiz.store';
-import { EntryStore } from '../entry';
 import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
 import { SessionResponse } from '../api';
 
 mockLocalStorage();
 
-const PROVIDERS = [...provideTestEnvironment(), provideRouter([]), EntryStore, QuizStore];
+const PROVIDERS = [...provideTestEnvironment(), provideRouter([]), QuizStore];
 
 function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse {
   return {

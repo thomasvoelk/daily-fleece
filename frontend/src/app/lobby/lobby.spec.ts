@@ -6,7 +6,6 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Lobby } from './lobby';
 import { LobbyStore } from './lobby.store';
-import { EntryStore } from '../entry';
 import {
   provideTestEnvironment,
   expectNoA11yViolations,
@@ -35,7 +34,6 @@ function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse 
 const PROVIDERS = [
   ...provideTestEnvironment(),
   provideRouter([{ path: 'quiz', component: QuizStub }]),
-  EntryStore,
   LobbyStore,
 ];
 

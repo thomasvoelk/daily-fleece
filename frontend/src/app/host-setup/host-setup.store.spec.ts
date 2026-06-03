@@ -2,13 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { provideRouter, Router } from '@angular/router';
 import { HostSetupStore } from './host-setup.store';
-import { EntryStore } from '../entry';
 import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
 import { SessionResponse } from '../api';
 
 mockLocalStorage();
 
-const PROVIDERS = [...provideTestEnvironment(), provideRouter([]), EntryStore, HostSetupStore];
+const PROVIDERS = [...provideTestEnvironment(), provideRouter([]), HostSetupStore];
 
 function seedPlayer(playerId: string, displayName: string): void {
   localStorage.setItem(

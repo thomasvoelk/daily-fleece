@@ -3,7 +3,6 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { provideRouter, Router } from '@angular/router';
 import { LobbyStore } from './lobby.store';
-import { EntryStore } from '../entry';
 import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
 import { SessionResponse } from '../api';
 
@@ -15,7 +14,6 @@ class QuizStub {}
 const PROVIDERS = [
   ...provideTestEnvironment(),
   provideRouter([{ path: 'quiz', component: QuizStub }]),
-  EntryStore,
   LobbyStore,
 ];
 
