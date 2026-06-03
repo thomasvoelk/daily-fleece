@@ -1,11 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { form, FormField, submit, required, maxLength } from '@angular/forms/signals';
+import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
 import { EntryStore } from './entry.store';
-import { FieldError } from '../shared';
 
 @Component({
   selector: 'app-entry',
-  imports: [FormField, FieldError],
+  imports: [FormField, MatFormField, MatLabel, MatInput, MatError, MatButton],
   templateUrl: './entry.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -28,13 +30,6 @@ export class Entry {
       message: $localize`:entry|Validation error when Display name exceeds 20 characters@@entry.displayNameTooLong:Maximum 20 characters`,
     });
   });
-
-  protected companyIdInvalid = computed(
-    () => this.entryForm.companyId().touched() && this.entryForm.companyId().invalid(),
-  );
-  protected displayNameInvalid = computed(
-    () => this.entryForm.displayName().touched() && this.entryForm.displayName().invalid(),
-  );
 
   protected onJoinLobby(): void {
     submit(this.entryForm, async () => {

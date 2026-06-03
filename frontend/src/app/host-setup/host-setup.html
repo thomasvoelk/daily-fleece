@@ -15,13 +15,7 @@
       <label for="q1" i18n="hostSetup|Label for the Q1 file picker@@hostSetup.q1Label">
         Q1 — Knowledge (calendar page)
       </label>
-      <input
-        id="q1"
-        type="file"
-        accept="image/*"
-        (change)="onQ1Change($event)"
-        class="border rounded px-3 py-2"
-      />
+      <input id="q1" type="file" accept="image/*" (change)="onQ1Change($event)" />
       @if (q1Preview()) {
         <img
           [src]="q1Preview()"
@@ -36,13 +30,7 @@
       <label for="q2" i18n="hostSetup|Label for the Q2 file picker@@hostSetup.q2Label">
         Q2 — Geography (location)
       </label>
-      <input
-        id="q2"
-        type="file"
-        accept="image/*"
-        (change)="onQ2Change($event)"
-        class="border rounded px-3 py-2"
-      />
+      <input id="q2" type="file" accept="image/*" (change)="onQ2Change($event)" />
       @if (q2Preview()) {
         <img
           [src]="q2Preview()"
@@ -54,7 +42,7 @@
     </div>
 
     @if (store.phase() === 'error') {
-      <p class="text-red-600" role="alert" aria-live="assertive">
+      <p role="alert" aria-live="assertive">
         {{ store.errorMessage() }}
       </p>
     } @else {
@@ -62,10 +50,10 @@
     }
 
     <button
+      mat-flat-button
       type="button"
       (click)="store.createSession()"
       [disabled]="!store.canSubmit()"
-      class="bg-green-600 text-white rounded px-4 py-2 disabled:opacity-50"
       i18n="hostSetup|Button to create a session@@hostSetup.createSessionButton"
     >
       Create Session

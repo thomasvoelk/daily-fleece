@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { MatList, MatListItem } from '@angular/material/list';
+import { MatButton } from '@angular/material/button';
 import { LobbyStore } from './lobby.store';
 
 @Component({
   selector: 'app-lobby',
-  imports: [],
+  imports: [MatList, MatListItem, MatButton],
   templateUrl: './lobby.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

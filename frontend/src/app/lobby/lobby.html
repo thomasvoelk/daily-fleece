@@ -3,34 +3,33 @@
     <h1 class="text-xl font-bold mb-4" i18n="lobby|Heading for the waiting room@@lobby.heading">
       Today's Session
     </h1>
-    <ul
-      class="divide-y"
-      i18n-aria-label="lobby|Accessible label for the player list@@lobby.playerListAriaLabel"
+    <mat-list
       aria-label="Players in session"
+      i18n-aria-label="lobby|Accessible label for the player list@@lobby.playerListAriaLabel"
     >
       @for (player of store.session()?.players ?? []; track player.playerId) {
-        <li class="py-2">{{ player.displayName }}</li>
+        <mat-list-item>{{ player.displayName }}</mat-list-item>
       }
-    </ul>
+    </mat-list>
     <div class="flex gap-2 mt-4">
       <button
+        mat-stroked-button
         (click)="store.goToQuiz()"
-        class="border rounded px-4 py-2"
         i18n="lobby|Button to navigate to the quiz@@lobby.goToQuizButton"
       >
         Go to Quiz
       </button>
       @if (store.isHost()) {
         <button
+          mat-flat-button
           (click)="store.startQuiz()"
-          class="bg-blue-600 text-white rounded px-4 py-2"
           i18n="lobby|Button for host to start the quiz@@lobby.startQuizButton"
         >
           Start Quiz
         </button>
       }
     </div>
-    <p class="mt-2 text-sm text-red-600" role="alert" aria-live="assertive">
+    <p class="mt-2 text-sm" role="alert" aria-live="assertive">
       {{ store.error() ?? '' }}
     </p>
   </div>

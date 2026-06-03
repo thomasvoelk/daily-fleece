@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { MatButton } from '@angular/material/button';
 import { HostSetupStore } from './host-setup.store';
 
 @Component({
   selector: 'app-host-setup',
-  imports: [],
+  imports: [MatButton],
   templateUrl: './host-setup.html',
   styleUrl: './host-setup.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

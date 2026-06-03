@@ -16,51 +16,51 @@
 
     <div class="answers">
       @for (option of ['A', 'B', 'C']; track option) {
-        <button [class.selected]="quizStore.myQ1Answer() === option" (click)="submit($any(option))">
+        <button
+          mat-stroked-button
+          [class.selected]="quizStore.myQ1Answer() === option"
+          (click)="submit($any(option))"
+        >
           {{ option }}
         </button>
       }
     </div>
 
     @if (quizStore.q1Status() === 'Closed') {
-      <div class="reveal">
-        <p>
-          Richtige Antwort: <strong>{{ session.voting.q1.correctAnswer }}</strong>
-        </p>
-        <ul>
-          @for (entry of session.voting.q1.answers | keyvalue; track entry.key) {
-            <li>
-              <span>{{ entry.value.displayName }}</span
-              >: {{ entry.value.answer }}
-            </li>
-          }
-        </ul>
-      </div>
+      <mat-card class="reveal">
+        <mat-card-content>
+          <p>
+            Richtige Antwort: <strong>{{ session.voting.q1.correctAnswer }}</strong>
+          </p>
+          <ul>
+            @for (entry of session.voting.q1.answers | keyvalue; track entry.key) {
+              <li>
+                <span>{{ entry.value.displayName }}</span
+                >: {{ entry.value.answer }}
+              </li>
+            }
+          </ul>
+        </mat-card-content>
+      </mat-card>
     }
 
     @if (quizStore.isHost()) {
       <section class="host-controls" aria-label="Host-Steuerung">
         @if (quizStore.q1Status() === 'Open') {
-          <div class="correct-picker">
+          <mat-radio-group class="correct-picker">
             @for (option of ['A', 'B', 'C']; track option) {
-              <label>
-                <input
-                  type="radio"
-                  name="correctAnswer"
-                  [value]="option"
-                  (change)="selectedCorrectAnswer.set($any(option))"
-                />
+              <mat-radio-button [value]="option" (change)="selectedCorrectAnswer.set($any(option))">
                 {{ option }}
-              </label>
+              </mat-radio-button>
             }
-          </div>
-          <button [disabled]="!selectedCorrectAnswer()" (click)="closeVoting()">
+          </mat-radio-group>
+          <button mat-flat-button [disabled]="!selectedCorrectAnswer()" (click)="closeVoting()">
             Abstimmung schließen
           </button>
         }
       </section>
     }
 
-    <button class="refresh" (click)="refresh()">Aktualisieren</button>
+    <button mat-button class="refresh" (click)="refresh()">Aktualisieren</button>
   }
 </main>

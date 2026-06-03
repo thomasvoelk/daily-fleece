@@ -1,10 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { KeyValuePipe } from '@angular/common';
+import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
+import { MatButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
 import { QuizStore } from './quiz.store';
 
 @Component({
   selector: 'app-quiz',
-  imports: [CommonModule],
+  imports: [KeyValuePipe, MatRadioGroup, MatRadioButton, MatButton, MatCard, MatCardContent],
   templateUrl: './quiz.html',
   styleUrl: './quiz.css',
 })
