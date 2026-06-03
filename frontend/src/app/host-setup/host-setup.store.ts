@@ -1,8 +1,7 @@
 import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
-import { Api } from '../api/api';
-import { createSession } from '../api/fn/sessions/create-session';
+import { Api, createSession } from '../api';
 import { EntryStore } from '../entry';
 
 interface HostSetupState {

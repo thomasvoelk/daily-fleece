@@ -1,7 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { Api } from '../api/api';
-import { getTodaySession } from '../api/fn/sessions/get-today-session';
+import { Api, getTodaySession } from '../api';
 import { QuizStore } from './quiz.store';
 
 export const quizGuard: CanActivateFn = async () => {

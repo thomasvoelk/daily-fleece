@@ -4,9 +4,8 @@ import { HttpTestingController } from '@angular/common/http/testing';
 import { lobbyGuard } from './lobby.guard';
 import { LobbyStore } from './lobby.store';
 import { EntryStore } from '../entry';
-import { provideTestEnvironment } from '../../testing/providers';
-import { mockLocalStorage } from '../../testing/local-storage';
-import { SessionResponse } from '../api/models';
+import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
+import { SessionResponse } from '../api';
 
 mockLocalStorage();
 

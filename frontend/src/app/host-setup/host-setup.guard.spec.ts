@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MaybeAsync, GuardResult, Router, UrlTree, provideRouter } from '@angular/router';
 import { hasPlayerIdGuard } from './host-setup.guard';
-import { mockLocalStorage } from '../../testing/local-storage';
+import { mockLocalStorage } from '../shared/testing';
 
 mockLocalStorage();
 

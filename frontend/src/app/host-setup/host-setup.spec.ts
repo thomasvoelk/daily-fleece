@@ -4,8 +4,7 @@ import { provideRouter } from '@angular/router';
 import { HostSetup } from './host-setup';
 import { HostSetupStore } from './host-setup.store';
 import { EntryStore } from '../entry';
-import { provideTestEnvironment } from '../../testing/providers';
-import { mockLocalStorage } from '../../testing/local-storage';
+import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
 
 mockLocalStorage();
 

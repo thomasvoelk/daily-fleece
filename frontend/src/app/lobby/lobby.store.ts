@@ -1,11 +1,8 @@
 import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
-import { Api } from '../api/api';
-import { getTodaySession } from '../api/fn/sessions/get-today-session';
-import { startSession } from '../api/fn/sessions/start-session';
+import { Api, getTodaySession, startSession, SessionResponse } from '../api';
 import { EntryStore } from '../entry';
-import { SessionResponse } from '../api/models';
 
 interface LobbyState {
   session: SessionResponse | null;

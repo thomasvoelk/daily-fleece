@@ -87,7 +87,7 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "tsconfig.spec.json",
-            "setupFiles": ["src/testing/setup.ts"]
+            "setupFiles": ["src/app/shared/testing/setup.ts"]
           }
         }
       }

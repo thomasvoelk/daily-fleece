@@ -7,10 +7,12 @@ import { provideRouter } from '@angular/router';
 import { Lobby } from './lobby';
 import { LobbyStore } from './lobby.store';
 import { EntryStore } from '../entry';
-import { provideTestEnvironment } from '../../testing/providers';
-import { expectNoA11yViolations } from '../../testing/a11y';
-import { mockLocalStorage } from '../../testing/local-storage';
-import { SessionResponse } from '../api/models';
+import {
+  provideTestEnvironment,
+  expectNoA11yViolations,
+  mockLocalStorage,
+} from '../shared/testing';
+import { SessionResponse } from '../api';
 
 mockLocalStorage();
 

@@ -3,8 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { provideRouter } from '@angular/router';
 import { Entry } from './entry';
 import { EntryStore } from './entry.store';
-import { provideTestEnvironment } from '../../testing/providers';
-import { mockLocalStorage } from '../../testing/local-storage';
+import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
 
 mockLocalStorage();
 
