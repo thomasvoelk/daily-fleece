@@ -3,7 +3,7 @@ import type { SheriffConfig } from '@softarc/sheriff-core';
 export const sheriffConfig: SheriffConfig = {
   version: 1,
   modules: {
-    'src/app/api': 'root:api',
+    'src/app/backend-client': 'root:backend-client',
     'src/app/entry': 'domain:entry',
     'src/app/host-setup': 'domain:host-setup',
     'src/app/lobby': 'domain:lobby',
@@ -13,9 +13,9 @@ export const sheriffConfig: SheriffConfig = {
   },
   depRules: {
     root: ['domain:*'],
-    'root:api': [],
+    'root:backend-client': [],
     'domain:shared': [],
-    'domain:entry': ['domain:shared', 'root', 'root:api'],
-    'domain:*': ['domain:shared', 'domain:entry', 'root', 'root:api'],
+    'domain:entry': ['domain:shared', 'root', 'root:backend-client'],
+    'domain:*': ['domain:shared', 'domain:entry', 'root', 'root:backend-client'],
   },
 };

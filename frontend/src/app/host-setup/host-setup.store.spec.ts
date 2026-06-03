@@ -3,7 +3,7 @@ import { HttpTestingController } from '@angular/common/http/testing';
 import { provideRouter, Router } from '@angular/router';
 import { HostSetupStore } from './host-setup.store';
 import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
-import { SessionResponse } from '../api';
+import { SessionResponse } from '../backend-client';
 
 mockLocalStorage();
 

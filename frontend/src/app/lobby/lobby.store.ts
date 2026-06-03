@@ -1,7 +1,7 @@
 import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
-import { Api, getTodaySession, startSession, SessionResponse } from '../api';
+import { Api, getTodaySession, startSession, SessionResponse } from '../backend-client';
 import { EntryContext } from '../entry';
 
 interface LobbyState {

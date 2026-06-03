@@ -7,7 +7,7 @@ const sheriff = require("@softarc/eslint-plugin-sheriff");
 
 module.exports = defineConfig([
   {
-    ignores: ["src/app/api/**"],
+    ignores: ["src/app/backend-client/**"],
   },
   {
     files: ["**/*.ts"],

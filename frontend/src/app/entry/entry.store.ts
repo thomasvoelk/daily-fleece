@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { withStorageSync } from '@angular-architects/ngrx-toolkit';
-import { Api, registerPlayer, joinSession, getTodaySession } from '../api';
+import { Api, registerPlayer, joinSession, getTodaySession } from '../backend-client';
 
 interface EntryState {
   playerId: string | null;

@@ -11,7 +11,7 @@ import {
   expectNoA11yViolations,
   mockLocalStorage,
 } from '../shared/testing';
-import { SessionResponse } from '../api';
+import { SessionResponse } from '../backend-client';
 
 mockLocalStorage();
 

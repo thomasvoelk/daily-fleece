@@ -11,6 +11,6 @@ pre-commit:
         - "frontend/src/**/*.{ts,html,json}"
         - "api/**/*.yaml"
         - "backend/src/**/*.{yaml,yml}"
-      exclude: "frontend/src/app/api/**"
+      exclude: "frontend/src/app/backend-client/**"
       run: frontend/node_modules/.bin/prettier --write {staged_files}
       stage_fixed: true

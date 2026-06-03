@@ -4,7 +4,7 @@ import { HttpTestingController } from '@angular/common/http/testing';
 import { quizGuard } from './quiz.guard';
 import { QuizStore } from './quiz.store';
 import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
-import { SessionResponse } from '../api';
+import { SessionResponse } from '../backend-client';
 
 mockLocalStorage();
 
