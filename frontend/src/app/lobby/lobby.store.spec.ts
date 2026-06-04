@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { provideRouter, Router } from '@angular/router';
@@ -8,7 +8,7 @@ import { SessionResponse } from '../backend-client';
 
 mockLocalStorage();
 
-@Component({ template: '' })
+@Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class QuizStub {}
 
 const PROVIDERS = [

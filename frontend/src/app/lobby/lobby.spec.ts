@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 import { HttpTestingController } from '@angular/common/http/testing';
@@ -15,7 +15,7 @@ import { SessionResponse } from '../backend-client';
 
 mockLocalStorage();
 
-@Component({ template: '' })
+@Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class QuizStub {}
 
 function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse {

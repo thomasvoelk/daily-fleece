@@ -1,15 +1,15 @@
-<main class="min-h-screen flex flex-col">
+<main class="flex min-h-screen flex-col">
   @if (quizStore.session(); as session) {
     <button
       type="button"
-      class="block w-full cursor-pointer border-0 p-0 bg-transparent"
+      class="block w-full cursor-pointer border-0 bg-transparent p-0"
       (click)="photoExpanded.set(true)"
     >
       <img
         [src]="'/api/v1/sessions/' + session.sessionId + '/photos/q1'"
         alt="Question 1"
         i18n-alt="quiz|Alt text for the Q1 photo@@quiz.q1PhotoAlt"
-        class="block w-full max-h-[50vh] object-cover"
+        class="block max-h-[50vh] w-full object-cover"
       />
     </button>
 
@@ -21,13 +21,13 @@
         aria-label="Photo lightbox"
         i18n-aria-label="
           quiz|Accessible label for the photo lightbox dialog@@quiz.lightboxDialogAriaLabel"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 cursor-pointer"
+        class="fixed inset-0 z-50 flex cursor-pointer items-center justify-center bg-black/90"
         (click)="photoExpanded.set(false)"
         (keydown.escape)="photoExpanded.set(false)"
       >
         <button
           type="button"
-          class="absolute top-4 right-4 text-white text-2xl leading-none bg-transparent border-0 cursor-pointer"
+          class="absolute top-4 right-4 cursor-pointer border-0 bg-transparent text-2xl leading-none text-white"
           aria-label="Close lightbox"
           i18n-aria-label="quiz|Close button for the photo lightbox@@quiz.lightboxCloseButton"
           (click)="$event.stopPropagation(); photoExpanded.set(false)"
@@ -39,13 +39,13 @@
           alt="Question 1 enlarged"
           i18n-alt="
             quiz|Alt text for the enlarged Q1 photo in the lightbox@@quiz.q1PhotoExpandedAlt"
-          class="max-w-full max-h-full object-contain cursor-default"
+          class="max-h-full max-w-full cursor-default object-contain"
         />
       </div>
     }
 
     <div
-      class="px-4 py-3 text-sm text-center"
+      class="px-4 py-3 text-center text-sm"
       i18n="quiz|Number of answers submitted out of total@@quiz.answerCount"
     >
       {{ quizStore.answerCount().answered }}/{{ quizStore.answerCount().total }} answered
@@ -60,7 +60,7 @@
       </p>
     }
 
-    <div class="flex gap-3 justify-center px-4 py-2">
+    <div class="flex justify-center gap-3 px-4 py-2">
       @for (option of ['A', 'B', 'C']; track option) {
         <button
           type="button"

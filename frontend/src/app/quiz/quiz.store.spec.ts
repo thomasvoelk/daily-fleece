@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { provideRouter, Router } from '@angular/router';
@@ -10,7 +10,7 @@ mockLocalStorage();
 
 const drainMicrotasks = () => new Promise<void>((r) => queueMicrotask(r));
 
-@Component({ template: '' })
+@Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class LobbyStub {}
 
 const PROVIDERS = [
