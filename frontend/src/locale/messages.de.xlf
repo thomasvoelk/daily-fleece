@@ -78,6 +78,10 @@
         <source> Start Quiz </source>
         <target> Quiz starten </target>
       </trans-unit>
+      <trans-unit id="quiz.lightboxCloseButton" datatype="html">
+        <source>Close lightbox</source>
+        <target>Lightbox schließen</target>
+      </trans-unit>
       <trans-unit id="lobby.quizNotStarted" datatype="html">
         <source>Quiz not started yet. Please wait.</source>
         <target>Quiz noch nicht gestartet. Bitte warten.</target>

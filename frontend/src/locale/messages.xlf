@@ -173,6 +173,14 @@
         <note priority="1" from="description">Button for host to start the quiz</note>
         <note priority="1" from="meaning">lobby</note>
       </trans-unit>
+      <trans-unit id="quiz.lightboxCloseButton" datatype="html">
+        <source>Close lightbox</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Close button for the photo lightbox</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
       <trans-unit id="lobby.quizNotStarted" datatype="html">
         <source>Quiz not started yet. Please wait.</source>
         <context-group purpose="location">

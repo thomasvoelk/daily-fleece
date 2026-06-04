@@ -15,6 +15,7 @@ export class Quiz {
   protected readonly quizStore = inject(QuizStore);
 
   protected readonly selectedCorrectAnswer = signal<'A' | 'B' | 'C' | null>(null);
+  protected readonly photoExpanded = signal(false);
 
   protected submit(answer: 'A' | 'B' | 'C'): void {
     this.quizStore.submitQ1Answer(answer);

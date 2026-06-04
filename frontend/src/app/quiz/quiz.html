@@ -3,8 +3,31 @@
     <img
       [src]="'/api/v1/sessions/' + session.sessionId + '/photos/q1'"
       alt="Frage 1"
-      class="q1-photo"
+      class="block w-full max-h-[50vh] object-cover cursor-pointer"
+      (click)="photoExpanded.set(true)"
     />
+
+    @if (photoExpanded()) {
+      <div
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 cursor-pointer"
+        (click)="photoExpanded.set(false)"
+      >
+        <button
+          class="absolute top-4 right-4 text-white text-2xl leading-none bg-transparent border-0 cursor-pointer"
+          aria-label="Close lightbox"
+          i18n-aria-label="quiz|Close button for the photo lightbox@@quiz.lightboxCloseButton"
+          (click)="$event.stopPropagation(); photoExpanded.set(false)"
+        >
+          ✕
+        </button>
+        <img
+          [src]="'/api/v1/sessions/' + session.sessionId + '/photos/q1'"
+          alt="Frage 1 vergrößert"
+          class="max-w-full max-h-full object-contain cursor-default"
+          (click)="$event.stopPropagation(); photoExpanded.set(false)"
+        />
+      </div>
+    }
 
     <div class="answer-count">
       {{ quizStore.answerCount().answered }}/{{ quizStore.answerCount().total }} beantwortet

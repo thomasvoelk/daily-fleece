@@ -223,6 +223,53 @@ describe('Quiz – reveal state', () => {
   });
 });
 
+// ─── Q1 photo lightbox ───────────────────────────────────────────────────────
+
+describe('Quiz – Q1 photo lightbox', () => {
+  it('lightbox overlay is not visible initially', async () => {
+    const { fixture } = await render(Quiz, { providers: PROVIDERS });
+    TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
+    fixture.detectChanges();
+
+    expect(screen.queryByRole('img', { name: 'Frage 1 vergrößert' })).toBeNull();
+  });
+
+  it('clicking the Q1 photo opens the lightbox overlay', async () => {
+    const user = userEvent.setup();
+    const { fixture } = await render(Quiz, { providers: PROVIDERS });
+    TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
+    fixture.detectChanges();
+
+    await user.click(screen.getByRole('img', { name: 'Frage 1' }));
+
+    expect(screen.getByRole('img', { name: 'Frage 1 vergrößert' })).toBeVisible();
+  });
+
+  it('clicking the photo inside the overlay closes the lightbox', async () => {
+    const user = userEvent.setup();
+    const { fixture } = await render(Quiz, { providers: PROVIDERS });
+    TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
+    fixture.detectChanges();
+
+    await user.click(screen.getByRole('img', { name: 'Frage 1' }));
+    await user.click(screen.getByRole('img', { name: 'Frage 1 vergrößert' }));
+
+    expect(screen.queryByRole('img', { name: 'Frage 1 vergrößert' })).toBeNull();
+  });
+
+  it('clicking the close button closes the lightbox', async () => {
+    const user = userEvent.setup();
+    const { fixture } = await render(Quiz, { providers: PROVIDERS });
+    TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
+    fixture.detectChanges();
+
+    await user.click(screen.getByRole('img', { name: 'Frage 1' }));
+    await user.click(screen.getByRole('button', { name: 'Close lightbox' }));
+
+    expect(screen.queryByRole('img', { name: 'Frage 1 vergrößert' })).toBeNull();
+  });
+});
+
 // ─── no-answer prompt ────────────────────────────────────────────────────────
 
 describe('Quiz – no-answer prompt', () => {
