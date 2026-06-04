@@ -1,10 +1,9 @@
-<main class="min-h-screen p-4">
-  <form
-    class="mx-auto mt-8 flex max-w-sm flex-col gap-4"
-    (submit)="$event.preventDefault()"
-    novalidate
-  >
-    <h1 class="text-xl font-bold" i18n="entry|Heading on the entry screen@@entry.heading">
+<main class="min-h-svh bg-cream flex flex-col items-center justify-center p-6">
+  <form class="w-full max-w-sm flex flex-col gap-4" (submit)="$event.preventDefault()" novalidate>
+    <h1
+      class="text-4xl text-center leading-tight mb-2"
+      i18n="entry|Heading on the entry screen@@entry.heading"
+    >
       Daily Fleece
     </h1>
 
@@ -28,7 +27,7 @@
       }
     </mat-form-field>
 
-    <p class="text-center" role="alert" aria-live="assertive">
+    <p class="text-center text-coral-700 text-sm min-h-5" role="alert" aria-live="assertive">
       {{ store.phase() === 'error' ? store.errorMessage() : '' }}
     </p>
 

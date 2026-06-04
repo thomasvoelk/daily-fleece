@@ -1,6 +1,6 @@
-<main class="min-h-screen p-4">
+<main class="min-h-svh bg-cream p-6">
   <div class="mx-auto mt-8 max-w-sm">
-    <h1 class="mb-4 text-xl font-bold" i18n="lobby|Heading for the waiting room@@lobby.heading">
+    <h1 class="text-3xl mb-4" i18n="lobby|Heading for the waiting room@@lobby.heading">
       Today's Session
     </h1>
     <mat-list
@@ -12,7 +12,7 @@
         <mat-list-item role="listitem">{{ player.displayName }}</mat-list-item>
       }
     </mat-list>
-    <div class="mt-4 flex gap-2">
+    <div class="mt-4 flex gap-3">
       <button
         type="button"
         mat-stroked-button
@@ -32,7 +32,7 @@
         </button>
       }
     </div>
-    <p class="mt-2 text-sm" role="alert" aria-live="assertive">
+    <p class="mt-2 text-sm text-coral-700" role="alert" aria-live="assertive">
       {{ store.error() ?? '' }}
     </p>
   </div>

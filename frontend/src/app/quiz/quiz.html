@@ -1,4 +1,4 @@
-<main class="flex min-h-screen flex-col">
+<main class="flex min-h-svh flex-col bg-cream">
   @if (quizStore.session(); as session) {
     <button
       type="button"
@@ -9,7 +9,7 @@
         [src]="'/api/v1/sessions/' + session.sessionId + '/photos/q1'"
         alt="Question 1"
         i18n-alt="quiz|Alt text for the Q1 photo@@quiz.q1PhotoAlt"
-        class="block max-h-[60vh] w-full object-contain"
+        class="block bg-plum max-h-[60vh] w-full object-contain"
       />
     </button>
 
@@ -45,7 +45,7 @@
     }
 
     <div
-      class="px-4 py-3 text-center text-sm"
+      class="px-4 py-3 text-center font-pixel text-[11px] text-plum-soft tracking-wider"
       i18n="quiz|Number of answers submitted out of total@@quiz.answerCount"
     >
       {{ quizStore.answerCount().answered }}/{{ quizStore.answerCount().total }} answered
@@ -53,7 +53,7 @@
 
     @if (quizStore.q1Status() === 'Open' && !quizStore.myQ1Answer()) {
       <p
-        class="px-4 py-1 text-center text-sm"
+        class="px-4 py-1 text-center font-body font-bold text-sm text-plum-soft"
         i18n="quiz|Prompt shown when the player has not yet answered@@quiz.answerPrompt"
       >
         Please choose your answer
@@ -75,7 +75,7 @@
     </mat-radio-group>
 
     @if (quizStore.q1Status() === 'Closed') {
-      <mat-card class="mx-4 mt-3">
+      <mat-card class="mx-4 mt-3 rounded-2xl">
         <mat-card-content>
           <p i18n="quiz|Reveals the correct answer after voting closes@@quiz.correctAnswer">
             Correct answer: <strong>{{ session.voting.q1.correctAnswer }}</strong>
@@ -94,7 +94,7 @@
 
     @if (quizStore.isHost()) {
       <section
-        class="flex flex-col gap-3 px-4 py-3"
+        class="flex flex-col gap-3 px-4 py-4 mx-4 mt-3 bg-cream-deep rounded-2xl"
         aria-label="Host controls"
         i18n-aria-label="
           quiz|Accessible label for the host controls section@@quiz.hostControlsAriaLabel"
@@ -125,6 +125,7 @@
       type="button"
       mat-button
       (click)="refresh()"
+      class="mx-auto mt-4"
       i18n="quiz|Button to reload the current quiz state@@quiz.refreshButton"
     >
       Refresh

@@ -9,7 +9,6 @@ import { EntryStore } from './entry.store';
   selector: 'app-entry',
   imports: [FormField, MatFormField, MatLabel, MatInput, MatError, MatButton],
   templateUrl: './entry.html',
-  styleUrl: './entry.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Entry {

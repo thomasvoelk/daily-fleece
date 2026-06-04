@@ -7,7 +7,6 @@ import { LobbyStore } from './lobby.store';
   selector: 'app-lobby',
   imports: [MatList, MatListItem, MatButton],
   templateUrl: './lobby.html',
-  styleUrl: './lobby.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Lobby {

@@ -1,58 +1,13 @@
-main {
-  min-height: 100svh;
-  background: var(--cream);
-  padding: var(--sp-6);
-}
-
-form {
-  max-width: 400px;
-  margin: var(--sp-8) auto 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-5);
-}
-
-h1 {
-  font-family: var(--font-display);
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--plum);
-}
-
-/* File input sections */
-div.flex.flex-col {
-  background: var(--paper);
-  border: 2px solid var(--wool-line);
-  border-radius: var(--r-md);
-  padding: var(--sp-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-}
-
-label {
-  font-family: var(--font-body);
-  font-weight: 800;
-  font-size: 14px;
-  color: var(--plum-soft);
-  letter-spacing: .02em;
-}
-
-input[type="file"] {
-  font-family: var(--font-body);
-  font-size: 14px;
-  color: var(--plum);
-  cursor: pointer;
-}
+/* File input button — can't be styled from template */
 
 input[type="file"]::file-selector-button {
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 14px;
-  background: var(--grape-200);
-  color: var(--grape-700);
+  background: var(--color-grape-200);
+  color: var(--color-grape-700);
   border: none;
-  border-radius: var(--r-pill);
+  border-radius: 999px;
   padding: 6px 14px;
   cursor: pointer;
   margin-right: 10px;
@@ -60,14 +15,6 @@ input[type="file"]::file-selector-button {
 }
 
 input[type="file"]::file-selector-button:hover {
-  background: var(--grape);
+  background: var(--color-grape);
   color: #fff;
-}
-
-/* Error alert */
-p[role="alert"] {
-  font-family: var(--font-body);
-  font-size: 14px;
-  color: var(--coral-700);
-  min-height: 20px;
 }

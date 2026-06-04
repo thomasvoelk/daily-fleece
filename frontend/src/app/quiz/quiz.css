@@ -1,54 +1,11 @@
-main {
-  min-height: 100svh;
-  background: var(--cream);
-  display: flex;
-  flex-direction: column;
-}
-
-/* Photo area */
-img {
-  display: block;
-  background: var(--plum);
-}
-
-/* Answer count pill */
-div.text-center.text-sm {
-  font-family: var(--font-pixel);
-  font-size: 11px;
-  color: var(--plum-soft);
-  letter-spacing: .04em;
-  padding: var(--sp-3) var(--sp-4);
-  text-align: center;
-}
-
-/* "Please choose" prompt */
-p.text-sm {
-  font-family: var(--font-body);
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--plum-soft);
-  text-align: center;
-}
-
-/* Host controls section */
-section {
-  background: var(--cream-deep);
-  border-radius: var(--r-md);
-  margin: 0 var(--sp-4);
-  padding: var(--sp-4);
-}
-
-/* Results card content */
-mat-card {
-  border-radius: var(--r-md) !important;
-}
+/* Results card contents — Angular Material internals, can't target from template */
 
 mat-card-content p {
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 16px;
-  color: var(--plum);
-  margin-bottom: var(--sp-3);
+  color: var(--color-plum);
+  margin-bottom: 12px;
 }
 
 mat-card-content ul {
@@ -57,24 +14,18 @@ mat-card-content ul {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: 8px;
 }
 
 mat-card-content li {
   font-family: var(--font-body);
   font-size: 15px;
-  color: var(--plum-soft);
+  color: var(--color-plum-soft);
   display: flex;
-  gap: var(--sp-2);
+  gap: 8px;
 }
 
 mat-card-content li span {
   font-weight: 700;
-  color: var(--plum);
-}
-
-/* Refresh button */
-button[mat-button] {
-  margin: var(--sp-4) auto;
-  display: block;
+  color: var(--color-plum);
 }
