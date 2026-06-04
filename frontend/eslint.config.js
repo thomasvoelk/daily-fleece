@@ -16,7 +16,7 @@ module.exports = defineConfig([
     files: ["**/*.ts"],
     extends: [
       eslint.configs.recommended,
-      tseslint.configs.recommendedTypeChecked,
+      tseslint.configs.strictTypeChecked,
       tseslint.configs.stylisticTypeChecked,
       angular.configs.tsRecommended,
       sheriff.configs.all,
@@ -54,6 +54,7 @@ module.exports = defineConfig([
           style: "kebab-case",
         },
       ],
+      "@typescript-eslint/no-extraneous-class": ["error", { allowWithDecorator: true }],
     },
   },
   {

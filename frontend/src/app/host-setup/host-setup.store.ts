@@ -37,14 +37,26 @@ export const HostSetupStore = signalStore(
       },
       async createSession(): Promise<void> {
         if (!store.canSubmit()) return;
+        const playerId = entryStore.playerId();
+        const displayName = entryStore.displayName();
+        if (!playerId || !displayName) {
+          patchState(store, {
+            phase: 'error',
+            errorMessage: $localize`:hostSetup|Error shown when player identity is missing@@hostSetup.missingIdentity:Player identity not found. Please start over.`,
+          });
+          return;
+        }
+        const q1 = store.q1();
+        const q2 = store.q2();
+        if (!q1 || !q2) return; // canSubmit() already guarantees this; needed for type narrowing
         patchState(store, { phase: 'loading', errorMessage: null });
         try {
           await api.invoke(createSession, {
             body: {
-              hostId: entryStore.playerId()!,
-              hostDisplayName: entryStore.displayName()!,
-              q1: store.q1()!,
-              q2: store.q2()!,
+              hostId: playerId,
+              hostDisplayName: displayName,
+              q1,
+              q2,
             },
           });
           patchState(store, { phase: 'idle' });

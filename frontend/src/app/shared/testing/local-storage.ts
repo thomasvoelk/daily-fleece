@@ -6,16 +6,20 @@ export function mockLocalStorage(): void {
       _store[k] = v;
     },
     removeItem: (k) => {
-      delete _store[k];
+      Reflect.deleteProperty(_store, k);
     },
     clear: () => {
-      for (const k of Object.keys(_store)) delete _store[k];
+      for (const k of Object.keys(_store)) Reflect.deleteProperty(_store, k);
     },
     key: (i) => Object.keys(_store)[i] ?? null,
     get length() {
       return Object.keys(_store).length;
     },
   };
-  beforeAll(() => vi.stubGlobal('localStorage', mock));
-  beforeEach(() => mock.clear());
+  beforeAll(() => {
+    vi.stubGlobal('localStorage', mock);
+  });
+  beforeEach(() => {
+    mock.clear();
+  });
 }

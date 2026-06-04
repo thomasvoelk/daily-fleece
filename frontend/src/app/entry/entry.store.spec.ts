@@ -21,7 +21,10 @@ function makeSession(sessionId: string): SessionResponse {
   };
 }
 
-const drainMicrotasks = () => new Promise<void>((r) => queueMicrotask(r));
+const drainMicrotasks = () =>
+  new Promise<void>((r) => {
+    queueMicrotask(r);
+  });
 
 // ─── createLobby ─────────────────────────────────────────────────────────────
 

@@ -8,7 +8,10 @@ import { SessionResponse } from '../backend-client';
 
 mockLocalStorage();
 
-const drainMicrotasks = () => new Promise<void>((r) => queueMicrotask(r));
+const drainMicrotasks = () =>
+  new Promise<void>((r) => {
+    queueMicrotask(r);
+  });
 
 @Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class LobbyStub {}

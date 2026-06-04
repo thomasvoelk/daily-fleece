@@ -27,12 +27,11 @@ export const QuizStore = signalStore(
     const entryStore = inject(EntryContext);
     return {
       q1Status: computed(() => store.session()?.voting.q1.status ?? null),
-      isHost: computed(
-        () =>
-          store.session() !== null &&
-          entryStore.playerId() !== null &&
-          store.session()!.hostId === entryStore.playerId(),
-      ),
+      isHost: computed(() => {
+        const session = store.session();
+        const playerId = entryStore.playerId();
+        return session !== null && playerId !== null && session.hostId === playerId;
+      }),
       myQ1Answer: computed(() => {
         const ownAnswer = store.ownQ1Answer();
         if (ownAnswer) return ownAnswer;

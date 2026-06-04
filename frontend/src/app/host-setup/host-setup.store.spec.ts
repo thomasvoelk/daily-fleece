@@ -73,6 +73,22 @@ describe('HostSetupStore – createSession', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['/lobby']);
   });
 
+  it('sets phase to error when player identity is not set', async () => {
+    // No seedPlayer call — playerId and displayName remain null
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(HostSetupStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    store.selectQ1(new File(['x'], 'q1.jpg', { type: 'image/jpeg' }));
+    store.selectQ2(new File(['x'], 'q2.jpg', { type: 'image/jpeg' }));
+
+    await store.createSession();
+
+    http.expectNone('/api/v1/sessions');
+    expect(store.phase()).toBe('error');
+    expect(store.errorMessage()).toBeTruthy();
+  });
+
   it('sets phase to error and re-enables canSubmit on failure', async () => {
     seedPlayer('p1', 'Alice');
     TestBed.configureTestingModule({ providers: PROVIDERS });

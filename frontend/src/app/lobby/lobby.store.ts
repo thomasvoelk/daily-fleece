@@ -18,12 +18,11 @@ export const LobbyStore = signalStore(
   withComputed((store) => {
     const entryStore = inject(EntryContext);
     return {
-      isHost: computed(
-        () =>
-          store.session() !== null &&
-          entryStore.playerId() !== null &&
-          store.session()!.hostId === entryStore.playerId(),
-      ),
+      isHost: computed(() => {
+        const session = store.session();
+        const playerId = entryStore.playerId();
+        return session !== null && playerId !== null && session.hostId === playerId;
+      }),
     };
   }),
   withMethods((store) => {
