@@ -1,1 +1,167 @@
 @import "tailwindcss";
+
+/* =============================================================
+   Daily Fleece — design tokens
+   "Cozy Arcade": warm wool + retro arcade quiz-show energy
+   ============================================================= */
+
+:root {
+  /* Brand core */
+  --grape:        #7C3AF0;
+  --grape-700:    #5E26C0;
+  --grape-200:    #E4D6FC;
+
+  --teal:         #14B8A6;
+  --teal-700:     #0C8678;
+  --teal-200:     #C7F1EB;
+
+  --marigold:     #FFB422;
+  --marigold-700: #D98A00;
+  --marigold-200: #FFE9BE;
+
+  --coral:        #FF5A5F;
+  --coral-700:    #D13338;
+  --coral-200:    #FFD7D8;
+
+  --green:        #34C759;
+  --green-700:    #1E9E40;
+  --green-200:    #CDF3D6;
+
+  --sky:          #3FA7F0;
+
+  /* Wool neutrals */
+  --cream:        #FFF3E0;
+  --cream-deep:   #F6E7CE;
+  --paper:        #FFFBF4;
+  --plum:         #241B3A;
+  --plum-soft:    #4A3E66;
+  --plum-faint:   #8A7FA6;
+  --wool-line:    #EADBC2;
+
+  /* Semantic roles */
+  --fg-1:       var(--plum);
+  --fg-2:       var(--plum-soft);
+  --fg-3:       var(--plum-faint);
+  --bg-app:     var(--cream);
+  --bg-surface: var(--paper);
+  --bg-sunken:  var(--cream-deep);
+  --primary:    var(--grape);
+  --border:     var(--wool-line);
+
+  /* Typography */
+  --font-display: 'Fredoka', 'Trebuchet MS', sans-serif;
+  --font-body:    'Nunito', system-ui, sans-serif;
+  --font-pixel:   'Press Start 2P', 'Courier New', monospace;
+
+  /* Spacing (4px base) */
+  --sp-1: 4px;  --sp-2: 8px;   --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px;  --sp-8: 32px; --sp-10: 40px;
+  --sp-12: 48px; --sp-16: 64px;
+
+  /* Radii */
+  --r-sm:  10px;
+  --r-md:  16px;
+  --r-lg:  24px;
+  --r-xl:  32px;
+  --r-pill: 999px;
+
+  /* Elevation */
+  --shadow-1: 0 1px 3px rgba(36,27,58,.10), 0 1px 2px rgba(36,27,58,.06);
+  --shadow-2: 0 4px 12px rgba(36,27,58,.12);
+  --shadow-3: 0 12px 28px rgba(36,27,58,.16);
+  --chunk-grape:    0 5px 0 var(--grape-700);
+  --chunk-marigold: 0 5px 0 var(--marigold-700);
+  --chunk-teal:     0 5px 0 var(--teal-700);
+  --chunk-coral:    0 5px 0 var(--coral-700);
+
+  /* Motion */
+  --ease-bounce: cubic-bezier(.34, 1.56, .64, 1);
+  --ease-out:    cubic-bezier(.22, 1, .36, 1);
+  --dur-fast: 120ms;
+  --dur-base: 220ms;
+  --dur-slow: 420ms;
+}
+
+/* =============================================================
+   Global typography
+   ============================================================= */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--plum);
+  margin: 0;
+}
+
+/* =============================================================
+   Quiz answer tiles — styled globally so they pierce Angular
+   Material's component boundary without ::ng-deep
+   ============================================================= */
+
+app-quiz mat-radio-button .mdc-form-field {
+  display: grid;
+  place-items: center;
+  padding: 18px 22px;
+  background: var(--paper);
+  border: 2px solid var(--wool-line);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  min-width: 72px;
+  box-shadow: 0 4px 0 var(--wool-line);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+app-quiz mat-radio-button .mdc-form-field:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--wool-line);
+}
+
+/* hide the radio circle — the tile IS the control */
+app-quiz mat-radio-button .mdc-radio {
+  display: none;
+}
+
+app-quiz mat-radio-button label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--plum);
+  cursor: pointer;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* selected state */
+app-quiz mat-radio-button.mat-mdc-radio-checked .mdc-form-field {
+  border-color: var(--grape);
+  background: var(--grape-200);
+  box-shadow: 0 4px 0 var(--grape-700);
+}
+
+app-quiz mat-radio-button.mat-mdc-radio-checked label {
+  color: var(--grape-700);
+}
+
+/* =============================================================
+   Category chip helpers (reusable via class)
+   ============================================================= */
+
+.df-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  letter-spacing: .02em;
+}
+.df-chip--knowledge { background: var(--grape-200); color: var(--grape-700); }
+.df-chip--geography { background: var(--teal-200);  color: var(--teal-700); }

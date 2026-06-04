@@ -1,38 +1,64 @@
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
 html {
   height: 100%;
+
   @include mat.theme(
     (
       color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
+        primary: mat.$violet-palette,
+        tertiary: mat.$cyan-palette,
       ),
-      typography: Roboto,
+      typography: Nunito,
       density: 0,
     )
   );
+
+  /* ---------- Daily Fleece brand — exact color overrides ---------- */
+
+  /* Grape: primary brand + Knowledge */
+  --mat-sys-primary:                  #7C3AF0;
+  --mat-sys-on-primary:               #FFFFFF;
+  --mat-sys-primary-container:        #E4D6FC;
+  --mat-sys-on-primary-container:     #5E26C0;
+  --mat-sys-primary-fixed:            #E4D6FC;
+  --mat-sys-primary-fixed-dim:        #7C3AF0;
+  --mat-sys-on-primary-fixed:         #241B3A;
+  --mat-sys-on-primary-fixed-variant: #5E26C0;
+
+  /* Teal: Geography */
+  --mat-sys-secondary:                #14B8A6;
+  --mat-sys-on-secondary:             #FFFFFF;
+  --mat-sys-secondary-container:      #C7F1EB;
+  --mat-sys-on-secondary-container:   #0C8678;
+  --mat-sys-tertiary:                 #14B8A6;
+  --mat-sys-on-tertiary:              #FFFFFF;
+  --mat-sys-tertiary-container:       #C7F1EB;
+  --mat-sys-on-tertiary-container:    #0C8678;
+
+  /* Warm wool surfaces */
+  --mat-sys-background:               #FFF3E0;
+  --mat-sys-on-background:            #241B3A;
+  --mat-sys-surface:                  #FFF3E0;
+  --mat-sys-on-surface:               #241B3A;
+  --mat-sys-surface-variant:          #F6E7CE;
+  --mat-sys-on-surface-variant:       #4A3E66;
+  --mat-sys-surface-container-lowest: #FFFFFF;
+  --mat-sys-surface-container-low:    #FFFBF4;
+  --mat-sys-surface-container:        #F6E7CE;
+  --mat-sys-surface-container-high:   #EADBC2;
+  --mat-sys-surface-container-higher: #E0D1B8;
+  --mat-sys-outline:                  #C4AA88;
+  --mat-sys-outline-variant:          #EADBC2;
+  --mat-sys-scrim:                    rgba(36, 27, 58, 0.5);
+  --mat-sys-shadow:                   rgba(36, 27, 58, 0.15);
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
   color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
+  font-family: 'Nunito', system-ui, sans-serif;
   margin: 0;
   height: 100%;
 }
