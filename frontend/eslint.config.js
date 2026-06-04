@@ -5,6 +5,8 @@ const tseslint = require("typescript-eslint");
 const angular = require("angular-eslint");
 const sheriff = require("@softarc/eslint-plugin-sheriff");
 const rxjsx = require("eslint-plugin-rxjs-x").default;
+const tailwind = require("eslint-plugin-tailwindcss");
+const path = require("path");
 
 module.exports = defineConfig([
   {
@@ -60,7 +62,14 @@ module.exports = defineConfig([
       angular.configs.templateRecommended,
       angular.configs.templateAccessibility,
     ],
+    plugins: { tailwindcss: tailwind },
+    settings: {
+      tailwindcss: {
+        cssConfigPath: path.resolve(__dirname, "src/styles.css"),
+      },
+    },
     rules: {
+      "tailwindcss/no-custom-classname": "error",
       "@angular-eslint/template/prefer-self-closing-tags": "error",
       "@angular-eslint/template/no-empty-control-flow": "error",
       "@angular-eslint/template/use-track-by-function": "error",
