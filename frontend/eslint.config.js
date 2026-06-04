@@ -44,6 +44,20 @@ module.exports = defineConfig([
       angular.configs.templateRecommended,
       angular.configs.templateAccessibility,
     ],
-    rules: {},
+    rules: {
+      "@angular-eslint/template/i18n": [
+        "error",
+        {
+          checkId: true,
+          checkText: true,
+          checkAttributes: true,
+          ignoreAttributes: [
+            "appearance", // Material Design tokens, not user-facing text
+            "accept",     // MIME types on file inputs
+            "aria-live",  // ARIA token values (assertive, polite)
+          ],
+        },
+      ],
+    },
   },
 ]);
