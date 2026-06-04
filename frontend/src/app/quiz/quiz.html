@@ -2,7 +2,8 @@
   @if (quizStore.session(); as session) {
     <img
       [src]="'/api/v1/sessions/' + session.sessionId + '/photos/q1'"
-      alt="Frage 1"
+      alt="Question 1"
+      i18n-alt="quiz|Alt text for the Q1 photo@@quiz.q1PhotoAlt"
       class="block w-full max-h-[50vh] object-cover cursor-pointer"
       (click)="photoExpanded.set(true)"
     />
@@ -22,19 +23,29 @@
         </button>
         <img
           [src]="'/api/v1/sessions/' + session.sessionId + '/photos/q1'"
-          alt="Frage 1 vergrößert"
+          alt="Question 1 enlarged"
+          i18n-alt="
+            quiz|Alt text for the enlarged Q1 photo in the lightbox@@quiz.q1PhotoExpandedAlt"
           class="max-w-full max-h-full object-contain cursor-default"
           (click)="$event.stopPropagation(); photoExpanded.set(false)"
         />
       </div>
     }
 
-    <div class="answer-count">
-      {{ quizStore.answerCount().answered }}/{{ quizStore.answerCount().total }} beantwortet
+    <div
+      class="answer-count"
+      i18n="quiz|Number of answers submitted out of total@@quiz.answerCount"
+    >
+      {{ quizStore.answerCount().answered }}/{{ quizStore.answerCount().total }} answered
     </div>
 
     @if (quizStore.q1Status() === 'Open' && !quizStore.myQ1Answer()) {
-      <p class="prompt">Bitte wähle deine Antwort</p>
+      <p
+        class="prompt"
+        i18n="quiz|Prompt shown when the player has not yet answered@@quiz.answerPrompt"
+      >
+        Please choose your answer
+      </p>
     }
 
     <div class="answers">
@@ -52,8 +63,8 @@
     @if (quizStore.q1Status() === 'Closed') {
       <mat-card class="reveal">
         <mat-card-content>
-          <p>
-            Richtige Antwort: <strong>{{ session.voting.q1.correctAnswer }}</strong>
+          <p i18n="quiz|Reveals the correct answer after voting closes@@quiz.correctAnswer">
+            Correct answer: <strong>{{ session.voting.q1.correctAnswer }}</strong>
           </p>
           <ul>
             @for (entry of session.voting.q1.answers | keyvalue; track entry.key) {
@@ -68,7 +79,12 @@
     }
 
     @if (quizStore.isHost()) {
-      <section class="host-controls" aria-label="Host-Steuerung">
+      <section
+        class="host-controls"
+        aria-label="Host controls"
+        i18n-aria-label="
+          quiz|Accessible label for the host controls section@@quiz.hostControlsAriaLabel"
+      >
         @if (quizStore.q1Status() === 'Open') {
           <mat-radio-group class="correct-picker">
             @for (option of ['A', 'B', 'C']; track option) {
@@ -77,13 +93,26 @@
               </mat-radio-button>
             }
           </mat-radio-group>
-          <button mat-flat-button [disabled]="!selectedCorrectAnswer()" (click)="closeVoting()">
-            Abstimmung schließen
+          <button
+            mat-flat-button
+            [disabled]="!selectedCorrectAnswer()"
+            (click)="closeVoting()"
+            i18n="
+              quiz|Button to close the voting and reveal the correct answer@@quiz.closeVotingButton"
+          >
+            Close voting
           </button>
         }
       </section>
     }
 
-    <button mat-button class="refresh" (click)="refresh()">Aktualisieren</button>
+    <button
+      mat-button
+      class="refresh"
+      (click)="refresh()"
+      i18n="quiz|Button to reload the current quiz state@@quiz.refreshButton"
+    >
+      Refresh
+    </button>
   }
 </main>

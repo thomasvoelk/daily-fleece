@@ -181,6 +181,86 @@
         <note priority="1" from="description">Close button for the photo lightbox</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
+      <trans-unit id="quiz.q1PhotoAlt" datatype="html">
+        <source>Question 1</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Alt text for the Q1 photo</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.q1PhotoExpandedAlt" datatype="html">
+        <source>Question 1 enlarged</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Alt text for the enlarged Q1 photo in the lightbox</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.answerCount" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ quizStore.answerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.answerCount().total }}"/> answered</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Number of answers submitted out of total</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.answerPrompt" datatype="html">
+        <source>Please choose your answer</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Prompt shown when the player has not yet answered</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.correctAnswer" datatype="html">
+        <source>Correct answer: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION" equiv-text="{{ session.voting.q1.correctAnswer }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Reveals the correct answer after voting closes</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.hostControlsAriaLabel" datatype="html">
+        <source>Host controls</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Accessible label for the host controls section</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.closeVotingButton" datatype="html">
+        <source>Close voting</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Button to close the voting and reveal the correct answer</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.refreshButton" datatype="html">
+        <source>Refresh</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Button to reload the current quiz state</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="hostSetup.q1PreviewAlt" datatype="html">
+        <source>Q1 photo preview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/host-setup/host-setup.html</context>
+        </context-group>
+        <note priority="1" from="description">Alt text for Q1 photo preview</note>
+        <note priority="1" from="meaning">hostSetup</note>
+      </trans-unit>
+      <trans-unit id="hostSetup.q2PreviewAlt" datatype="html">
+        <source>Q2 photo preview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/host-setup/host-setup.html</context>
+        </context-group>
+        <note priority="1" from="description">Alt text for Q2 photo preview</note>
+        <note priority="1" from="meaning">hostSetup</note>
+      </trans-unit>
       <trans-unit id="lobby.quizNotStarted" datatype="html">
         <source>Quiz not started yet. Please wait.</source>
         <context-group purpose="location">

@@ -82,6 +82,46 @@
         <source>Close lightbox</source>
         <target>Lightbox schließen</target>
       </trans-unit>
+      <trans-unit id="quiz.q1PhotoAlt" datatype="html">
+        <source>Question 1</source>
+        <target>Frage 1</target>
+      </trans-unit>
+      <trans-unit id="quiz.q1PhotoExpandedAlt" datatype="html">
+        <source>Question 1 enlarged</source>
+        <target>Frage 1 vergrößert</target>
+      </trans-unit>
+      <trans-unit id="quiz.answerCount" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ quizStore.answerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.answerCount().total }}"/> answered</source>
+        <target><x id="INTERPOLATION" equiv-text="{{ quizStore.answerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.answerCount().total }}"/> beantwortet</target>
+      </trans-unit>
+      <trans-unit id="quiz.answerPrompt" datatype="html">
+        <source>Please choose your answer</source>
+        <target>Bitte wähle deine Antwort</target>
+      </trans-unit>
+      <trans-unit id="quiz.correctAnswer" datatype="html">
+        <source>Correct answer: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION" equiv-text="{{ session.voting.q1.correctAnswer }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
+        <target>Richtige Antwort: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION" equiv-text="{{ session.voting.q1.correctAnswer }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></target>
+      </trans-unit>
+      <trans-unit id="quiz.hostControlsAriaLabel" datatype="html">
+        <source>Host controls</source>
+        <target>Host-Steuerung</target>
+      </trans-unit>
+      <trans-unit id="quiz.closeVotingButton" datatype="html">
+        <source>Close voting</source>
+        <target>Abstimmung schließen</target>
+      </trans-unit>
+      <trans-unit id="quiz.refreshButton" datatype="html">
+        <source>Refresh</source>
+        <target>Aktualisieren</target>
+      </trans-unit>
+      <trans-unit id="hostSetup.q1PreviewAlt" datatype="html">
+        <source>Q1 photo preview</source>
+        <target>Vorschau Foto F1</target>
+      </trans-unit>
+      <trans-unit id="hostSetup.q2PreviewAlt" datatype="html">
+        <source>Q2 photo preview</source>
+        <target>Vorschau Foto F2</target>
+      </trans-unit>
       <trans-unit id="lobby.quizNotStarted" datatype="html">
         <source>Quiz not started yet. Please wait.</source>
         <target>Quiz noch nicht gestartet. Bitte warten.</target>
