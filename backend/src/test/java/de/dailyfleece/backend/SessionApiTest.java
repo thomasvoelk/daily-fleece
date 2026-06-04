@@ -251,6 +251,35 @@ class SessionApiTest {
     }
 
     @Test
+    void createSession_accepts_5MB_photos() {
+        byte[] fiveMB = new byte[5 * 1024 * 1024];
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("hostId", HOST_ID.toString());
+        body.add("hostDisplayName", "Host");
+        body.add("q1", new ByteArrayResource(fiveMB) {
+            @Override
+            public String getFilename() {
+                return "q1.jpg";
+            }
+        });
+        body.add("q2", new ByteArrayResource(fiveMB) {
+            @Override
+            public String getFilename() {
+                return "q2.jpg";
+            }
+        });
+
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(body)
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    }
+
+    @Test
     void createSession_duplicate_day_returns_409() {
         postSession();
 
