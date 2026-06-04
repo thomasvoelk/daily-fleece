@@ -169,3 +169,4 @@
 {"id":"int-ffe9ea1e7c3e62408f7f9daa2f55a2cc","kind":"field_change","created_at":"2026-06-04T14:41:10.896119Z","actor":"thomas","issue_id":"df-jef","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Closed"}}
 {"id":"int-e2d5532021b0b0bf20a3210b04e2eba5","kind":"field_change","created_at":"2026-06-04T14:53:45.324593Z","actor":"thomas","issue_id":"df-e19","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-1d42a9fcd5d2dc178ab028c038add9d7","kind":"field_change","created_at":"2026-06-04T14:53:45.590469Z","actor":"thomas","issue_id":"df-e19.1","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
+{"id":"int-72b203a562705c87f6237dbd9c0dc7fe","kind":"field_change","created_at":"2026-06-04T15:52:29.508308Z","actor":"thomas","issue_id":"df-5o1","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Closed"}}
