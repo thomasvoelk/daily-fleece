@@ -32,13 +32,13 @@ export class Entry {
   });
 
   protected onJoinLobby(): void {
-    submit(this.entryForm, async () => {
+    void submit(this.entryForm, async () => {
       await this.store.joinLobby(this.model().companyId, this.model().displayName);
     });
   }
 
   protected onCreateLobby(): void {
-    submit(this.entryForm, async () => {
+    void submit(this.entryForm, async () => {
       await this.store.createLobby(this.model().companyId, this.model().displayName);
     });
   }

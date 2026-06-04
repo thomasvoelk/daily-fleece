@@ -4,22 +4,32 @@ const { defineConfig } = require("eslint/config");
 const tseslint = require("typescript-eslint");
 const angular = require("angular-eslint");
 const sheriff = require("@softarc/eslint-plugin-sheriff");
+const rxjsx = require("eslint-plugin-rxjs-x").default;
 
 module.exports = defineConfig([
   {
-    ignores: ["src/app/backend-client/**"],
+    ignores: ["src/app/backend-client/**", "src/index.html"],
   },
   {
     files: ["**/*.ts"],
     extends: [
       eslint.configs.recommended,
-      tseslint.configs.recommended,
-      tseslint.configs.stylistic,
+      tseslint.configs.recommendedTypeChecked,
+      tseslint.configs.stylisticTypeChecked,
       angular.configs.tsRecommended,
       sheriff.configs.all,
+      rxjsx.configs.recommended,
     ],
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ["src/app/shared/testing/*.ts"],
+        },
+      },
+    },
     processor: angular.processInlineTemplates,
     rules: {
+      "rxjs-x/no-floating-observables": "error",
       "@angular-eslint/directive-selector": [
         "error",
         {

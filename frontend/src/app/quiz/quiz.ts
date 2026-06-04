@@ -18,16 +18,16 @@ export class Quiz {
   protected readonly photoExpanded = signal(false);
 
   protected submit(answer: 'A' | 'B' | 'C'): void {
-    this.quizStore.submitQ1Answer(answer);
+    void this.quizStore.submitQ1Answer(answer);
   }
 
   protected refresh(): void {
-    this.quizStore.refresh();
+    void this.quizStore.refresh();
   }
 
   protected closeVoting(): void {
     const answer = this.selectedCorrectAnswer();
-    if (answer) this.quizStore.setQ1CorrectAnswer(answer);
+    if (answer) void this.quizStore.setQ1CorrectAnswer(answer);
   }
 
   @HostListener('document:keydown.escape')
