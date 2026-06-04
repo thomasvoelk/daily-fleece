@@ -1,17 +1,29 @@
 <main class="quiz">
   @if (quizStore.session(); as session) {
-    <img
-      [src]="'/api/v1/sessions/' + session.sessionId + '/photos/q1'"
-      alt="Question 1"
-      i18n-alt="quiz|Alt text for the Q1 photo@@quiz.q1PhotoAlt"
-      class="block w-full max-h-[50vh] object-cover cursor-pointer"
+    <button
+      type="button"
+      class="block w-full cursor-pointer border-0 p-0 bg-transparent"
       (click)="photoExpanded.set(true)"
-    />
+    >
+      <img
+        [src]="'/api/v1/sessions/' + session.sessionId + '/photos/q1'"
+        alt="Question 1"
+        i18n-alt="quiz|Alt text for the Q1 photo@@quiz.q1PhotoAlt"
+        class="block w-full max-h-[50vh] object-cover"
+      />
+    </button>
 
     @if (photoExpanded()) {
       <div
+        role="dialog"
+        aria-modal="true"
+        tabindex="-1"
+        aria-label="Photo lightbox"
+        i18n-aria-label="
+          quiz|Accessible label for the photo lightbox dialog@@quiz.lightboxDialogAriaLabel"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 cursor-pointer"
         (click)="photoExpanded.set(false)"
+        (keydown.escape)="photoExpanded.set(false)"
       >
         <button
           class="absolute top-4 right-4 text-white text-2xl leading-none bg-transparent border-0 cursor-pointer"
@@ -27,7 +39,6 @@
           i18n-alt="
             quiz|Alt text for the enlarged Q1 photo in the lightbox@@quiz.q1PhotoExpandedAlt"
           class="max-w-full max-h-full object-contain cursor-default"
-          (click)="$event.stopPropagation(); photoExpanded.set(false)"
         />
       </div>
     }

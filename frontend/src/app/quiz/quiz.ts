@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { KeyValuePipe } from '@angular/common';
 import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
 import { MatButton } from '@angular/material/button';
@@ -28,5 +28,10 @@ export class Quiz {
   protected closeVoting(): void {
     const answer = this.selectedCorrectAnswer();
     if (answer) this.quizStore.setQ1CorrectAnswer(answer);
+  }
+
+  @HostListener('document:keydown.escape')
+  protected onEscape(): void {
+    this.photoExpanded.set(false);
   }
 }

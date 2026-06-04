@@ -32,7 +32,7 @@ describe('Quiz – Q1 photo', () => {
     TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
     fixture.detectChanges();
 
-    const img = screen.getByRole('img', { name: /frage 1/i });
+    const img = screen.getByRole('img', { name: /question 1/i });
     expect(img).toHaveAttribute('src', '/api/v1/sessions/abc/photos/q1');
   });
 });
@@ -96,7 +96,7 @@ describe('Quiz – Aktualisieren', () => {
     store.initializeSession(makeSession());
     fixture.detectChanges();
 
-    await user.click(screen.getByRole('button', { name: /aktualisieren/i }));
+    await user.click(screen.getByRole('button', { name: /refresh/i }));
 
     expect(store.refresh).toHaveBeenCalled();
   });
@@ -122,7 +122,7 @@ describe('Quiz – answer count', () => {
     );
     fixture.detectChanges();
 
-    screen.getByText(/1\/3 beantwortet/i);
+    screen.getByText(/1\/3 answered/i);
   });
 });
 
@@ -141,7 +141,7 @@ describe('Quiz – host controls', () => {
     screen.getByRole('radio', { name: 'A' });
     screen.getByRole('radio', { name: 'B' });
     screen.getByRole('radio', { name: 'C' });
-    screen.getByRole('button', { name: /abstimmung schließen/i });
+    screen.getByRole('button', { name: /close voting/i });
   });
 
   it('hides host controls for a non-host player', async () => {
@@ -153,7 +153,7 @@ describe('Quiz – host controls', () => {
     TestBed.inject(QuizStore).initializeSession(makeSession({ hostId: 'host-1' }));
     fixture.detectChanges();
 
-    expect(screen.queryByRole('button', { name: /abstimmung schließen/i })).toBeNull();
+    expect(screen.queryByRole('button', { name: /close voting/i })).toBeNull();
   });
 
   it('Abstimmung schließen is disabled until a correct answer is selected', async () => {
@@ -165,7 +165,7 @@ describe('Quiz – host controls', () => {
     TestBed.inject(QuizStore).initializeSession(makeSession({ hostId: 'host-1' }));
     fixture.detectChanges();
 
-    expect(screen.getByRole('button', { name: /abstimmung schließen/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /close voting/i })).toBeDisabled();
   });
 
   it('calls setQ1CorrectAnswer when Abstimmung schließen is clicked with selection', async () => {
@@ -181,7 +181,7 @@ describe('Quiz – host controls', () => {
     fixture.detectChanges();
 
     await user.click(screen.getByRole('radio', { name: 'B' }));
-    await user.click(screen.getByRole('button', { name: /abstimmung schließen/i }));
+    await user.click(screen.getByRole('button', { name: /close voting/i }));
 
     expect(store.setQ1CorrectAnswer).toHaveBeenCalledWith('B');
   });
@@ -209,7 +209,7 @@ describe('Quiz – reveal state', () => {
     );
     fixture.detectChanges();
 
-    screen.getByText(/richtige antwort/i);
+    screen.getByText(/correct answer/i);
     screen.getByText('Alice');
     screen.getByText('Bob');
   });
@@ -226,35 +226,35 @@ describe('Quiz – reveal state', () => {
 // ─── Q1 photo lightbox ───────────────────────────────────────────────────────
 
 describe('Quiz – Q1 photo lightbox', () => {
-  it('lightbox overlay is not visible initially', async () => {
+  it('lightbox is not visible initially', async () => {
     const { fixture } = await render(Quiz, { providers: PROVIDERS });
     TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
     fixture.detectChanges();
 
-    expect(screen.queryByRole('img', { name: 'Frage 1 vergrößert' })).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('clicking the Q1 photo opens the lightbox overlay', async () => {
+  it('clicking the Q1 photo opens the lightbox', async () => {
     const user = userEvent.setup();
     const { fixture } = await render(Quiz, { providers: PROVIDERS });
     TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
     fixture.detectChanges();
 
-    await user.click(screen.getByRole('img', { name: 'Frage 1' }));
+    await user.click(screen.getByRole('img', { name: 'Question 1' }));
 
-    expect(screen.getByRole('img', { name: 'Frage 1 vergrößert' })).toBeVisible();
+    expect(screen.getByRole('dialog')).toBeVisible();
   });
 
-  it('clicking the photo inside the overlay closes the lightbox', async () => {
+  it('clicking the photo inside the lightbox closes it', async () => {
     const user = userEvent.setup();
     const { fixture } = await render(Quiz, { providers: PROVIDERS });
     TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
     fixture.detectChanges();
 
-    await user.click(screen.getByRole('img', { name: 'Frage 1' }));
-    await user.click(screen.getByRole('img', { name: 'Frage 1 vergrößert' }));
+    await user.click(screen.getByRole('img', { name: 'Question 1' }));
+    await user.click(screen.getByRole('img', { name: 'Question 1 enlarged' }));
 
-    expect(screen.queryByRole('img', { name: 'Frage 1 vergrößert' })).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 
   it('clicking the close button closes the lightbox', async () => {
@@ -263,10 +263,36 @@ describe('Quiz – Q1 photo lightbox', () => {
     TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
     fixture.detectChanges();
 
-    await user.click(screen.getByRole('img', { name: 'Frage 1' }));
+    await user.click(screen.getByRole('img', { name: 'Question 1' }));
     await user.click(screen.getByRole('button', { name: 'Close lightbox' }));
 
-    expect(screen.queryByRole('img', { name: 'Frage 1 vergrößert' })).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('pressing Enter on the Q1 photo button opens the lightbox', async () => {
+    const user = userEvent.setup();
+    const { fixture } = await render(Quiz, { providers: PROVIDERS });
+    TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
+    fixture.detectChanges();
+
+    screen.getByRole('button', { name: 'Question 1' }).focus();
+    await user.keyboard('[Enter]');
+
+    expect(screen.getByRole('dialog')).toBeVisible();
+  });
+
+  it('pressing Escape closes the lightbox', async () => {
+    const user = userEvent.setup();
+    const { fixture } = await render(Quiz, { providers: PROVIDERS });
+    TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
+    fixture.detectChanges();
+
+    await user.click(screen.getByRole('img', { name: 'Question 1' }));
+    expect(screen.getByRole('img', { name: 'Question 1 enlarged' })).toBeVisible();
+
+    await user.keyboard('[Escape]');
+
+    expect(screen.queryByRole('img', { name: 'Question 1 enlarged' })).toBeNull();
   });
 });
 
@@ -282,7 +308,7 @@ describe('Quiz – no-answer prompt', () => {
     TestBed.inject(QuizStore).initializeSession(makeSession());
     fixture.detectChanges();
 
-    screen.getByText(/bitte wähle deine antwort/i);
+    screen.getByText(/please choose your answer/i);
   });
 
   it('hides prompt once player has answered', async () => {
@@ -301,6 +327,6 @@ describe('Quiz – no-answer prompt', () => {
     );
     fixture.detectChanges();
 
-    expect(screen.queryByText(/bitte wähle deine antwort/i)).toBeNull();
+    expect(screen.queryByText(/please choose your answer/i)).toBeNull();
   });
 });

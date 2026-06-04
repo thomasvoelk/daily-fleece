@@ -56,3 +56,22 @@ test('Schließen-Button schließt die Lightbox', async ({ page }) => {
 
   await expect(page.getByRole('img', { name: 'Frage 1 vergrößert' })).not.toBeVisible();
 });
+
+test('Enter auf Q1-Foto-Button öffnet Lightbox', async ({ page }) => {
+  await navigateToQuiz(page);
+
+  await page.getByRole('button', { name: 'Frage 1' }).press('Enter');
+
+  await expect(page.getByRole('dialog')).toBeVisible();
+});
+
+test('Escape schließt die Lightbox', async ({ page }) => {
+  await navigateToQuiz(page);
+
+  await page.getByRole('img', { name: 'Frage 1' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+
+  await page.getByRole('dialog').press('Escape');
+
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+});

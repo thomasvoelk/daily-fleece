@@ -78,6 +78,10 @@
         <source> Start Quiz </source>
         <target> Quiz starten </target>
       </trans-unit>
+      <trans-unit id="quiz.lightboxDialogAriaLabel" datatype="html">
+        <source>Photo lightbox</source>
+        <target>Foto-Lightbox</target>
+      </trans-unit>
       <trans-unit id="quiz.lightboxCloseButton" datatype="html">
         <source>Close lightbox</source>
         <target>Lightbox schließen</target>
