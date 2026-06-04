@@ -1,10 +1,14 @@
 import { render, screen, within } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
-import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { Quiz } from './quiz';
 import { QuizStore } from './quiz.store';
-import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
+import {
+  provideTestEnvironment,
+  expectNoA11yViolations,
+  mockLocalStorage,
+} from '../shared/testing';
 import { SessionResponse } from '../backend-client';
 
 mockLocalStorage();
@@ -22,15 +26,54 @@ function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse 
   };
 }
 
-const PROVIDERS = [...provideTestEnvironment(), provideRouter([]), QuizStore];
+function makeStoreMock(
+  overrides: {
+    session?: SessionResponse;
+    answerCount?: { answered: number; total: number };
+    q1Status?: 'Open' | 'Closed' | null;
+    myQ1Answer?: 'A' | 'B' | 'C' | null;
+    isHost?: boolean;
+    submitQ1Answer?: (answer: 'A' | 'B' | 'C') => void;
+    refresh?: () => void;
+    setQ1CorrectAnswer?: (answer: 'A' | 'B' | 'C') => void;
+  } = {},
+) {
+  return {
+    session: signal(overrides.session ?? makeSession()),
+    answerCount: signal(overrides.answerCount ?? { answered: 0, total: 0 }),
+    q1Status: signal<'Open' | 'Closed' | null>(overrides.q1Status ?? 'Open'),
+    myQ1Answer: signal<'A' | 'B' | 'C' | null>(overrides.myQ1Answer ?? null),
+    isHost: signal(overrides.isHost ?? false),
+    submitQ1Answer: overrides.submitQ1Answer ?? vi.fn(),
+    refresh: overrides.refresh ?? vi.fn(),
+    setQ1CorrectAnswer: overrides.setQ1CorrectAnswer ?? vi.fn(),
+  };
+}
+
+async function renderQuiz(overrides: Parameters<typeof makeStoreMock>[0] = {}) {
+  return render(Quiz, {
+    providers: [
+      ...provideTestEnvironment(),
+      provideRouter([]),
+      { provide: QuizStore, useValue: makeStoreMock(overrides) },
+    ],
+  });
+}
+
+// ─── a11y ────────────────────────────────────────────────────────────────────
+
+describe('Quiz – a11y', () => {
+  it('has no axe violations', async () => {
+    const { container } = await renderQuiz();
+    await expectNoA11yViolations(container);
+  });
+});
 
 // ─── Q1 photo ────────────────────────────────────────────────────────────────
 
 describe('Quiz – Q1 photo', () => {
   it('renders the photo for the active session', async () => {
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
-    fixture.detectChanges();
+    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
 
     const img = screen.getByRole('img', { name: /question 1/i });
     expect(img).toHaveAttribute('src', '/api/v1/sessions/abc/photos/q1');
@@ -41,9 +84,7 @@ describe('Quiz – Q1 photo', () => {
 
 describe('Quiz – answer radio buttons', () => {
   it('shows A, B, C as radio inputs', async () => {
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(makeSession());
-    fixture.detectChanges();
+    await renderQuiz();
 
     const answerGroup = screen.getByRole('radiogroup', { name: /answer/i });
     within(answerGroup).getByRole('radio', { name: 'A' });
@@ -52,20 +93,7 @@ describe('Quiz – answer radio buttons', () => {
   });
 
   it("checks the radio matching the player's submitted answer", async () => {
-    localStorage.setItem(
-      'lobby-player',
-      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
-    );
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(
-      makeSession({
-        voting: {
-          q1: { status: 'Open', answers: { p1: { answer: 'B', displayName: 'Alice' } } },
-          q2: { status: 'Open' },
-        },
-      }),
-    );
-    fixture.detectChanges();
+    await renderQuiz({ myQ1Answer: 'B' });
 
     const answerGroup = screen.getByRole('radiogroup', { name: /answer/i });
     expect(within(answerGroup).getByRole('radio', { name: 'B' })).toBeChecked();
@@ -75,16 +103,13 @@ describe('Quiz – answer radio buttons', () => {
 
   it('calls submitQ1Answer when a radio is clicked', async () => {
     const user = userEvent.setup();
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    const store = TestBed.inject(QuizStore);
-    vi.spyOn(store, 'submitQ1Answer').mockResolvedValue(undefined);
-    store.initializeSession(makeSession());
-    fixture.detectChanges();
+    const submitQ1Answer = vi.fn();
+    await renderQuiz({ submitQ1Answer });
 
     const answerGroup = screen.getByRole('radiogroup', { name: /answer/i });
     await user.click(within(answerGroup).getByRole('radio', { name: 'C' }));
 
-    expect(store.submitQ1Answer).toHaveBeenCalledWith('C');
+    expect(submitQ1Answer).toHaveBeenCalledWith('C');
   });
 });
 
@@ -93,15 +118,12 @@ describe('Quiz – answer radio buttons', () => {
 describe('Quiz – Aktualisieren', () => {
   it('calls refresh when Aktualisieren is clicked', async () => {
     const user = userEvent.setup();
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    const store = TestBed.inject(QuizStore);
-    vi.spyOn(store, 'refresh').mockResolvedValue(undefined);
-    store.initializeSession(makeSession());
-    fixture.detectChanges();
+    const refresh = vi.fn();
+    await renderQuiz({ refresh });
 
     await user.click(screen.getByRole('button', { name: /refresh/i }));
 
-    expect(store.refresh).toHaveBeenCalled();
+    expect(refresh).toHaveBeenCalled();
   });
 });
 
@@ -109,21 +131,7 @@ describe('Quiz – Aktualisieren', () => {
 
 describe('Quiz – answer count', () => {
   it('shows answered/total beantwortet', async () => {
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(
-      makeSession({
-        players: [
-          { playerId: 'p1', displayName: 'Alice' },
-          { playerId: 'p2', displayName: 'Bob' },
-          { playerId: 'p3', displayName: 'Carl' },
-        ],
-        voting: {
-          q1: { status: 'Open', answerCount: 1 },
-          q2: { status: 'Open' },
-        },
-      }),
-    );
-    fixture.detectChanges();
+    await renderQuiz({ answerCount: { answered: 1, total: 3 } });
 
     screen.getByText(/1\/3 answered/i);
   });
@@ -133,13 +141,7 @@ describe('Quiz – answer count', () => {
 
 describe('Quiz – host controls', () => {
   it('shows correct-answer picker and Abstimmung schließen for host', async () => {
-    localStorage.setItem(
-      'lobby-player',
-      JSON.stringify({ playerId: 'host-1', companyId: 'acme', displayName: 'Host' }),
-    );
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(makeSession({ hostId: 'host-1' }));
-    fixture.detectChanges();
+    await renderQuiz({ isHost: true });
 
     const hostControls = screen.getByRole('region', { name: /host controls/i });
     within(hostControls).getByRole('radio', { name: 'A' });
@@ -149,46 +151,27 @@ describe('Quiz – host controls', () => {
   });
 
   it('hides host controls for a non-host player', async () => {
-    localStorage.setItem(
-      'lobby-player',
-      JSON.stringify({ playerId: 'player-2', companyId: 'acme', displayName: 'Bob' }),
-    );
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(makeSession({ hostId: 'host-1' }));
-    fixture.detectChanges();
+    await renderQuiz();
 
     expect(screen.queryByRole('button', { name: /close voting/i })).toBeNull();
   });
 
   it('Abstimmung schließen is disabled until a correct answer is selected', async () => {
-    localStorage.setItem(
-      'lobby-player',
-      JSON.stringify({ playerId: 'host-1', companyId: 'acme', displayName: 'Host' }),
-    );
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(makeSession({ hostId: 'host-1' }));
-    fixture.detectChanges();
+    await renderQuiz({ isHost: true });
 
     expect(screen.getByRole('button', { name: /close voting/i })).toBeDisabled();
   });
 
   it('calls setQ1CorrectAnswer when Abstimmung schließen is clicked with selection', async () => {
     const user = userEvent.setup();
-    localStorage.setItem(
-      'lobby-player',
-      JSON.stringify({ playerId: 'host-1', companyId: 'acme', displayName: 'Host' }),
-    );
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    const store = TestBed.inject(QuizStore);
-    vi.spyOn(store, 'setQ1CorrectAnswer').mockResolvedValue(undefined);
-    store.initializeSession(makeSession({ hostId: 'host-1' }));
-    fixture.detectChanges();
+    const setQ1CorrectAnswer = vi.fn();
+    await renderQuiz({ isHost: true, setQ1CorrectAnswer });
 
     const hostControls = screen.getByRole('region', { name: /host controls/i });
     await user.click(within(hostControls).getByRole('radio', { name: 'B' }));
     await user.click(screen.getByRole('button', { name: /close voting/i }));
 
-    expect(store.setQ1CorrectAnswer).toHaveBeenCalledWith('B');
+    expect(setQ1CorrectAnswer).toHaveBeenCalledWith('B');
   });
 });
 
@@ -196,9 +179,9 @@ describe('Quiz – host controls', () => {
 
 describe('Quiz – reveal state', () => {
   it('shows correct answer and player answers when Q1 is Closed', async () => {
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(
-      makeSession({
+    await renderQuiz({
+      q1Status: 'Closed',
+      session: makeSession({
         voting: {
           q1: {
             status: 'Closed',
@@ -211,8 +194,7 @@ describe('Quiz – reveal state', () => {
           q2: { status: 'Open' },
         },
       }),
-    );
-    fixture.detectChanges();
+    });
 
     screen.getByText(/correct answer/i);
     screen.getByText('Alice');
@@ -220,9 +202,7 @@ describe('Quiz – reveal state', () => {
   });
 
   it('does not show reveal section when Q1 is still Open', async () => {
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(makeSession());
-    fixture.detectChanges();
+    await renderQuiz();
 
     expect(screen.queryByText(/richtige antwort/i)).toBeNull();
   });
@@ -232,18 +212,14 @@ describe('Quiz – reveal state', () => {
 
 describe('Quiz – Q1 photo lightbox', () => {
   it('lightbox is not visible initially', async () => {
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
-    fixture.detectChanges();
+    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
 
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
   it('clicking the Q1 photo opens the lightbox', async () => {
     const user = userEvent.setup();
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
-    fixture.detectChanges();
+    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
 
     await user.click(screen.getByRole('img', { name: 'Question 1' }));
 
@@ -252,9 +228,7 @@ describe('Quiz – Q1 photo lightbox', () => {
 
   it('clicking the photo inside the lightbox closes it', async () => {
     const user = userEvent.setup();
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
-    fixture.detectChanges();
+    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
 
     await user.click(screen.getByRole('img', { name: 'Question 1' }));
     await user.click(screen.getByRole('img', { name: 'Question 1 enlarged' }));
@@ -264,9 +238,7 @@ describe('Quiz – Q1 photo lightbox', () => {
 
   it('clicking the close button closes the lightbox', async () => {
     const user = userEvent.setup();
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
-    fixture.detectChanges();
+    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
 
     await user.click(screen.getByRole('img', { name: 'Question 1' }));
     await user.click(screen.getByRole('button', { name: 'Close lightbox' }));
@@ -276,9 +248,7 @@ describe('Quiz – Q1 photo lightbox', () => {
 
   it('pressing Enter on the Q1 photo button opens the lightbox', async () => {
     const user = userEvent.setup();
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
-    fixture.detectChanges();
+    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
 
     screen.getByRole('button', { name: 'Question 1' }).focus();
     await user.keyboard('[Enter]');
@@ -288,9 +258,7 @@ describe('Quiz – Q1 photo lightbox', () => {
 
   it('pressing Escape closes the lightbox', async () => {
     const user = userEvent.setup();
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(makeSession({ sessionId: 'abc' }));
-    fixture.detectChanges();
+    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
 
     await user.click(screen.getByRole('img', { name: 'Question 1' }));
     expect(screen.getByRole('img', { name: 'Question 1 enlarged' })).toBeVisible();
@@ -305,32 +273,13 @@ describe('Quiz – Q1 photo lightbox', () => {
 
 describe('Quiz – no-answer prompt', () => {
   it('shows prompt when Q1 is Open and player has not answered', async () => {
-    localStorage.setItem(
-      'lobby-player',
-      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
-    );
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(makeSession());
-    fixture.detectChanges();
+    await renderQuiz();
 
     screen.getByText(/please choose your answer/i);
   });
 
   it('hides prompt once player has answered', async () => {
-    localStorage.setItem(
-      'lobby-player',
-      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
-    );
-    const { fixture } = await render(Quiz, { providers: PROVIDERS });
-    TestBed.inject(QuizStore).initializeSession(
-      makeSession({
-        voting: {
-          q1: { status: 'Open', answers: { p1: { answer: 'A', displayName: 'Alice' } } },
-          q2: { status: 'Open' },
-        },
-      }),
-    );
-    fixture.detectChanges();
+    await renderQuiz({ myQ1Answer: 'A' });
 
     expect(screen.queryByText(/please choose your answer/i)).toBeNull();
   });

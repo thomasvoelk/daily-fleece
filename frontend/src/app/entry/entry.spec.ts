@@ -3,11 +3,24 @@ import userEvent from '@testing-library/user-event';
 import { provideRouter } from '@angular/router';
 import { Entry } from './entry';
 import { EntryStore } from './entry.store';
-import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
+import {
+  provideTestEnvironment,
+  expectNoA11yViolations,
+  mockLocalStorage,
+} from '../shared/testing';
 
 mockLocalStorage();
 
 const PROVIDERS = [...provideTestEnvironment(), provideRouter([]), EntryStore];
+
+// ─── a11y ────────────────────────────────────────────────────────────────────
+
+describe('Entry – a11y', () => {
+  it('has no axe violations', async () => {
+    const { container } = await render(Entry, { providers: PROVIDERS });
+    await expectNoA11yViolations(container);
+  });
+});
 
 // ─── idle state ──────────────────────────────────────────────────────────────
 
