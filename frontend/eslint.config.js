@@ -6,6 +6,7 @@ const angular = require("angular-eslint");
 const sheriff = require("@softarc/eslint-plugin-sheriff");
 const rxjsx = require("eslint-plugin-rxjs-x").default;
 const tailwind = require("eslint-plugin-tailwindcss");
+const sonarjs = require("eslint-plugin-sonarjs");
 const path = require("path");
 
 module.exports = defineConfig([
@@ -21,6 +22,7 @@ module.exports = defineConfig([
       angular.configs.tsRecommended,
       sheriff.configs.all,
       rxjsx.configs.recommended,
+      sonarjs.configs.recommended,
     ],
     languageOptions: {
       parserOptions: {
@@ -55,6 +57,34 @@ module.exports = defineConfig([
         },
       ],
       "@typescript-eslint/no-extraneous-class": ["error", { allowWithDecorator: true }],
+      // Additional @angular-eslint rules (df-jef.4)
+      "@angular-eslint/no-conflicting-lifecycle": "error",
+      "@angular-eslint/consistent-component-styles": "error",
+      // component-class-suffix omitted: project uses suffix-free page components (App, Lobby, Quiz…)
+      "@angular-eslint/directive-class-suffix": "error",
+      "@angular-eslint/computed-must-return": "error",
+      "@angular-eslint/no-attribute-decorator": "error",
+      "@angular-eslint/no-lifecycle-call": "error",
+      "@angular-eslint/no-duplicates-in-metadata-arrays": "error",
+      "@angular-eslint/use-injectable-provided-in": "error",
+      "@angular-eslint/relative-url-prefix": "error",
+      "@angular-eslint/prefer-output-readonly": "error",
+      "@angular-eslint/no-input-prefix": "error",
+      "@angular-eslint/no-forward-ref": "error",
+      "@angular-eslint/use-component-selector": "error",
+      "@angular-eslint/contextual-decorator": "error",
+      "@angular-eslint/no-queries-metadata-property": "error",
+      "@angular-eslint/pipe-prefix": ["error", { prefixes: ["app"] }],
+      // sonarjs overrides
+      "sonarjs/function-return-type": "off", // CanActivateFn legitimately returns boolean | UrlTree
+    },
+  },
+  {
+    // Test stubs are anonymous route components — they need no selector
+    files: ["**/*.spec.ts"],
+    rules: {
+      "@angular-eslint/use-component-selector": "off",
+      "@angular-eslint/prefer-on-push-component-change-detection": "off",
     },
   },
   {

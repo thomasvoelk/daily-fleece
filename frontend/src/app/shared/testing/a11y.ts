@@ -5,7 +5,10 @@ export async function expectNoA11yViolations(container: Element): Promise<void> 
   if (results.violations.length === 0) return;
 
   const detail = results.violations
-    .map((v) => `  [${v.id}] ${v.description}\n${v.nodes.map((n) => `    ${n.html}`).join('\n')}`)
+    .map((v) => {
+      const nodes = v.nodes.map((n) => `    ${n.html}`).join('\n');
+      return `  [${v.id}] ${v.description}\n${nodes}`;
+    })
     .join('\n\n');
 
   throw new Error(`Accessibility violations found:\n\n${detail}`);
