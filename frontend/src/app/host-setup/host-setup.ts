@@ -12,8 +12,8 @@ import { HostSetupStore } from './host-setup.store';
 export class HostSetup {
   protected store = inject(HostSetupStore);
 
-  protected q1Preview = signal<string | null>(null);
-  protected q2Preview = signal<string | null>(null);
+  protected readonly q1Preview = signal<string | null>(null);
+  protected readonly q2Preview = signal<string | null>(null);
 
   protected onQ1Change(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];

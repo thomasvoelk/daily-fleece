@@ -30,6 +30,12 @@ module.exports = defineConfig([
     processor: angular.processInlineTemplates,
     rules: {
       "rxjs-x/no-floating-observables": "error",
+      "@angular-eslint/no-uncalled-signals": "error",
+      "@angular-eslint/no-pipe-impure": "error",
+      "@angular-eslint/prefer-signals": "error",
+      "@angular-eslint/no-async-lifecycle-method": "error",
+      "@angular-eslint/no-implicit-take-until-destroyed": "error",
+      "@angular-eslint/prefer-on-push-component-change-detection": "error",
       "@angular-eslint/directive-selector": [
         "error",
         {
@@ -55,6 +61,10 @@ module.exports = defineConfig([
       angular.configs.templateAccessibility,
     ],
     rules: {
+      "@angular-eslint/template/prefer-self-closing-tags": "error",
+      "@angular-eslint/template/no-empty-control-flow": "error",
+      "@angular-eslint/template/use-track-by-function": "error",
+      "@angular-eslint/template/button-has-type": "error",
       "@angular-eslint/template/i18n": [
         "error",
         {

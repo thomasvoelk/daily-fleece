@@ -26,6 +26,7 @@
         (keydown.escape)="photoExpanded.set(false)"
       >
         <button
+          type="button"
           class="absolute top-4 right-4 text-white text-2xl leading-none bg-transparent border-0 cursor-pointer"
           aria-label="Close lightbox"
           i18n-aria-label="quiz|Close button for the photo lightbox@@quiz.lightboxCloseButton"
@@ -62,6 +63,7 @@
     <div class="answers">
       @for (option of ['A', 'B', 'C']; track option) {
         <button
+          type="button"
           mat-stroked-button
           [class.selected]="quizStore.myQ1Answer() === option"
           (click)="submit($any(option))"
@@ -105,6 +107,7 @@
             }
           </mat-radio-group>
           <button
+            type="button"
             mat-flat-button
             [disabled]="!selectedCorrectAnswer()"
             (click)="closeVoting()"
@@ -118,6 +121,7 @@
     }
 
     <button
+      type="button"
       mat-button
       class="refresh"
       (click)="refresh()"

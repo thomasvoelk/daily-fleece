@@ -14,6 +14,7 @@
     </mat-list>
     <div class="flex gap-2 mt-4">
       <button
+        type="button"
         mat-stroked-button
         (click)="store.goToQuiz()"
         i18n="lobby|Button to navigate to the quiz@@lobby.goToQuizButton"
@@ -22,6 +23,7 @@
       </button>
       @if (store.isHost()) {
         <button
+          type="button"
           mat-flat-button
           (click)="store.startQuiz()"
           i18n="lobby|Button for host to start the quiz@@lobby.startQuizButton"

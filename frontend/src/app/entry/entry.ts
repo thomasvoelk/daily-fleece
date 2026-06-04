@@ -14,7 +14,7 @@ import { EntryStore } from './entry.store';
 export class Entry {
   protected store = inject(EntryStore);
 
-  private model = signal({
+  private readonly model = signal({
     companyId: this.store.companyId() ?? '',
     displayName: this.store.displayName() ?? '',
   });

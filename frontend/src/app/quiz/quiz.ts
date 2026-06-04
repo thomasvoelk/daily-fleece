@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, inject, signal } from '@angular/core';
 import { KeyValuePipe } from '@angular/common';
 import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
 import { MatButton } from '@angular/material/button';
@@ -10,6 +10,7 @@ import { QuizStore } from './quiz.store';
   imports: [KeyValuePipe, MatRadioGroup, MatRadioButton, MatButton, MatCard, MatCardContent],
   templateUrl: './quiz.html',
   styleUrl: './quiz.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Quiz {
   protected readonly quizStore = inject(QuizStore);
