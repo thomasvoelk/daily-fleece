@@ -62,6 +62,10 @@
         <source>Something went wrong. Please try again.</source>
         <target>Etwas ist schiefgelaufen. Bitte erneut versuchen.</target>
       </trans-unit>
+      <trans-unit id="hostSetup.missingIdentity" datatype="html">
+        <source>Player identity not found. Please start over.</source>
+        <target>Spieleridentität nicht gefunden. Bitte von vorne beginnen.</target>
+      </trans-unit>
       <trans-unit id="lobby.heading" datatype="html">
         <source> Today&apos;s Session </source>
         <target> Heutige Session </target>
