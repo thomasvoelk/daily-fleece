@@ -42,7 +42,7 @@ test('UC-04+05: Q1 voting — answer submission, refresh, close voting, reveal',
   await expect(playerPage.getByRole('img', { name: 'Frage 1' })).toBeVisible();
 
   // ── UC-04 Scenario 2: player selects A — radio checked ─────────────────
-  const playerAnswerGroup = playerPage.getByRole('radiogroup', { name: /answer/i });
+  const playerAnswerGroup = playerPage.getByRole('radiogroup', { name: 'Antwort' });
   await playerAnswerGroup.getByRole('radio', { name: 'A', exact: true }).check();
   await expect(playerAnswerGroup.getByRole('radio', { name: 'A', exact: true })).toBeChecked();
 
@@ -56,7 +56,7 @@ test('UC-04+05: Q1 voting — answer submission, refresh, close voting, reveal',
   await expect(page.getByText('1/2 beantwortet')).toBeVisible();
 
   // ── UC-05 Scenario 1: host picks correct answer A and closes voting ──────
-  await page.getByRole('radio', { name: 'A' }).check();
+  await page.getByRole('region', { name: 'Host-Steuerung' }).getByRole('radio', { name: 'A' }).check();
   await page.getByRole('button', { name: 'Abstimmung schließen' }).click();
 
   // ── UC-05 Scenario 2: host sees reveal — correct answer and all answers ──

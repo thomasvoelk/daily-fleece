@@ -27,7 +27,7 @@ module.exports = defineConfig([
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ["src/app/shared/testing/*.ts"],
+          allowDefaultProject: [],
         },
       },
     },

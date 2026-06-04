@@ -27,27 +27,19 @@ function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse 
 }
 
 function makeStoreMock(
-  overrides: {
-    session?: SessionResponse;
-    answerCount?: { answered: number; total: number };
-    q1Status?: 'Open' | 'Closed' | null;
-    myQ1Answer?: 'A' | 'B' | 'C' | null;
-    isHost?: boolean;
-    submitQ1Answer?: (answer: 'A' | 'B' | 'C') => void;
-    refresh?: () => void;
-    setQ1CorrectAnswer?: (answer: 'A' | 'B' | 'C') => void;
-  } = {},
-) {
+  overrides: Partial<InstanceType<typeof QuizStore>> = {},
+): InstanceType<typeof QuizStore> {
   return {
-    session: signal(overrides.session ?? makeSession()),
-    answerCount: signal(overrides.answerCount ?? { answered: 0, total: 0 }),
-    q1Status: signal<'Open' | 'Closed' | null>(overrides.q1Status ?? 'Open'),
-    myQ1Answer: signal<'A' | 'B' | 'C' | null>(overrides.myQ1Answer ?? null),
-    isHost: signal(overrides.isHost ?? false),
-    submitQ1Answer: overrides.submitQ1Answer ?? vi.fn(),
-    refresh: overrides.refresh ?? vi.fn(),
-    setQ1CorrectAnswer: overrides.setQ1CorrectAnswer ?? vi.fn(),
-  };
+    session: signal(makeSession()),
+    answerCount: signal({ answered: 0, total: 0 }),
+    q1Status: signal('Open' as const),
+    myQ1Answer: signal(null),
+    isHost: signal(false),
+    submitQ1Answer: vi.fn(),
+    refresh: vi.fn(),
+    setQ1CorrectAnswer: vi.fn(),
+    ...overrides,
+  } as InstanceType<typeof QuizStore>;
 }
 
 async function renderQuiz(overrides: Parameters<typeof makeStoreMock>[0] = {}) {
@@ -73,7 +65,7 @@ describe('Quiz – a11y', () => {
 
 describe('Quiz – Q1 photo', () => {
   it('renders the photo for the active session', async () => {
-    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
+    await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
 
     const img = screen.getByRole('img', { name: /question 1/i });
     expect(img).toHaveAttribute('src', '/api/v1/sessions/abc/photos/q1');
@@ -93,7 +85,7 @@ describe('Quiz – answer radio buttons', () => {
   });
 
   it("checks the radio matching the player's submitted answer", async () => {
-    await renderQuiz({ myQ1Answer: 'B' });
+    await renderQuiz({ myQ1Answer: signal('B' as const) });
 
     const answerGroup = screen.getByRole('radiogroup', { name: /answer/i });
     expect(within(answerGroup).getByRole('radio', { name: 'B' })).toBeChecked();
@@ -131,7 +123,7 @@ describe('Quiz – Aktualisieren', () => {
 
 describe('Quiz – answer count', () => {
   it('shows answered/total beantwortet', async () => {
-    await renderQuiz({ answerCount: { answered: 1, total: 3 } });
+    await renderQuiz({ answerCount: signal({ answered: 1, total: 3 }) });
 
     screen.getByText(/1\/3 answered/i);
   });
@@ -141,7 +133,7 @@ describe('Quiz – answer count', () => {
 
 describe('Quiz – host controls', () => {
   it('shows correct-answer picker and Abstimmung schließen for host', async () => {
-    await renderQuiz({ isHost: true });
+    await renderQuiz({ isHost: signal(true) });
 
     const hostControls = screen.getByRole('region', { name: /host controls/i });
     within(hostControls).getByRole('radio', { name: 'A' });
@@ -157,7 +149,7 @@ describe('Quiz – host controls', () => {
   });
 
   it('Abstimmung schließen is disabled until a correct answer is selected', async () => {
-    await renderQuiz({ isHost: true });
+    await renderQuiz({ isHost: signal(true) });
 
     expect(screen.getByRole('button', { name: /close voting/i })).toBeDisabled();
   });
@@ -165,7 +157,7 @@ describe('Quiz – host controls', () => {
   it('calls setQ1CorrectAnswer when Abstimmung schließen is clicked with selection', async () => {
     const user = userEvent.setup();
     const setQ1CorrectAnswer = vi.fn();
-    await renderQuiz({ isHost: true, setQ1CorrectAnswer });
+    await renderQuiz({ isHost: signal(true), setQ1CorrectAnswer });
 
     const hostControls = screen.getByRole('region', { name: /host controls/i });
     await user.click(within(hostControls).getByRole('radio', { name: 'B' }));
@@ -180,20 +172,22 @@ describe('Quiz – host controls', () => {
 describe('Quiz – reveal state', () => {
   it('shows correct answer and player answers when Q1 is Closed', async () => {
     await renderQuiz({
-      q1Status: 'Closed',
-      session: makeSession({
-        voting: {
-          q1: {
-            status: 'Closed',
-            correctAnswer: 'A',
-            answers: {
-              p1: { answer: 'A', displayName: 'Alice' },
-              p2: { answer: 'C', displayName: 'Bob' },
+      q1Status: signal('Closed' as const),
+      session: signal(
+        makeSession({
+          voting: {
+            q1: {
+              status: 'Closed',
+              correctAnswer: 'A',
+              answers: {
+                p1: { answer: 'A', displayName: 'Alice' },
+                p2: { answer: 'C', displayName: 'Bob' },
+              },
             },
+            q2: { status: 'Open' },
           },
-          q2: { status: 'Open' },
-        },
-      }),
+        }),
+      ),
     });
 
     screen.getByText(/correct answer/i);
@@ -212,14 +206,14 @@ describe('Quiz – reveal state', () => {
 
 describe('Quiz – Q1 photo lightbox', () => {
   it('lightbox is not visible initially', async () => {
-    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
+    await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
 
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
   it('clicking the Q1 photo opens the lightbox', async () => {
     const user = userEvent.setup();
-    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
+    await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
 
     await user.click(screen.getByRole('img', { name: 'Question 1' }));
 
@@ -228,7 +222,7 @@ describe('Quiz – Q1 photo lightbox', () => {
 
   it('clicking the photo inside the lightbox closes it', async () => {
     const user = userEvent.setup();
-    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
+    await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
 
     await user.click(screen.getByRole('img', { name: 'Question 1' }));
     await user.click(screen.getByRole('img', { name: 'Question 1 enlarged' }));
@@ -238,7 +232,7 @@ describe('Quiz – Q1 photo lightbox', () => {
 
   it('clicking the close button closes the lightbox', async () => {
     const user = userEvent.setup();
-    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
+    await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
 
     await user.click(screen.getByRole('img', { name: 'Question 1' }));
     await user.click(screen.getByRole('button', { name: 'Close lightbox' }));
@@ -248,7 +242,7 @@ describe('Quiz – Q1 photo lightbox', () => {
 
   it('pressing Enter on the Q1 photo button opens the lightbox', async () => {
     const user = userEvent.setup();
-    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
+    await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
 
     screen.getByRole('button', { name: 'Question 1' }).focus();
     await user.keyboard('[Enter]');
@@ -258,7 +252,7 @@ describe('Quiz – Q1 photo lightbox', () => {
 
   it('pressing Escape closes the lightbox', async () => {
     const user = userEvent.setup();
-    await renderQuiz({ session: makeSession({ sessionId: 'abc' }) });
+    await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
 
     await user.click(screen.getByRole('img', { name: 'Question 1' }));
     expect(screen.getByRole('img', { name: 'Question 1 enlarged' })).toBeVisible();
@@ -279,7 +273,7 @@ describe('Quiz – no-answer prompt', () => {
   });
 
   it('hides prompt once player has answered', async () => {
-    await renderQuiz({ myQ1Answer: 'A' });
+    await renderQuiz({ myQ1Answer: signal('A' as const) });
 
     expect(screen.queryByText(/please choose your answer/i)).toBeNull();
   });
