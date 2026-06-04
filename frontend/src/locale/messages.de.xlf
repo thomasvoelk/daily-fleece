@@ -102,6 +102,10 @@
         <source><x id="INTERPOLATION" equiv-text="{{ quizStore.answerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.answerCount().total }}"/> answered</source>
         <target><x id="INTERPOLATION" equiv-text="{{ quizStore.answerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.answerCount().total }}"/> beantwortet</target>
       </trans-unit>
+      <trans-unit id="quiz.answerGroupAriaLabel" datatype="html">
+        <source>Answer</source>
+        <target>Antwort</target>
+      </trans-unit>
       <trans-unit id="quiz.answerPrompt" datatype="html">
         <source>Please choose your answer</source>
         <target>Bitte wähle deine Antwort</target>

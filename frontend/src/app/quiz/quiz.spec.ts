@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/angular';
+import { render, screen, within } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
@@ -37,20 +37,21 @@ describe('Quiz – Q1 photo', () => {
   });
 });
 
-// ─── A/B/C answer buttons ────────────────────────────────────────────────────
+// ─── A/B/C answer radio buttons ──────────────────────────────────────────────
 
-describe('Quiz – answer buttons', () => {
-  it('shows A, B, C answer buttons', async () => {
+describe('Quiz – answer radio buttons', () => {
+  it('shows A, B, C as radio inputs', async () => {
     const { fixture } = await render(Quiz, { providers: PROVIDERS });
     TestBed.inject(QuizStore).initializeSession(makeSession());
     fixture.detectChanges();
 
-    screen.getByRole('button', { name: 'A' });
-    screen.getByRole('button', { name: 'B' });
-    screen.getByRole('button', { name: 'C' });
+    const answerGroup = screen.getByRole('radiogroup', { name: /answer/i });
+    within(answerGroup).getByRole('radio', { name: 'A' });
+    within(answerGroup).getByRole('radio', { name: 'B' });
+    within(answerGroup).getByRole('radio', { name: 'C' });
   });
 
-  it('highlights the selected answer', async () => {
+  it("checks the radio matching the player's submitted answer", async () => {
     localStorage.setItem(
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
@@ -66,12 +67,13 @@ describe('Quiz – answer buttons', () => {
     );
     fixture.detectChanges();
 
-    expect(screen.getByRole('button', { name: 'B' })).toHaveClass('selected');
-    expect(screen.getByRole('button', { name: 'A' })).not.toHaveClass('selected');
-    expect(screen.getByRole('button', { name: 'C' })).not.toHaveClass('selected');
+    const answerGroup = screen.getByRole('radiogroup', { name: /answer/i });
+    expect(within(answerGroup).getByRole('radio', { name: 'B' })).toBeChecked();
+    expect(within(answerGroup).getByRole('radio', { name: 'A' })).not.toBeChecked();
+    expect(within(answerGroup).getByRole('radio', { name: 'C' })).not.toBeChecked();
   });
 
-  it('calls submitQ1Answer when a button is clicked', async () => {
+  it('calls submitQ1Answer when a radio is clicked', async () => {
     const user = userEvent.setup();
     const { fixture } = await render(Quiz, { providers: PROVIDERS });
     const store = TestBed.inject(QuizStore);
@@ -79,7 +81,8 @@ describe('Quiz – answer buttons', () => {
     store.initializeSession(makeSession());
     fixture.detectChanges();
 
-    await user.click(screen.getByRole('button', { name: 'C' }));
+    const answerGroup = screen.getByRole('radiogroup', { name: /answer/i });
+    await user.click(within(answerGroup).getByRole('radio', { name: 'C' }));
 
     expect(store.submitQ1Answer).toHaveBeenCalledWith('C');
   });
@@ -138,9 +141,10 @@ describe('Quiz – host controls', () => {
     TestBed.inject(QuizStore).initializeSession(makeSession({ hostId: 'host-1' }));
     fixture.detectChanges();
 
-    screen.getByRole('radio', { name: 'A' });
-    screen.getByRole('radio', { name: 'B' });
-    screen.getByRole('radio', { name: 'C' });
+    const hostControls = screen.getByRole('region', { name: /host controls/i });
+    within(hostControls).getByRole('radio', { name: 'A' });
+    within(hostControls).getByRole('radio', { name: 'B' });
+    within(hostControls).getByRole('radio', { name: 'C' });
     screen.getByRole('button', { name: /close voting/i });
   });
 
@@ -180,7 +184,8 @@ describe('Quiz – host controls', () => {
     store.initializeSession(makeSession({ hostId: 'host-1' }));
     fixture.detectChanges();
 
-    await user.click(screen.getByRole('radio', { name: 'B' }));
+    const hostControls = screen.getByRole('region', { name: /host controls/i });
+    await user.click(within(hostControls).getByRole('radio', { name: 'B' }));
     await user.click(screen.getByRole('button', { name: /close voting/i }));
 
     expect(store.setQ1CorrectAnswer).toHaveBeenCalledWith('B');

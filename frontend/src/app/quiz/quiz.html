@@ -60,18 +60,19 @@
       </p>
     }
 
-    <div class="flex justify-center gap-3 px-4 py-2">
+    <mat-radio-group
+      class="flex justify-center gap-3 px-4 py-2"
+      [value]="quizStore.myQ1Answer()"
+      aria-label="Answer"
+      i18n-aria-label="
+        quiz|Accessible label for the player answer radio group@@quiz.answerGroupAriaLabel"
+    >
       @for (option of ['A', 'B', 'C']; track option) {
-        <button
-          type="button"
-          mat-stroked-button
-          [class.ring-2]="quizStore.myQ1Answer() === option"
-          (click)="submit($any(option))"
-        >
+        <mat-radio-button [value]="option" (change)="submit($any(option))">
           {{ option }}
-        </button>
+        </mat-radio-button>
       }
-    </div>
+    </mat-radio-group>
 
     @if (quizStore.q1Status() === 'Closed') {
       <mat-card class="mx-4 mt-3">

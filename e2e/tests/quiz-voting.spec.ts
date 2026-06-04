@@ -41,14 +41,15 @@ test('UC-04+05: Q1 voting — answer submission, refresh, close voting, reveal',
   await expect(page.getByRole('img', { name: 'Frage 1' })).toBeVisible();
   await expect(playerPage.getByRole('img', { name: 'Frage 1' })).toBeVisible();
 
-  // ── UC-04 Scenario 2: player selects A — button highlighted ────────────
-  await playerPage.getByRole('button', { name: 'A', exact: true }).click();
-  await expect(playerPage.getByRole('button', { name: 'A', exact: true })).toHaveClass(/selected/);
+  // ── UC-04 Scenario 2: player selects A — radio checked ─────────────────
+  const playerAnswerGroup = playerPage.getByRole('radiogroup', { name: /answer/i });
+  await playerAnswerGroup.getByRole('radio', { name: 'A', exact: true }).check();
+  await expect(playerAnswerGroup.getByRole('radio', { name: 'A', exact: true })).toBeChecked();
 
-  // ── UC-04 Scenario 3: player changes to B — B highlighted, A not ───────
-  await playerPage.getByRole('button', { name: 'B', exact: true }).click();
-  await expect(playerPage.getByRole('button', { name: 'B', exact: true })).toHaveClass(/selected/);
-  await expect(playerPage.getByRole('button', { name: 'A', exact: true })).not.toHaveClass(/selected/);
+  // ── UC-04 Scenario 3: player changes to B — B checked, A not ───────────
+  await playerAnswerGroup.getByRole('radio', { name: 'B', exact: true }).check();
+  await expect(playerAnswerGroup.getByRole('radio', { name: 'B', exact: true })).toBeChecked();
+  await expect(playerAnswerGroup.getByRole('radio', { name: 'A', exact: true })).not.toBeChecked();
 
   // ── UC-04 Scenario 4: host refreshes — answer count shows 1/2 ──────────
   await page.getByRole('button', { name: 'Aktualisieren' }).click();
@@ -67,7 +68,7 @@ test('UC-04+05: Q1 voting — answer submission, refresh, close voting, reveal',
   // ── UC-05 Scenario 3: player refreshes — sees same revealed state ────────
   await playerPage.getByRole('button', { name: 'Aktualisieren' }).click();
   await expect(playerPage.getByText(/Richtige Antwort:.*A/)).toBeVisible();
-  await expect(playerPage.locator('.reveal li').filter({ hasText: 'Bob Spieler' })).toContainText('B');
+  await expect(playerPage.getByRole('list').getByRole('listitem').filter({ hasText: 'Bob Spieler' })).toContainText('B');
 
   await playerContext.close();
 });
