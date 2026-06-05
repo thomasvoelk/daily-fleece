@@ -181,6 +181,28 @@ describe('Quiz – Q2 answer count', () => {
 
     screen.getByText(/2\/4 answered/i);
   });
+
+  it('shows Q2 count and not Q1 count when Q2 is open', async () => {
+    await renderQuiz({
+      q2Status: signal('Open' as const),
+      answerCount: signal({ answered: 1, total: 5 }),
+      q2AnswerCount: signal({ answered: 3, total: 5 }),
+    });
+
+    screen.getByText(/3\/5 answered/i);
+    expect(screen.queryByText(/1\/5 answered/i)).toBeNull();
+  });
+
+  it('shows Q1 count when Q2 is not open', async () => {
+    await renderQuiz({
+      q2Status: signal(null),
+      answerCount: signal({ answered: 1, total: 5 }),
+      q2AnswerCount: signal({ answered: 3, total: 5 }),
+    });
+
+    screen.getByText(/1\/5 answered/i);
+    expect(screen.queryByText(/3\/5 answered/i)).toBeNull();
+  });
 });
 
 // ─── Q2 reveal ───────────────────────────────────────────────────────────────

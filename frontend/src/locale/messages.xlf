@@ -222,6 +222,14 @@
         <note priority="1" from="description">Alt text for the enlarged Q2 photo in the lightbox</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
+      <trans-unit id="quiz.q2AnswerCount" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ quizStore.q2AnswerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.q2AnswerCount().total }}"/> answered</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Number of Q2 answers submitted out of total</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
       <trans-unit id="quiz.answerCount" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{ quizStore.answerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.answerCount().total }}"/> answered</source>
         <context-group purpose="location">

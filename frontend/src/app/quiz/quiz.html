@@ -117,16 +117,21 @@
       </div>
     }
 
-    <div
-      class="px-4 py-3 text-center font-pixel text-[11px] text-plum-soft tracking-wider"
-      i18n="quiz|Number of answers submitted out of total@@quiz.answerCount"
-    >
-      @if (quizStore.q2Status() === 'Open') {
+    @if (quizStore.q2Status() === 'Open') {
+      <div
+        class="px-4 py-3 text-center font-pixel text-[11px] text-plum-soft tracking-wider"
+        i18n="quiz|Number of Q2 answers submitted out of total@@quiz.q2AnswerCount"
+      >
         {{ quizStore.q2AnswerCount().answered }}/{{ quizStore.q2AnswerCount().total }} answered
-      } @else {
+      </div>
+    } @else {
+      <div
+        class="px-4 py-3 text-center font-pixel text-[11px] text-plum-soft tracking-wider"
+        i18n="quiz|Number of answers submitted out of total@@quiz.answerCount"
+      >
         {{ quizStore.answerCount().answered }}/{{ quizStore.answerCount().total }} answered
-      }
-    </div>
+      </div>
+    }
 
     @if (quizStore.q2Status() !== 'Open') {
       @if (quizStore.q1Status() === 'Open' && !quizStore.myQ1Answer()) {

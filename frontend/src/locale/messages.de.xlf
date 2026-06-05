@@ -106,6 +106,10 @@
         <source>Question 2 enlarged</source>
         <target>Frage 2 vergrößert</target>
       </trans-unit>
+      <trans-unit id="quiz.q2AnswerCount" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ quizStore.q2AnswerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.q2AnswerCount().total }}"/> answered</source>
+        <target><x id="INTERPOLATION" equiv-text="{{ quizStore.q2AnswerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.q2AnswerCount().total }}"/> beantwortet</target>
+      </trans-unit>
       <trans-unit id="quiz.answerCount" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{ quizStore.answerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.answerCount().total }}"/> answered</source>
         <target><x id="INTERPOLATION" equiv-text="{{ quizStore.answerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.answerCount().total }}"/> beantwortet</target>
