@@ -100,6 +100,78 @@ describe('QuizStore – setQ1CorrectAnswer', () => {
   });
 });
 
+// ─── submitQ2Answer ──────────────────────────────────────────────────────────
+
+describe('QuizStore – submitQ2Answer', () => {
+  it('PUTs answer to the q2 endpoint and myQ2Answer tracks local state', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'player-1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    const loadPromise = store.refresh();
+    http.expectOne('/api/v1/sessions/today').flush(makeSession({ sessionId: 's42' }));
+    await loadPromise;
+
+    const submitPromise = store.submitQ2Answer('DE');
+    const req = http.expectOne('/api/v1/sessions/s42/questions/q2/answers');
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toMatchObject({ playerId: 'player-1', answer: 'DE' });
+    req.flush('');
+    await drainMicrotasks();
+    http.expectOne('/api/v1/sessions/today').flush(makeSession({ sessionId: 's42' }));
+    await submitPromise;
+
+    expect(store.myQ2Answer()).toBe('DE');
+  });
+});
+
+// ─── setQ2CorrectAnswer ───────────────────────────────────────────────────────
+
+describe('QuizStore – setQ2CorrectAnswer', () => {
+  it('POSTs correct answer and q2Status becomes Closed', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'host-1', companyId: 'acme', displayName: 'Host' }),
+    );
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    const loadPromise = store.refresh();
+    http
+      .expectOne('/api/v1/sessions/today')
+      .flush(
+        makeSession({
+          sessionId: 's42',
+          hostId: 'host-1',
+          voting: { q1: { status: 'Closed', correctAnswer: 'A' }, q2: { status: 'Open' } },
+        }),
+      );
+    await loadPromise;
+
+    const closePromise = store.setQ2CorrectAnswer('DE');
+    const req = http.expectOne('/api/v1/sessions/s42/questions/q2/correct');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toMatchObject({ hostId: 'host-1', correctAnswer: 'DE' });
+    req.flush(
+      makeSession({
+        sessionId: 's42',
+        voting: {
+          q1: { status: 'Closed', correctAnswer: 'A' },
+          q2: { status: 'Closed', correctAnswer: 'DE' },
+        },
+      }),
+    );
+    await closePromise;
+
+    expect(store.q2Status()).toBe('Closed');
+  });
+});
+
 // ─── computed signals ────────────────────────────────────────────────────────
 
 describe('QuizStore – computed signals', () => {
@@ -186,6 +258,72 @@ describe('QuizStore – computed signals', () => {
     await promise;
 
     expect(store.myQ1Answer()).toBeNull();
+  });
+
+  it('myQ2Answer returns the country from session when voting is revealed', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'player-1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    const promise = store.refresh();
+    http.expectOne('/api/v1/sessions/today').flush(
+      makeSession({
+        voting: {
+          q1: { status: 'Closed', correctAnswer: 'A' },
+          q2: {
+            status: 'Closed',
+            correctAnswer: 'DE',
+            answers: { 'player-1': { answer: 'FR', displayName: 'Alice' } },
+          },
+        },
+      }),
+    );
+    await promise;
+
+    expect(store.myQ2Answer()).toBe('FR');
+  });
+
+  it('myQ2Answer returns null when player has not answered Q2', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'player-1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    const promise = store.refresh();
+    http.expectOne('/api/v1/sessions/today').flush(makeSession());
+    await promise;
+
+    expect(store.myQ2Answer()).toBeNull();
+  });
+
+  it('q2AnswerCount reflects how many players have answered Q2', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    const promise = store.refresh();
+    http.expectOne('/api/v1/sessions/today').flush(
+      makeSession({
+        players: [
+          { playerId: 'p1', displayName: 'Alice' },
+          { playerId: 'p2', displayName: 'Bob' },
+        ],
+        voting: {
+          q1: { status: 'Closed', correctAnswer: 'A' },
+          q2: { status: 'Open', answerCount: 1 },
+        },
+      }),
+    );
+    await promise;
+
+    expect(store.q2AnswerCount()).toEqual({ answered: 1, total: 2 });
   });
 
   it('answerCount reflects how many players have answered', async () => {

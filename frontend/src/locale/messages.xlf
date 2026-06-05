@@ -262,6 +262,38 @@
         <note priority="1" from="description">Button to close the voting and reveal the correct answer</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
+      <trans-unit id="quiz.countryLabel" datatype="html">
+        <source>Country</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Label for the Q2 country picker</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.hostCountryLabel" datatype="html">
+        <source>Country</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Label for the host Q2 correct-country picker</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.q2CorrectAnswer" datatype="html">
+        <source> Correct answer: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION" equiv-text="{{ countryName(session.voting.q2.correctAnswer) }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Reveals the correct Q2 country after voting closes</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.closeQ2VotingButton" datatype="html">
+        <source> Close voting </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+        </context-group>
+        <note priority="1" from="description">Button to close Q2 voting and reveal the correct country</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
       <trans-unit id="quiz.refreshButton" datatype="html">
         <source>Refresh</source>
         <context-group purpose="location">

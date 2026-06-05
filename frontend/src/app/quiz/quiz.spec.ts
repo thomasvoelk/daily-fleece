@@ -32,13 +32,17 @@ function makeStoreMock(
   return {
     session: signal(makeSession()),
     answerCount: signal({ answered: 0, total: 0 }),
+    q2AnswerCount: signal({ answered: 0, total: 0 }),
     q1Status: signal('Open' as const),
     q2Status: signal(null),
     myQ1Answer: signal(null),
+    myQ2Answer: signal(null),
     isHost: signal(false),
     submitQ1Answer: vi.fn(),
+    submitQ2Answer: vi.fn(),
     refresh: vi.fn(),
     setQ1CorrectAnswer: vi.fn(),
+    setQ2CorrectAnswer: vi.fn(),
     ...overrides,
   } as InstanceType<typeof QuizStore>;
 }
@@ -58,6 +62,15 @@ async function renderQuiz(overrides: Parameters<typeof makeStoreMock>[0] = {}) {
 describe('Quiz – a11y', () => {
   it('has no axe violations', async () => {
     const { container } = await renderQuiz();
+    await expectNoA11yViolations(container);
+  });
+
+  it('has no axe violations in host Q2 voting state', async () => {
+    const { container } = await renderQuiz({
+      isHost: signal(true),
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Open' as const),
+    });
     await expectNoA11yViolations(container);
   });
 });
@@ -152,6 +165,54 @@ describe('Quiz – answer count', () => {
   });
 });
 
+// ─── Q2 answer count ─────────────────────────────────────────────────────────
+
+describe('Quiz – Q2 answer count', () => {
+  it('shows Q2 answered/total when Q2 is open', async () => {
+    await renderQuiz({
+      q2Status: signal('Open' as const),
+      q2AnswerCount: signal({ answered: 2, total: 4 }),
+    });
+
+    screen.getByText(/2\/4 answered/i);
+  });
+});
+
+// ─── Q2 reveal ───────────────────────────────────────────────────────────────
+
+describe('Quiz – Q2 reveal', () => {
+  it('shows correct country name and player answers when Q2 is Closed', async () => {
+    await renderQuiz({
+      q2Status: signal('Closed' as const),
+      session: signal(
+        makeSession({
+          voting: {
+            q1: { status: 'Closed', correctAnswer: 'A' },
+            q2: {
+              status: 'Closed',
+              correctAnswer: 'DE',
+              answers: {
+                p1: { answer: 'DE', displayName: 'Alice' },
+                p2: { answer: 'FR', displayName: 'Bob' },
+              },
+            },
+          },
+        }),
+      ),
+    });
+
+    expect(screen.getAllByText(/deutschland/i).length).toBeGreaterThan(0);
+    screen.getByText('Alice');
+    screen.getByText('Bob');
+  });
+
+  it('does not show Q2 reveal when Q2 is still Open', async () => {
+    await renderQuiz({ q2Status: signal('Open' as const) });
+
+    expect(screen.queryByText(/deutschland/i)).toBeNull();
+  });
+});
+
 // ─── host controls ───────────────────────────────────────────────────────────
 
 describe('Quiz – host controls', () => {
@@ -165,6 +226,31 @@ describe('Quiz – host controls', () => {
     screen.getByRole('button', { name: /close voting/i });
   });
 
+  it('shows country picker and close Q2 voting button for host when Q2 is open', async () => {
+    await renderQuiz({
+      isHost: signal(true),
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Open' as const),
+    });
+
+    const hostControls = screen.getByRole('region', { name: /host controls/i });
+    within(hostControls).getByRole('combobox', { name: /country/i });
+    screen.getByRole('button', { name: /close voting/i });
+  });
+
+  it('close Q2 voting button is aria-disabled when no country is selected', async () => {
+    await renderQuiz({
+      isHost: signal(true),
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Open' as const),
+    });
+
+    expect(screen.getByRole('button', { name: /close voting/i })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+  });
+
   it('hides host controls for a non-host player', async () => {
     await renderQuiz();
 
@@ -175,6 +261,26 @@ describe('Quiz – host controls', () => {
     await renderQuiz({ isHost: signal(true) });
 
     expect(screen.getByRole('button', { name: /close voting/i })).toBeDisabled();
+  });
+
+  it('calls setQ2CorrectAnswer when close Q2 voting is clicked with a country selected', async () => {
+    const user = userEvent.setup();
+    const setQ2CorrectAnswer = vi.fn();
+    await renderQuiz({
+      isHost: signal(true),
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Open' as const),
+      setQ2CorrectAnswer,
+    });
+
+    const hostControls = screen.getByRole('region', { name: /host controls/i });
+    const input = within(hostControls).getByRole('combobox', { name: /country/i });
+    await user.click(input);
+    const options = screen.getAllByRole('option');
+    await user.click(options[0]);
+    await user.click(screen.getByRole('button', { name: /close voting/i }));
+
+    expect(setQ2CorrectAnswer).toHaveBeenCalledWith(expect.any(String));
   });
 
   it('calls setQ1CorrectAnswer when Abstimmung schließen is clicked with selection', async () => {
@@ -369,6 +475,49 @@ describe('Quiz – Q2 photo lightbox', () => {
     await user.keyboard('[Escape]');
 
     expect(screen.queryByRole('img', { name: 'Question 2 enlarged' })).toBeNull();
+  });
+});
+
+// ─── Q2 country input ────────────────────────────────────────────────────────
+
+describe('Quiz – Q2 country input', () => {
+  it('shows country combobox when q2Status is Open', async () => {
+    await renderQuiz({ q2Status: signal('Open' as const) });
+
+    screen.getByRole('combobox', { name: /country/i });
+  });
+
+  it('hides country combobox when q2Status is not Open', async () => {
+    await renderQuiz();
+
+    expect(screen.queryByRole('combobox', { name: /country/i })).toBeNull();
+  });
+
+  it('selecting a country option calls submitQ2Answer with the ISO code', async () => {
+    const user = userEvent.setup();
+    const submitQ2Answer = vi.fn();
+    await renderQuiz({ q2Status: signal('Open' as const), submitQ2Answer });
+
+    const input = screen.getByRole('combobox', { name: /country/i });
+    await user.click(input);
+    await user.type(input, 'deutsch');
+    const option = screen.getAllByRole('option')[0];
+    await user.click(option);
+
+    expect(submitQ2Answer).toHaveBeenCalledWith('DE');
+  });
+
+  it('typing in the combobox filters the options list', async () => {
+    const user = userEvent.setup();
+    await renderQuiz({ q2Status: signal('Open' as const) });
+
+    const input = screen.getByRole('combobox', { name: /country/i });
+    await user.click(input);
+    await user.type(input, 'deutsch');
+
+    const options = screen.getAllByRole('option');
+    expect(options.length).toBeGreaterThan(0);
+    expect(options.every((o) => o.textContent?.toLowerCase().includes('deutsch'))).toBe(true);
   });
 });
 

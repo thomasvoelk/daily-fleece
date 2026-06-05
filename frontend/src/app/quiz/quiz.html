@@ -90,13 +90,42 @@
           />
         </div>
       }
+
+      <div class="px-4 pt-2">
+        <mat-form-field class="w-full">
+          <mat-label i18n="quiz|Label for the Q2 country picker@@quiz.countryLabel"
+            >Country</mat-label
+          >
+          <input
+            type="text"
+            matInput
+            [matAutocomplete]="q2Auto"
+            [value]="q2CountryInput()"
+            (input)="q2CountryInput.set($any($event.target).value)"
+          />
+          <mat-autocomplete
+            #q2Auto
+            (optionSelected)="
+              submitQ2($event.option.value); q2CountryInput.set($event.option.viewValue)
+            "
+          >
+            @for (country of filteredCountries(); track country.code) {
+              <mat-option [value]="country.code">{{ country.name }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
     }
 
     <div
       class="px-4 py-3 text-center font-pixel text-[11px] text-plum-soft tracking-wider"
       i18n="quiz|Number of answers submitted out of total@@quiz.answerCount"
     >
-      {{ quizStore.answerCount().answered }}/{{ quizStore.answerCount().total }} answered
+      @if (quizStore.q2Status() === 'Open') {
+        {{ quizStore.q2AnswerCount().answered }}/{{ quizStore.q2AnswerCount().total }} answered
+      } @else {
+        {{ quizStore.answerCount().answered }}/{{ quizStore.answerCount().total }} answered
+      }
     </div>
 
     @if (quizStore.q1Status() === 'Open' && !quizStore.myQ1Answer()) {
@@ -140,6 +169,24 @@
       </mat-card>
     }
 
+    @if (quizStore.q2Status() === 'Closed' && session.voting.q2.correctAnswer) {
+      <mat-card class="mx-4 mt-3 rounded-2xl">
+        <mat-card-content>
+          <p i18n="quiz|Reveals the correct Q2 country after voting closes@@quiz.q2CorrectAnswer">
+            Correct answer: <strong>{{ countryName(session.voting.q2.correctAnswer) }}</strong>
+          </p>
+          <ul>
+            @for (entry of session.voting.q2.answers | keyvalue; track entry.key) {
+              <li>
+                <span>{{ entry.value.displayName }}</span
+                >: {{ countryName(entry.value.answer) }}
+              </li>
+            }
+          </ul>
+        </mat-card-content>
+      </mat-card>
+    }
+
     @if (quizStore.isHost()) {
       <section
         class="flex flex-col gap-3 px-4 py-4 mx-4 mt-3 bg-cream-deep rounded-2xl"
@@ -162,6 +209,42 @@
             (click)="closeVoting()"
             i18n="
               quiz|Button to close the voting and reveal the correct answer@@quiz.closeVotingButton"
+          >
+            Close voting
+          </button>
+        }
+
+        @if (quizStore.q2Status() === 'Open') {
+          <mat-form-field class="w-full">
+            <mat-label
+              i18n="quiz|Label for the host Q2 correct-country picker@@quiz.hostCountryLabel"
+              >Country</mat-label
+            >
+            <input
+              type="text"
+              matInput
+              [matAutocomplete]="q2HostAuto"
+              [value]="selectedQ2CorrectCountry() ? countryName(selectedQ2CorrectCountry()!) : ''"
+              (input)="selectedQ2CorrectCountry.set(null)"
+            />
+            <mat-autocomplete
+              #q2HostAuto
+              (optionSelected)="selectedQ2CorrectCountry.set($event.option.value)"
+            >
+              @for (country of allCountries; track country.code) {
+                <mat-option [value]="country.code">{{ country.name }}</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+          <button
+            type="button"
+            mat-flat-button
+            disabledInteractive
+            [disabled]="!selectedQ2CorrectCountry()"
+            (click)="closeQ2Voting()"
+            i18n="
+              quiz|Button to close Q2 voting and reveal the correct
+              country@@quiz.closeQ2VotingButton"
           >
             Close voting
           </button>

@@ -130,6 +130,22 @@
         <source>Close voting</source>
         <target>Abstimmung schließen</target>
       </trans-unit>
+      <trans-unit id="quiz.countryLabel" datatype="html">
+        <source>Country</source>
+        <target>Land</target>
+      </trans-unit>
+      <trans-unit id="quiz.hostCountryLabel" datatype="html">
+        <source>Country</source>
+        <target>Land</target>
+      </trans-unit>
+      <trans-unit id="quiz.q2CorrectAnswer" datatype="html">
+        <source> Correct answer: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION" equiv-text="{{ countryName(session.voting.q2.correctAnswer) }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
+        <target> Richtige Antwort: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION" equiv-text="{{ countryName(session.voting.q2.correctAnswer) }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></target>
+      </trans-unit>
+      <trans-unit id="quiz.closeQ2VotingButton" datatype="html">
+        <source> Close voting </source>
+        <target> Abstimmung schließen </target>
+      </trans-unit>
       <trans-unit id="quiz.refreshButton" datatype="html">
         <source>Refresh</source>
         <target>Aktualisieren</target>
