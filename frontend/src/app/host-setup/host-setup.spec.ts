@@ -25,9 +25,12 @@ describe('HostSetup – a11y', () => {
 // ─── initial state ───────────────────────────────────────────────────────────
 
 describe('HostSetup – initial state', () => {
-  it('"Create Session" button is disabled when no files are selected', async () => {
+  it('"Create Session" button is aria-disabled when no files are selected', async () => {
     await render(HostSetup, { providers: PROVIDERS });
-    expect(screen.getByRole('button', { name: /create session/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /create session/i })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
   });
 });
 

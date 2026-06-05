@@ -57,6 +57,7 @@
     <button
       mat-flat-button
       type="button"
+      disabledInteractive
       (click)="store.createSession()"
       [disabled]="!store.canSubmit()"
       i18n="hostSetup|Button to create a session@@hostSetup.createSessionButton"
