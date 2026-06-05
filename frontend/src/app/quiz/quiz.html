@@ -10,7 +10,7 @@
           [src]="photoUrl('q1')"
           alt="Question 1"
           i18n-alt="quiz|Alt text for the Q1 photo@@quiz.q1PhotoAlt"
-          class="block bg-plum max-h-[60vh] w-full object-contain"
+          class="block max-h-[60vh] w-full bg-plum object-contain"
         />
       </button>
 
@@ -56,7 +56,7 @@
           [src]="photoUrl('q2')"
           alt="Question 2"
           i18n-alt="quiz|Alt text for the Q2 photo@@quiz.q2PhotoAlt"
-          class="block bg-plum max-h-[50vh] w-full object-contain"
+          class="block max-h-[50vh] w-full bg-plum object-contain"
         />
       </button>
 
@@ -119,14 +119,14 @@
 
     @if (quizStore.q2Status() === 'Open') {
       <div
-        class="px-4 py-3 text-center font-pixel text-[11px] text-plum-soft tracking-wider"
+        class="px-4 py-3 text-center font-pixel text-[11px] tracking-wider text-plum-soft"
         i18n="quiz|Number of Q2 answers submitted out of total@@quiz.q2AnswerCount"
       >
         {{ quizStore.q2AnswerCount().answered }}/{{ quizStore.q2AnswerCount().total }} answered
       </div>
     } @else {
       <div
-        class="px-4 py-3 text-center font-pixel text-[11px] text-plum-soft tracking-wider"
+        class="px-4 py-3 text-center font-pixel text-[11px] tracking-wider text-plum-soft"
         i18n="quiz|Number of answers submitted out of total@@quiz.answerCount"
       >
         {{ quizStore.answerCount().answered }}/{{ quizStore.answerCount().total }} answered
@@ -136,7 +136,7 @@
     @if (quizStore.q2Status() !== 'Open') {
       @if (quizStore.q1Status() === 'Open' && !quizStore.myQ1Answer()) {
         <p
-          class="px-4 py-1 text-center font-body font-bold text-sm text-plum-soft"
+          class="px-4 py-1 text-center font-body text-sm font-bold text-plum-soft"
           i18n="quiz|Prompt shown when the player has not yet answered@@quiz.answerPrompt"
         >
           Please choose your answer
@@ -196,7 +196,7 @@
 
     @if (quizStore.isHost()) {
       <section
-        class="flex flex-col gap-3 px-4 py-4 mx-4 mt-3 bg-cream-deep rounded-2xl"
+        class="mx-4 mt-3 flex flex-col gap-3 rounded-2xl bg-cream-deep p-4"
         aria-label="Host controls"
         i18n-aria-label="
           quiz|Accessible label for the host controls section@@quiz.hostControlsAriaLabel"

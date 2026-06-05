@@ -268,7 +268,7 @@ const ISO_CODES = [
   'ZW',
 ];
 
-function buildCountries(): ReadonlyArray<{ code: string; name: string }> {
+function buildCountries(): readonly { code: string; name: string }[] {
   const dn = new Intl.DisplayNames(['de'], { type: 'region' });
   return ISO_CODES.map((code) => ({ code, name: dn.of(code) ?? code })).sort((a, b) =>
     a.name.localeCompare(b.name, 'de'),

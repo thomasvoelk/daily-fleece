@@ -1,6 +1,6 @@
 <main class="min-h-svh bg-cream p-6">
   <form
-    class="mx-auto mt-8 max-w-sm flex flex-col gap-5"
+    class="mx-auto mt-8 flex max-w-sm flex-col gap-5"
     (submit)="$event.preventDefault()"
     novalidate
   >
@@ -8,10 +8,10 @@
       Host Setup
     </h1>
 
-    <div class="bg-paper border-2 border-wool-line rounded-2xl p-4 flex flex-col gap-2">
+    <div class="flex flex-col gap-2 rounded-2xl border-2 border-wool-line bg-paper p-4">
       <label
         for="q1"
-        class="font-body font-extrabold text-sm text-plum-soft tracking-wide uppercase"
+        class="font-body text-sm font-extrabold tracking-wide text-plum-soft uppercase"
         i18n="hostSetup|Label for the Q1 file picker@@hostSetup.q1Label"
       >
         Q1 — Knowledge (calendar page)
@@ -22,15 +22,15 @@
           [src]="q1Preview()"
           alt="Q1 photo preview"
           i18n-alt="hostSetup|Alt text for Q1 photo preview@@hostSetup.q1PreviewAlt"
-          class="mt-1 max-h-40 object-contain rounded-lg"
+          class="mt-1 max-h-40 rounded-lg object-contain"
         />
       }
     </div>
 
-    <div class="bg-paper border-2 border-wool-line rounded-2xl p-4 flex flex-col gap-2">
+    <div class="flex flex-col gap-2 rounded-2xl border-2 border-wool-line bg-paper p-4">
       <label
         for="q2"
-        class="font-body font-extrabold text-sm text-plum-soft tracking-wide uppercase"
+        class="font-body text-sm font-extrabold tracking-wide text-plum-soft uppercase"
         i18n="hostSetup|Label for the Q2 file picker@@hostSetup.q2Label"
       >
         Q2 — Geography (location)
@@ -41,7 +41,7 @@
           [src]="q2Preview()"
           alt="Q2 photo preview"
           i18n-alt="hostSetup|Alt text for Q2 photo preview@@hostSetup.q2PreviewAlt"
-          class="mt-1 max-h-40 object-contain rounded-lg"
+          class="mt-1 max-h-40 rounded-lg object-contain"
         />
       }
     </div>

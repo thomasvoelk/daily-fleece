@@ -325,7 +325,7 @@ describe('Quiz – host controls', () => {
 
     const options = screen.getAllByRole('option');
     expect(options.length).toBeGreaterThan(0);
-    expect(options.every((o) => o.textContent?.toLowerCase().includes('deutsch'))).toBe(true);
+    expect(options.every((o) => o.textContent.toLowerCase().includes('deutsch'))).toBe(true);
   });
 
   it('calls setQ1CorrectAnswer when Abstimmung schließen is clicked with selection', async () => {
@@ -562,7 +562,7 @@ describe('Quiz – Q2 country input', () => {
 
     const options = screen.getAllByRole('option');
     expect(options.length).toBeGreaterThan(0);
-    expect(options.every((o) => o.textContent?.toLowerCase().includes('deutsch'))).toBe(true);
+    expect(options.every((o) => o.textContent.toLowerCase().includes('deutsch'))).toBe(true);
   });
 });
 
