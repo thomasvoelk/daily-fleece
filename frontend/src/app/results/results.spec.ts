@@ -238,8 +238,8 @@ describe('Results – own board row highlighted', () => {
     await drainMicrotasks();
     fixture.detectChanges();
 
-    expect(screen.getByText('Alice').closest('[aria-current="true"]')).toBeTruthy();
-    expect(screen.getByText('Bob').closest('[aria-current="true"]')).toBeNull();
+    expect(screen.getByRole('listitem', { name: /Alice/ })).toHaveAttribute('aria-current', 'true');
+    expect(screen.getByRole('listitem', { name: /Bob/ })).not.toHaveAttribute('aria-current');
   });
 });
 
@@ -274,10 +274,12 @@ describe('Results – board sort order', () => {
     await drainMicrotasks();
     fixture.detectChanges();
 
-    const bobEl = screen.getByText('Bob');
-    const aliceEl = screen.getByText('Alice');
+    const bobRow = screen.getByRole('listitem', { name: /Bob/ });
+    const aliceRow = screen.getByRole('listitem', { name: /Alice/ });
     // Node.DOCUMENT_POSITION_FOLLOWING (4): Alice comes after Bob → Bob renders first
-    expect(bobEl.compareDocumentPosition(aliceEl) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(
+      bobRow.compareDocumentPosition(aliceRow) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });
 
