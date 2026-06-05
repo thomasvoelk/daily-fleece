@@ -1,8 +1,8 @@
 package de.dailyfleece.backend.quiz.application;
 
-import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
+import de.dailyfleece.backend.shared.PlayerName;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package de.dailyfleece.backend.quiz.api;
 
-import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.shared.PlayerName;
 import java.util.List;
 import java.util.UUID;
 

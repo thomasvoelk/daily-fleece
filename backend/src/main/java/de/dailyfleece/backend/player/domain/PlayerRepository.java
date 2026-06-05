@@ -1,7 +1,7 @@
 package de.dailyfleece.backend.player.domain;
 
 import de.dailyfleece.backend.player.api.CompanyId;
-import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.shared.PlayerName;
 import java.util.Optional;
 import java.util.UUID;
 

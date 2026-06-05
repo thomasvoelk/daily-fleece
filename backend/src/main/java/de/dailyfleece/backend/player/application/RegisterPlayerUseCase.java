@@ -1,9 +1,9 @@
 package de.dailyfleece.backend.player.application;
 
 import de.dailyfleece.backend.player.api.CompanyId;
-import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.player.domain.Player;
 import de.dailyfleece.backend.player.domain.PlayerRepository;
+import de.dailyfleece.backend.shared.PlayerName;
 import org.springframework.stereotype.Service;
 
 /** Registers a new Player or recovers an existing one by Company ID. */

@@ -1,6 +1,6 @@
-@ApplicationModule(allowedDependencies = {"shared", "quiz :: api"})
+@ApplicationModule
 @NullMarked
-package de.dailyfleece.backend.player;
+package de.dailyfleece.backend.shared;
 
 import org.jspecify.annotations.NullMarked;
 import org.springframework.modulith.ApplicationModule;

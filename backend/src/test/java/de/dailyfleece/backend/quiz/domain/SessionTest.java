@@ -3,7 +3,7 @@ package de.dailyfleece.backend.quiz.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.shared.PlayerName;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;

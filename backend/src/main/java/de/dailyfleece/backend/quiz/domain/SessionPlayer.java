@@ -1,6 +1,6 @@
 package de.dailyfleece.backend.quiz.domain;
 
-import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.shared.PlayerName;
 import java.util.UUID;
 
 /** A Player's participation record within a Session, linking their identity to the Display Name they used at join time. */

@@ -2,11 +2,11 @@ package de.dailyfleece.backend;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.api.SessionEndedDomainEvent;
 import de.dailyfleece.backend.quiz.domain.QuestionKey;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
+import de.dailyfleece.backend.shared.PlayerName;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneId;

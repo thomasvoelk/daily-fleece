@@ -3,7 +3,7 @@ package de.dailyfleece.backend.player.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.dailyfleece.backend.player.api.CompanyId;
-import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.shared.PlayerName;
 import org.junit.jupiter.api.Test;
 
 class PlayerTest {

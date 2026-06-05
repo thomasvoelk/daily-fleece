@@ -1,4 +1,4 @@
-@ApplicationModule(allowedDependencies = "player :: api")
+@ApplicationModule(allowedDependencies = "shared")
 @NullMarked
 package de.dailyfleece.backend.quiz;
 

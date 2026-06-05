@@ -1,10 +1,10 @@
 package de.dailyfleece.backend.quiz.infrastructure.persistence;
 
-import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.quiz.domain.QuestionVoting;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionPhase;
 import de.dailyfleece.backend.quiz.domain.SessionPlayer;
+import de.dailyfleece.backend.shared.PlayerName;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;

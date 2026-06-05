@@ -1,8 +1,8 @@
-package de.dailyfleece.backend.player.api;
+package de.dailyfleece.backend.shared;
 
 /**
  * The name shown to other Players in the Lobby, Session Results, and Leaderboard. Not an identity
- * — not unique, and not used for authentication.
+ * — not unique, and not used for authentication. Shared across quiz and player modules.
  */
 public record PlayerName(String value) {
     public PlayerName {

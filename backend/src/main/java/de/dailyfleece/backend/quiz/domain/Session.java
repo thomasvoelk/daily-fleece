@@ -1,6 +1,6 @@
 package de.dailyfleece.backend.quiz.domain;
 
-import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.shared.PlayerName;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;

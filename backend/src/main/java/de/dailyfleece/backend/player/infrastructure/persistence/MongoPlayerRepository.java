@@ -1,9 +1,9 @@
 package de.dailyfleece.backend.player.infrastructure.persistence;
 
 import de.dailyfleece.backend.player.api.CompanyId;
-import de.dailyfleece.backend.player.api.PlayerName;
 import de.dailyfleece.backend.player.domain.Player;
 import de.dailyfleece.backend.player.domain.PlayerRepository;
+import de.dailyfleece.backend.shared.PlayerName;
 import java.util.Optional;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;

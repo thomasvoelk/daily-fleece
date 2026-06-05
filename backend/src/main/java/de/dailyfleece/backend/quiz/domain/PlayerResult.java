@@ -1,6 +1,6 @@
 package de.dailyfleece.backend.quiz.domain;
 
-import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.shared.PlayerName;
 import java.util.UUID;
 
 /** Per-player outcome for a Session, computed at read time from voting data. */
