@@ -83,7 +83,9 @@ export const QuizStore = signalStore(
       async loadSession(): Promise<void> {
         const session = await api.invoke(getTodaySession);
         patchState(store, { session, error: null });
-        if (session.phase !== 'Active') {
+        if (session.phase === 'Ended') {
+          await router.navigate(['/results']);
+        } else if (session.phase !== 'Active') {
           await router.navigate(['/lobby']);
         }
       },
@@ -140,6 +142,9 @@ export const QuizStore = signalStore(
           body: { hostId: playerId, correctAnswer },
         });
         patchState(store, { session: updated, error: null });
+        if (updated.phase === 'Ended') {
+          await router.navigate(['/results']);
+        }
       },
     };
   }),

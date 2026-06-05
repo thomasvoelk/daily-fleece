@@ -16,9 +16,15 @@ const drainMicrotasks = () =>
 @Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class LobbyStub {}
 
+@Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
+class ResultsStub {}
+
 const PROVIDERS = [
   ...provideTestEnvironment(),
-  provideRouter([{ path: 'lobby', component: LobbyStub }]),
+  provideRouter([
+    { path: 'lobby', component: LobbyStub },
+    { path: 'results', component: ResultsStub },
+  ]),
   QuizStore,
 ];
 
@@ -142,15 +148,13 @@ describe('QuizStore – setQ2CorrectAnswer', () => {
     const http = TestBed.inject(HttpTestingController);
 
     const loadPromise = store.refresh();
-    http
-      .expectOne('/api/v1/sessions/today')
-      .flush(
-        makeSession({
-          sessionId: 's42',
-          hostId: 'host-1',
-          voting: { q1: { status: 'Closed', correctAnswer: 'A' }, q2: { status: 'Open' } },
-        }),
-      );
+    http.expectOne('/api/v1/sessions/today').flush(
+      makeSession({
+        sessionId: 's42',
+        hostId: 'host-1',
+        voting: { q1: { status: 'Closed', correctAnswer: 'A' }, q2: { status: 'Open' } },
+      }),
+    );
     await loadPromise;
 
     const closePromise = store.setQ2CorrectAnswer('DE');
@@ -399,5 +403,60 @@ describe('QuizStore – loadSession', () => {
     await promise;
 
     expect(navigateSpy).toHaveBeenCalledWith(['/lobby']);
+  });
+
+  it('redirects to /results when session is Ended', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate');
+
+    const promise = store.loadSession();
+    http.expectOne('/api/v1/sessions/today').flush(makeSession({ phase: 'Ended' }));
+    await promise;
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/results']);
+  });
+});
+
+// ─── setQ2CorrectAnswer → navigate to /results ───────────────────────────────
+
+describe('QuizStore – setQ2CorrectAnswer navigates to /results', () => {
+  it('navigates to /results when the updated session phase is Ended', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'host-1', companyId: 'acme', displayName: 'Host' }),
+    );
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate');
+
+    const loadPromise = store.refresh();
+    http.expectOne('/api/v1/sessions/today').flush(
+      makeSession({
+        sessionId: 's42',
+        hostId: 'host-1',
+        voting: { q1: { status: 'Closed', correctAnswer: 'A' }, q2: { status: 'Open' } },
+      }),
+    );
+    await loadPromise;
+
+    const closePromise = store.setQ2CorrectAnswer('DE');
+    http.expectOne('/api/v1/sessions/s42/questions/q2/correct').flush(
+      makeSession({
+        sessionId: 's42',
+        phase: 'Ended',
+        voting: {
+          q1: { status: 'Closed', correctAnswer: 'A' },
+          q2: { status: 'Closed', correctAnswer: 'DE' },
+        },
+      }),
+    );
+    await closePromise;
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/results']);
   });
 });

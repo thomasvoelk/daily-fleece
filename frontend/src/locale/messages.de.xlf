@@ -166,6 +166,26 @@
         <source>Quiz not started yet. Please wait.</source>
         <target>Quiz noch nicht gestartet. Bitte warten.</target>
       </trans-unit>
+      <trans-unit id="results.name" datatype="html">
+        <source>Name</source>
+        <target>Name</target>
+      </trans-unit>
+      <trans-unit id="results.q1" datatype="html">
+        <source>F1</source>
+        <target>F1</target>
+      </trans-unit>
+      <trans-unit id="results.q2" datatype="html">
+        <source>F2</source>
+        <target>F2</target>
+      </trans-unit>
+      <trans-unit id="results.points" datatype="html">
+        <source>Punkte</source>
+        <target>Punkte</target>
+      </trans-unit>
+      <trans-unit id="results.leaderboard" datatype="html">
+        <source>Zum Leaderboard</source>
+        <target>Zum Leaderboard</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

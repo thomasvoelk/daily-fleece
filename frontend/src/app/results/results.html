@@ -1,0 +1,31 @@
+@if (results(); as data) {
+  <table>
+    <thead>
+      <tr>
+        <th i18n="results|table header name@@results.name">Name</th>
+        <th i18n="results|table header q1@@results.q1">F1</th>
+        <th i18n="results|table header q2@@results.q2">F2</th>
+        <th i18n="results|table header points@@results.points">Punkte</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of data.results; track row.playerId) {
+        <tr>
+          <td>{{ row.displayName }}</td>
+          <td>{{ row.q1Correct ? '✓' : '✗' }}</td>
+          <td>{{ row.q2Correct ? '✓' : '✗' }}</td>
+          <td>{{ row.totalPoints }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
+
+<button
+  type="button"
+  mat-button
+  (click)="goToLeaderboard()"
+  i18n="results|leaderboard button@@results.leaderboard"
+>
+  Zum Leaderboard
+</button>
