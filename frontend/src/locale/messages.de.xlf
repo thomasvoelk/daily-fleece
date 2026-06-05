@@ -186,6 +186,50 @@
         <source>Zum Leaderboard</source>
         <target>Zum Leaderboard</target>
       </trans-unit>
+      <trans-unit id="results.headlinePerfect" datatype="html">
+        <source> Perfekt! 🦙 </source>
+        <target> Perfekt! 🦙 </target>
+      </trans-unit>
+      <trans-unit id="results.subtitlePerfect" datatype="html">
+        <source> Beide Fragen richtig — stark! </source>
+        <target> Beide Fragen richtig — stark! </target>
+      </trans-unit>
+      <trans-unit id="results.headlinePartial" datatype="html">
+        <source> Gut dabei! 🦙 </source>
+        <target> Gut dabei! 🦙 </target>
+      </trans-unit>
+      <trans-unit id="results.subtitlePartial" datatype="html">
+        <source> Eine von zwei — morgen holst du auf. </source>
+        <target> Eine von zwei — morgen holst du auf. </target>
+      </trans-unit>
+      <trans-unit id="results.headlineZero" datatype="html">
+        <source> Weiter so! 🦙 </source>
+        <target> Weiter so! 🦙 </target>
+      </trans-unit>
+      <trans-unit id="results.subtitleZero" datatype="html">
+        <source> Morgen ist ein frischer Start. </source>
+        <target> Morgen ist ein frischer Start. </target>
+      </trans-unit>
+      <trans-unit id="results.statsPoints" datatype="html">
+        <source> PUNKTE </source>
+        <target> PUNKTE </target>
+      </trans-unit>
+      <trans-unit id="results.statsRank" datatype="html">
+        <source> RANG </source>
+        <target> RANG </target>
+      </trans-unit>
+      <trans-unit id="results.headlineDone" datatype="html">
+        <source> Session vorbei! 🦙 </source>
+        <target> Session vorbei! 🦙 </target>
+      </trans-unit>
+      <trans-unit id="results.subtitleDone" datatype="html">
+        <source> Schau dir die Ergebnisse an. </source>
+        <target> Schau dir die Ergebnisse an. </target>
+      </trans-unit>
+      <trans-unit id="results.boardHeading" datatype="html">
+        <source> Heutige Ergebnisse </source>
+        <target> Heutige Ergebnisse </target>
+      </trans-unit>
       <trans-unit id="leaderboard.name" datatype="html">
         <source>Name</source>
         <target>Name</target>

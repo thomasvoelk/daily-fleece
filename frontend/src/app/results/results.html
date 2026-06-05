@@ -1,31 +1,188 @@
-@if (results(); as data) {
-  <table>
-    <thead>
-      <tr>
-        <th i18n="results|table header name@@results.name">Name</th>
-        <th i18n="results|table header q1@@results.q1">F1</th>
-        <th i18n="results|table header q2@@results.q2">F2</th>
-        <th i18n="results|table header points@@results.points">Punkte</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (row of data.results; track row.playerId) {
-        <tr>
-          <td>{{ row.displayName }}</td>
-          <td>{{ row.q1Correct ? '✓' : '✗' }}</td>
-          <td>{{ row.q2Correct ? '✓' : '✗' }}</td>
-          <td>{{ row.totalPoints }}</td>
-        </tr>
+<main class="flex min-h-svh flex-col">
+  @if (results(); as data) {
+    <div class="relative flex items-center justify-center overflow-hidden bg-plum px-6 py-10">
+      @for (c of confetti; track $index) {
+        <div
+          class="confetti"
+          [style.left.%]="c.left"
+          [style.top.%]="c.top"
+          [style.width.px]="c.size"
+          [style.height.px]="c.size"
+          [style.background]="c.color"
+          [style.transform]="'rotate(' + c.rotate + 'deg)'"
+        ></div>
       }
-    </tbody>
-  </table>
-}
 
-<button
-  type="button"
-  mat-button
-  (click)="goToLeaderboard()"
-  i18n="results|leaderboard button@@results.leaderboard"
->
-  Zum Leaderboard
-</button>
+      <div class="relative z-10 flex w-full max-w-[360px] flex-col items-center gap-5 text-center">
+        <img src="/alpaca-mark.svg" alt="" width="96" height="96" class="pop rounded-[26px]" />
+
+        @if (myResult(); as me) {
+          @if (correctCount() === 2) {
+            <h1
+              class="pop m-0 font-display text-[30px] leading-tight font-bold text-white"
+              i18n="results|perfect score headline@@results.headlinePerfect"
+            >
+              Perfekt! 🦙
+            </h1>
+            <p
+              class="m-0 -mt-3 font-body text-sm font-semibold text-white/70"
+              i18n="results|perfect score subtitle@@results.subtitlePerfect"
+            >
+              Beide Fragen richtig — stark!
+            </p>
+          } @else if (correctCount() === 1) {
+            <h1
+              class="pop m-0 font-display text-[30px] leading-tight font-bold text-white"
+              i18n="results|partial score headline@@results.headlinePartial"
+            >
+              Gut dabei! 🦙
+            </h1>
+            <p
+              class="m-0 -mt-3 font-body text-sm font-semibold text-white/70"
+              i18n="results|partial score subtitle@@results.subtitlePartial"
+            >
+              Eine von zwei — morgen holst du auf.
+            </p>
+          } @else {
+            <h1
+              class="pop m-0 font-display text-[30px] leading-tight font-bold text-white"
+              i18n="results|zero score headline@@results.headlineZero"
+            >
+              Weiter so! 🦙
+            </h1>
+            <p
+              class="m-0 -mt-3 font-body text-sm font-semibold text-white/70"
+              i18n="results|zero score subtitle@@results.subtitleZero"
+            >
+              Morgen ist ein frischer Start.
+            </p>
+          }
+
+          <div class="rise flex w-full gap-3">
+            <div
+              class="q-card flex-1 rounded-2xl border-2 p-4 text-center"
+              [class.q-card--correct]="me.q1Correct"
+              [class.q-card--wrong]="!me.q1Correct"
+            >
+              <div
+                class="mb-2 font-pixel text-[8px] text-white/60"
+                i18n="results|question 1 label@@results.q1"
+              >
+                F1
+              </div>
+              <div class="font-display text-[32px] leading-none font-bold text-white">
+                {{ me.q1Correct ? '✓' : '✗' }}
+              </div>
+            </div>
+            <div
+              class="q-card flex-1 rounded-2xl border-2 p-4 text-center"
+              [class.q-card--correct]="me.q2Correct"
+              [class.q-card--wrong]="!me.q2Correct"
+            >
+              <div
+                class="mb-2 font-pixel text-[8px] text-white/60"
+                i18n="results|question 2 label@@results.q2"
+              >
+                F2
+              </div>
+              <div class="font-display text-[32px] leading-none font-bold text-white">
+                {{ me.q2Correct ? '✓' : '✗' }}
+              </div>
+            </div>
+          </div>
+
+          <div class="rise flex items-center gap-4">
+            <div class="flex flex-col items-center">
+              <div
+                class="font-pixel text-[7px] tracking-[.05em] text-white/50"
+                i18n="results|points earned label@@results.statsPoints"
+              >
+                PUNKTE
+              </div>
+              <div class="mt-1.5 font-pixel text-[28px] leading-none text-marigold">
+                +{{ me.totalPoints }}
+              </div>
+            </div>
+            @if (myRank(); as rank) {
+              <div class="h-12 w-px bg-white/20"></div>
+              <div class="flex flex-col items-center">
+                <div
+                  class="font-pixel text-[7px] tracking-[.05em] text-white/50"
+                  i18n="results|rank label@@results.statsRank"
+                >
+                  RANG
+                </div>
+                <div class="mt-1.5 font-pixel text-[28px] leading-none text-[#e4d6fc]">
+                  #{{ rank }}
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <h1
+            class="pop m-0 font-display text-[30px] leading-tight font-bold text-white"
+            i18n="results|session done headline@@results.headlineDone"
+          >
+            Session vorbei! 🦙
+          </h1>
+          <p
+            class="m-0 -mt-3 font-body text-sm font-semibold text-white/70"
+            i18n="results|session done subtitle@@results.subtitleDone"
+          >
+            Schau dir die Ergebnisse an.
+          </p>
+        }
+      </div>
+    </div>
+
+    <section class="flex flex-1 flex-col gap-3 bg-cream px-4 pt-6 pb-4">
+      <h2
+        class="font-display text-[18px] font-semibold text-plum"
+        i18n="results|board section heading@@results.boardHeading"
+      >
+        Heutige Ergebnisse
+      </h2>
+      <div class="flex flex-col gap-2">
+        @for (row of sortedResults(); track row.playerId; let i = $index) {
+          <div
+            class="board-row flex items-center gap-3 rounded-xl bg-paper px-3.5 py-3"
+            [class.board-row--you]="row.playerId === entry.playerId()"
+          >
+            <div class="w-7 shrink-0 text-center font-pixel text-[10px] text-plum-faint">
+              #{{ i + 1 }}
+            </div>
+            <div class="flex-1 font-body text-[15px] font-extrabold text-plum">
+              {{ row.displayName }}
+            </div>
+            <div
+              class="board-q w-6 text-center font-body text-sm font-extrabold text-coral-700"
+              [class.board-q--correct]="row.q1Correct"
+            >
+              {{ row.q1Correct ? '✓' : '✗' }}
+            </div>
+            <div
+              class="board-q w-6 text-center font-body text-sm font-extrabold text-coral-700"
+              [class.board-q--correct]="row.q2Correct"
+            >
+              {{ row.q2Correct ? '✓' : '✗' }}
+            </div>
+            <div class="shrink-0 font-pixel text-[11px] text-marigold-700">
+              {{ row.totalPoints }}
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <div class="bg-cream px-4 pt-2 pb-8">
+    <button
+      type="button"
+      class="chunk-btn"
+      (click)="goToLeaderboard()"
+      i18n="results|leaderboard button@@results.leaderboard"
+    >
+      Zum Leaderboard
+    </button>
+  </div>
+</main>

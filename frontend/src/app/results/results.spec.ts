@@ -110,6 +110,180 @@ describe('Results – player table', () => {
   });
 });
 
+// ─── arcade headline ──────────────────────────────────────────────────────────
+
+describe('Results – arcade headline', () => {
+  it('shows Perfekt! when current player answered both questions correctly', async () => {
+    // correctCount === 2
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    const { fixture } = await render(Results, { providers: PROVIDERS });
+    const http = TestBed.inject(HttpTestingController);
+
+    http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
+    await drainMicrotasks();
+    http.expectOne('/api/v1/sessions/s1/results').flush(
+      makeResults({
+        results: [
+          {
+            playerId: 'p1',
+            displayName: 'Alice',
+            q1Correct: true,
+            q2Correct: true,
+            totalPoints: 2,
+          },
+        ],
+      }),
+    );
+    await drainMicrotasks();
+    fixture.detectChanges();
+
+    expect(screen.getByText(/Perfekt/)).toBeTruthy();
+  });
+
+  it('shows Gut dabei! when current player answered exactly one question correctly', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    const { fixture } = await render(Results, { providers: PROVIDERS });
+    const http = TestBed.inject(HttpTestingController);
+
+    http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
+    await drainMicrotasks();
+    http.expectOne('/api/v1/sessions/s1/results').flush(
+      makeResults({
+        results: [
+          {
+            playerId: 'p1',
+            displayName: 'Alice',
+            q1Correct: true,
+            q2Correct: false,
+            totalPoints: 1,
+          },
+        ],
+      }),
+    );
+    await drainMicrotasks();
+    fixture.detectChanges();
+
+    expect(screen.getByText(/Gut dabei/)).toBeTruthy();
+  });
+
+  it('shows Weiter so! when current player answered no questions correctly', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    const { fixture } = await render(Results, { providers: PROVIDERS });
+    const http = TestBed.inject(HttpTestingController);
+
+    http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
+    await drainMicrotasks();
+    http.expectOne('/api/v1/sessions/s1/results').flush(
+      makeResults({
+        results: [
+          {
+            playerId: 'p1',
+            displayName: 'Alice',
+            q1Correct: false,
+            q2Correct: false,
+            totalPoints: 0,
+          },
+        ],
+      }),
+    );
+    await drainMicrotasks();
+    fixture.detectChanges();
+
+    expect(screen.getByText(/Weiter so/)).toBeTruthy();
+  });
+});
+
+// ─── board row highlighting ───────────────────────────────────────────────────
+
+describe('Results – own board row highlighted', () => {
+  it("marks the current player's board row with the board-row--you class", async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    const { fixture } = await render(Results, { providers: PROVIDERS });
+    const http = TestBed.inject(HttpTestingController);
+
+    http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
+    await drainMicrotasks();
+    http.expectOne('/api/v1/sessions/s1/results').flush(
+      makeResults({
+        results: [
+          {
+            playerId: 'p1',
+            displayName: 'Alice',
+            q1Correct: true,
+            q2Correct: true,
+            totalPoints: 2,
+          },
+          {
+            playerId: 'p2',
+            displayName: 'Bob',
+            q1Correct: false,
+            q2Correct: false,
+            totalPoints: 0,
+          },
+        ],
+      }),
+    );
+    await drainMicrotasks();
+    fixture.detectChanges();
+
+    const aliceRow = screen.getByText('Alice').closest('.board-row');
+    const bobRow = screen.getByText('Bob').closest('.board-row');
+
+    expect(aliceRow?.classList.contains('board-row--you')).toBe(true);
+    expect(bobRow?.classList.contains('board-row--you')).toBe(false);
+  });
+});
+
+// ─── board sort order ─────────────────────────────────────────────────────────
+
+describe('Results – board sort order', () => {
+  it('renders the highest scorer first regardless of response order', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    const { fixture } = await render(Results, { providers: PROVIDERS });
+    const http = TestBed.inject(HttpTestingController);
+
+    http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
+    await drainMicrotasks();
+    // Bob (2pts) comes second in the response but should render first
+    http.expectOne('/api/v1/sessions/s1/results').flush(
+      makeResults({
+        results: [
+          {
+            playerId: 'p1',
+            displayName: 'Alice',
+            q1Correct: false,
+            q2Correct: false,
+            totalPoints: 0,
+          },
+          { playerId: 'p2', displayName: 'Bob', q1Correct: true, q2Correct: true, totalPoints: 2 },
+        ],
+      }),
+    );
+    await drainMicrotasks();
+    fixture.detectChanges();
+
+    const bobEl = screen.getByText('Bob');
+    const aliceEl = screen.getByText('Alice');
+    // Node.DOCUMENT_POSITION_FOLLOWING (4): Alice comes after Bob → Bob renders first
+    expect(bobEl.compareDocumentPosition(aliceEl) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
 // ─── Zum Leaderboard button ───────────────────────────────────────────────────
 
 describe('Results – Zum Leaderboard button', () => {
