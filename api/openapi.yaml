@@ -601,8 +601,8 @@ paths:
         any session in the default project, ordered by total points descending.
 
         The leaderboard is pre-computed (Computed Pattern) and updated atomically
-        when each correct answer is set. It is available at any time — not only
-        at the end of a session.
+        once per session when the Host sets the Q2 correct answer (ending the session).
+        It is available at any time.
       responses:
         "200":
           description: Project leaderboard.
