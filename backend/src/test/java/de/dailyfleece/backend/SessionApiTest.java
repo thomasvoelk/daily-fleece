@@ -3,6 +3,7 @@ package de.dailyfleece.backend;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.dailyfleece.backend.player.api.PlayerName;
+import de.dailyfleece.backend.quiz.api.SessionEndedDomainEvent;
 import de.dailyfleece.backend.quiz.domain.QuestionKey;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
@@ -13,13 +14,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
@@ -33,6 +38,25 @@ import org.springframework.web.client.RestClient;
 @Import(TestcontainersConfiguration.class)
 class SessionApiTest {
 
+    @TestConfiguration
+    static class EventConfig {
+
+        @Bean
+        EventStore eventStore() {
+            return new EventStore();
+        }
+
+        static class EventStore {
+
+            final CopyOnWriteArrayList<SessionEndedDomainEvent> sessionEndedEvents = new CopyOnWriteArrayList<>();
+
+            @EventListener
+            void on(SessionEndedDomainEvent event) {
+                sessionEndedEvents.add(event);
+            }
+        }
+    }
+
     private static final UUID HOST_ID = UUID.fromString("00000000-0000-0000-0000-000000000099");
 
     @LocalServerPort
@@ -44,12 +68,16 @@ class SessionApiTest {
     @Autowired
     MongoTemplate mongoTemplate;
 
+    @Autowired
+    EventConfig.EventStore eventStore;
+
     RestClient http;
 
     @BeforeEach
     void setup() {
         mongoTemplate.dropCollection("players");
         mongoTemplate.dropCollection("sessions");
+        eventStore.sessionEndedEvents.clear();
         mongoTemplate.getDb().getCollection("fs.files").drop();
         mongoTemplate.getDb().getCollection("fs.chunks").drop();
         http = RestClient.builder()
@@ -333,6 +361,29 @@ class SessionApiTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).containsEntry("phase", "Ended");
+    }
+
+    @Test
+    void setCorrectAnswer_on_q2_publishes_SessionEndedDomainEvent() {
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        session.start();
+        session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.submitAnswer(QuestionKey.Q2, HOST_ID, "DE");
+        sessionRepository.save(session);
+
+        http.post()
+                .uri("/sessions/" + session.sessionId() + "/questions/q2/correct")
+                .body(Map.of("hostId", HOST_ID.toString(), "correctAnswer", "DE"))
+                .retrieve()
+                .toBodilessEntity();
+
+        assertThat(eventStore.sessionEndedEvents).hasSize(1);
+        SessionEndedDomainEvent event = eventStore.sessionEndedEvents.get(0);
+        assertThat(event.sessionId()).isEqualTo(session.sessionId());
+        assertThat(event.scores()).hasSize(1);
+        assertThat(event.scores().get(0).playerId()).isEqualTo(HOST_ID);
+        assertThat(event.scores().get(0).pointsEarned()).isEqualTo(2);
     }
 
     @Test

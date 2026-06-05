@@ -1,10 +1,14 @@
 package de.dailyfleece.backend.quiz.application;
 
+import de.dailyfleece.backend.quiz.api.SessionEndedDomainEvent;
+import de.dailyfleece.backend.quiz.api.SessionEndedDomainEvent.PlayerScore;
 import de.dailyfleece.backend.quiz.domain.QuestionKey;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.UUID;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 /** Closes voting for a question, records the correct answer, and advances the session phase. */
@@ -12,10 +16,12 @@ import org.springframework.stereotype.Service;
 public class SetCorrectAnswerUseCase {
 
     private final SessionRepository sessionRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public SetCorrectAnswerUseCase(SessionRepository sessionRepository) {
+    public SetCorrectAnswerUseCase(SessionRepository sessionRepository, ApplicationEventPublisher eventPublisher) {
         this.sessionRepository = sessionRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -30,6 +36,12 @@ public class SetCorrectAnswerUseCase {
         }
         session.setCorrectAnswer(question, requestingPlayerId, correctAnswer);
         sessionRepository.save(session);
+        if (question == QuestionKey.Q2) {
+            List<PlayerScore> scores = session.results().stream()
+                    .map(r -> new PlayerScore(r.playerId(), r.displayName(), r.totalPoints()))
+                    .toList();
+            eventPublisher.publishEvent(new SessionEndedDomainEvent(sessionId, scores));
+        }
         return session;
     }
 }
