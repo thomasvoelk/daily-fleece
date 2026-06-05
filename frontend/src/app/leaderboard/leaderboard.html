@@ -1,0 +1,25 @@
+@if (data(); as leaderboard) {
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th i18n="leaderboard|name column@@leaderboard.name">Name</th>
+        <th i18n="leaderboard|sessions column@@leaderboard.sessions">Sessions</th>
+        <th i18n="leaderboard|points column@@leaderboard.points">Punkte</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of leaderboard.entries; track row.playerId; let i = $index) {
+        <tr
+          [class.bg-grape-200]="row.playerId === entry.playerId()"
+          [attr.aria-current]="row.playerId === entry.playerId() ? 'true' : null"
+        >
+          <td>#{{ i + 1 }}</td>
+          <td>{{ row.displayName }}</td>
+          <td>{{ row.sessionsParticipated }}</td>
+          <td>{{ row.totalPoints }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

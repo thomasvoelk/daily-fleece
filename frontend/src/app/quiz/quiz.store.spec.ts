@@ -358,7 +358,7 @@ describe('QuizStore – computed signals', () => {
 // ─── refresh ─────────────────────────────────────────────────────────────────
 
 describe('QuizStore – refresh', () => {
-  it('updates session without redirecting when phase is not Active', async () => {
+  it('updates session without redirecting when phase is Active', async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
@@ -368,11 +368,25 @@ describe('QuizStore – refresh', () => {
     const promise = store.refresh();
     http
       .expectOne('/api/v1/sessions/today')
-      .flush(makeSession({ phase: 'Lobby', sessionId: 'r1' }));
+      .flush(makeSession({ phase: 'Active', sessionId: 'r1' }));
     await promise;
 
     expect(store.session()?.sessionId).toBe('r1');
     expect(navigateSpy).not.toHaveBeenCalled();
+  });
+
+  it('navigates to /results when session phase is Ended', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate');
+
+    const promise = store.refresh();
+    http.expectOne('/api/v1/sessions/today').flush(makeSession({ phase: 'Ended' }));
+    await promise;
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/results']);
   });
 });
 

@@ -186,6 +186,18 @@
         <source>Zum Leaderboard</source>
         <target>Zum Leaderboard</target>
       </trans-unit>
+      <trans-unit id="leaderboard.name" datatype="html">
+        <source>Name</source>
+        <target>Name</target>
+      </trans-unit>
+      <trans-unit id="leaderboard.sessions" datatype="html">
+        <source>Sessions</source>
+        <target>Sessions</target>
+      </trans-unit>
+      <trans-unit id="leaderboard.points" datatype="html">
+        <source>Punkte</source>
+        <target>Punkte</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

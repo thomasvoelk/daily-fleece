@@ -91,7 +91,11 @@ export const QuizStore = signalStore(
       },
 
       async refresh(): Promise<void> {
-        await fetchAndStore();
+        const session = await api.invoke(getTodaySession);
+        patchState(store, { session, error: null });
+        if (session.phase === 'Ended') {
+          await router.navigate(['/results']);
+        }
       },
 
       async submitQ1Answer(answer: 'A' | 'B' | 'C'): Promise<void> {

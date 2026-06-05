@@ -7,6 +7,7 @@ export const sheriffConfig: SheriffConfig = {
     'src/app/entry': 'domain:entry',
     'src/app/host-setup': 'domain:host-setup',
     'src/app/lobby': 'domain:lobby',
+    'src/app/leaderboard': 'domain:leaderboard',
     'src/app/quiz': 'domain:quiz',
     'src/app/results': 'domain:results',
     'src/app/shared': 'domain:shared',

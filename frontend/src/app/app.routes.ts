@@ -4,6 +4,7 @@ import { Lobby, lobbyGuard } from './lobby';
 import { HostSetup, hasPlayerIdGuard } from './host-setup';
 import { Quiz, quizGuard } from './quiz';
 import { Results } from './results';
+import { Leaderboard } from './leaderboard';
 
 export const routes: Routes = [
   { path: '', component: Entry },
@@ -11,4 +12,5 @@ export const routes: Routes = [
   { path: 'host', component: HostSetup, canActivate: [hasPlayerIdGuard] },
   { path: 'quiz', component: Quiz, canActivate: [quizGuard] },
   { path: 'results', component: Results },
+  { path: 'leaderboard', component: Leaderboard },
 ];
