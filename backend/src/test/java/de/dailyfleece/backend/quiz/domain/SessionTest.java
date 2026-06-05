@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import de.dailyfleece.backend.player.api.PlayerName;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -164,5 +165,59 @@ class SessionTest {
         assertThat(session.q2Voting().get().status()).isEqualTo(VotingStatus.CLOSED);
         assertThat(session.q2Voting().get().correctAnswer()).isEqualTo("DE");
         assertThat(session.phase()).isEqualTo(SessionPhase.ENDED);
+    }
+
+    @Test
+    void results_player_who_answered_both_correctly_gets_2_points() {
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        session.start();
+        session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.submitAnswer(QuestionKey.Q2, HOST_ID, "DE");
+        session.setCorrectAnswer(QuestionKey.Q2, HOST_ID, "DE");
+
+        List<PlayerResult> results = session.results();
+
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0).playerId()).isEqualTo(HOST_ID);
+        assertThat(results.get(0).displayName()).isEqualTo(HOST_NAME);
+        assertThat(results.get(0).q1Correct()).isTrue();
+        assertThat(results.get(0).q2Correct()).isTrue();
+        assertThat(results.get(0).totalPoints()).isEqualTo(2);
+    }
+
+    @Test
+    void results_player_who_did_not_answer_gets_0_points() {
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        session.join(PLAYER_1, new PlayerName("Anna"));
+        session.start();
+        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.setCorrectAnswer(QuestionKey.Q2, HOST_ID, "DE");
+
+        List<PlayerResult> results = session.results();
+
+        PlayerResult anna = results.stream()
+                .filter(r -> r.playerId().equals(PLAYER_1))
+                .findFirst()
+                .orElseThrow();
+        assertThat(anna.q1Correct()).isFalse();
+        assertThat(anna.q2Correct()).isFalse();
+        assertThat(anna.totalPoints()).isEqualTo(0);
+    }
+
+    @Test
+    void results_player_with_correct_q1_and_wrong_q2_gets_1_point() {
+        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        session.start();
+        session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.submitAnswer(QuestionKey.Q2, HOST_ID, "FR");
+        session.setCorrectAnswer(QuestionKey.Q2, HOST_ID, "DE");
+
+        List<PlayerResult> results = session.results();
+
+        assertThat(results.get(0).q1Correct()).isTrue();
+        assertThat(results.get(0).q2Correct()).isFalse();
+        assertThat(results.get(0).totalPoints()).isEqualTo(1);
     }
 }

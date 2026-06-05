@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
@@ -136,5 +137,20 @@ public final class Session {
 
     public Optional<QuestionVoting> q2Voting() {
         return Optional.ofNullable(q2Voting);
+    }
+
+    public List<PlayerResult> results() {
+        Map<String, String> q1Answers = q1Voting != null ? q1Voting.answers() : Map.of();
+        String q1Correct = q1Voting != null ? q1Voting.correctAnswer() : null;
+        Map<String, String> q2Answers = q2Voting != null ? q2Voting.answers() : Map.of();
+        String q2Correct = q2Voting != null ? q2Voting.correctAnswer() : null;
+        return players.stream()
+                .map(p -> {
+                    String pid = p.playerId().toString();
+                    boolean q1 = q1Correct != null && q1Correct.equals(q1Answers.get(pid));
+                    boolean q2 = q2Correct != null && q2Correct.equals(q2Answers.get(pid));
+                    return new PlayerResult(p.playerId(), p.displayName(), q1, q2);
+                })
+                .toList();
     }
 }

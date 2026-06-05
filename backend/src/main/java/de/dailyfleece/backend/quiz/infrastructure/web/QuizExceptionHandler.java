@@ -3,6 +3,7 @@ package de.dailyfleece.backend.quiz.infrastructure.web;
 import de.dailyfleece.backend.quiz.application.NoSessionForDate;
 import de.dailyfleece.backend.quiz.application.NotTheHost;
 import de.dailyfleece.backend.quiz.application.SessionAlreadyExists;
+import de.dailyfleece.backend.quiz.application.SessionNotEnded;
 import de.dailyfleece.backend.quiz.application.SessionNotFound;
 import de.dailyfleece.backend.quiz.domain.InvalidPhaseTransition;
 import de.dailyfleece.backend.quiz.domain.LobbyClosed;
@@ -48,6 +49,15 @@ class QuizExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
         problem.setType(URI.create("/problems/not-the-host"));
         problem.setTitle("Forbidden");
+        problem.setDetail(ex.getMessage());
+        return problem;
+    }
+
+    @ExceptionHandler(SessionNotEnded.class)
+    ProblemDetail handleSessionNotEnded(SessionNotEnded ex) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        problem.setType(URI.create("/problems/session-not-ended"));
+        problem.setTitle("Session Not Ended");
         problem.setDetail(ex.getMessage());
         return problem;
     }

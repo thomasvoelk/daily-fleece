@@ -401,6 +401,57 @@ class SessionApiTest {
     }
 
     @Test
+    void getSessionResults_returns_200_with_per_player_results_for_ended_session() {
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        session.start();
+        session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.submitAnswer(QuestionKey.Q2, HOST_ID, "DE");
+        session.setCorrectAnswer(QuestionKey.Q2, HOST_ID, "DE");
+        sessionRepository.save(session);
+
+        ResponseEntity<Map<String, Object>> response = http.get()
+                .uri("/sessions/" + session.sessionId() + "/results")
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> results = Objects.requireNonNull((List<Map<String, Object>>)
+                Objects.requireNonNull(response.getBody()).get("results"));
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0))
+                .containsEntry("playerId", HOST_ID.toString())
+                .containsEntry("q1Correct", true)
+                .containsEntry("q2Correct", true)
+                .containsEntry("totalPoints", 2);
+    }
+
+    @Test
+    void getSessionResults_returns_409_when_session_not_ended() {
+        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        ResponseEntity<Map<String, Object>> response = http.get()
+                .uri("/sessions/" + session.sessionId() + "/results")
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void getSessionResults_returns_404_when_session_not_found() {
+        ResponseEntity<Map<String, Object>> response = http.get()
+                .uri("/sessions/" + UUID.randomUUID() + "/results")
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     void submitAnswer_returns_400_for_invalid_question_key() {
         Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
         session.start();
