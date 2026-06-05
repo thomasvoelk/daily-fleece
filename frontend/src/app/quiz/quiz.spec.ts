@@ -129,6 +129,11 @@ describe('Quiz – answer radio buttons', () => {
     expect(within(answerGroup).getByRole('radio', { name: 'C' })).not.toBeChecked();
   });
 
+  it('hides Q1 A/B/C radio group when Q2 voting is open', async () => {
+    await renderQuiz({ q2Status: signal('Open' as const) });
+    expect(screen.queryByRole('radiogroup', { name: /answer/i })).toBeNull();
+  });
+
   it('calls submitQ1Answer when a radio is clicked', async () => {
     const user = userEvent.setup();
     const submitQ1Answer = vi.fn();
@@ -281,6 +286,24 @@ describe('Quiz – host controls', () => {
     await user.click(screen.getByRole('button', { name: /close voting/i }));
 
     expect(setQ2CorrectAnswer).toHaveBeenCalledWith(expect.any(String));
+  });
+
+  it('typing in the host country combobox filters the options list', async () => {
+    const user = userEvent.setup();
+    await renderQuiz({
+      isHost: signal(true),
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Open' as const),
+    });
+
+    const hostControls = screen.getByRole('region', { name: /host controls/i });
+    const input = within(hostControls).getByRole('combobox', { name: /country/i });
+    await user.click(input);
+    await user.type(input, 'deutsch');
+
+    const options = screen.getAllByRole('option');
+    expect(options.length).toBeGreaterThan(0);
+    expect(options.every((o) => o.textContent?.toLowerCase().includes('deutsch'))).toBe(true);
   });
 
   it('calls setQ1CorrectAnswer when Abstimmung schließen is clicked with selection', async () => {

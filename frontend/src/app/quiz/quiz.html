@@ -128,28 +128,30 @@
       }
     </div>
 
-    @if (quizStore.q1Status() === 'Open' && !quizStore.myQ1Answer()) {
-      <p
-        class="px-4 py-1 text-center font-body font-bold text-sm text-plum-soft"
-        i18n="quiz|Prompt shown when the player has not yet answered@@quiz.answerPrompt"
-      >
-        Please choose your answer
-      </p>
-    }
-
-    <mat-radio-group
-      class="flex justify-center gap-3 px-4 py-2"
-      [value]="quizStore.myQ1Answer()"
-      aria-label="Answer"
-      i18n-aria-label="
-        quiz|Accessible label for the player answer radio group@@quiz.answerGroupAriaLabel"
-    >
-      @for (option of ['A', 'B', 'C']; track option) {
-        <mat-radio-button [value]="option" (change)="submit($any(option))">
-          {{ option }}
-        </mat-radio-button>
+    @if (quizStore.q2Status() !== 'Open') {
+      @if (quizStore.q1Status() === 'Open' && !quizStore.myQ1Answer()) {
+        <p
+          class="px-4 py-1 text-center font-body font-bold text-sm text-plum-soft"
+          i18n="quiz|Prompt shown when the player has not yet answered@@quiz.answerPrompt"
+        >
+          Please choose your answer
+        </p>
       }
-    </mat-radio-group>
+
+      <mat-radio-group
+        class="flex justify-center gap-3 px-4 py-2"
+        [value]="quizStore.myQ1Answer()"
+        aria-label="Answer"
+        i18n-aria-label="
+          quiz|Accessible label for the player answer radio group@@quiz.answerGroupAriaLabel"
+      >
+        @for (option of ['A', 'B', 'C']; track option) {
+          <mat-radio-button [value]="option" (change)="submit($any(option))">
+            {{ option }}
+          </mat-radio-button>
+        }
+      </mat-radio-group>
+    }
 
     @if (quizStore.q1Status() === 'Closed') {
       <mat-card class="mx-4 mt-3 rounded-2xl">
@@ -224,14 +226,23 @@
               type="text"
               matInput
               [matAutocomplete]="q2HostAuto"
-              [value]="selectedQ2CorrectCountry() ? countryName(selectedQ2CorrectCountry()!) : ''"
-              (input)="selectedQ2CorrectCountry.set(null)"
+              [value]="
+                selectedQ2CorrectCountry()
+                  ? countryName(selectedQ2CorrectCountry()!)
+                  : hostQ2CountryInput()
+              "
+              (input)="
+                hostQ2CountryInput.set($any($event.target).value);
+                selectedQ2CorrectCountry.set(null)
+              "
             />
             <mat-autocomplete
               #q2HostAuto
-              (optionSelected)="selectedQ2CorrectCountry.set($event.option.value)"
+              (optionSelected)="
+                selectedQ2CorrectCountry.set($event.option.value); hostQ2CountryInput.set('')
+              "
             >
-              @for (country of allCountries; track country.code) {
+              @for (country of filteredHostCountries(); track country.code) {
                 <mat-option [value]="country.code">{{ country.name }}</mat-option>
               }
             </mat-autocomplete>

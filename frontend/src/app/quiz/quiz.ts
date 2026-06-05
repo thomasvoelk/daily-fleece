@@ -310,6 +310,12 @@ export class Quiz {
     return this.allCountries.filter((c) => c.name.toLowerCase().includes(q));
   });
   protected readonly selectedQ2CorrectCountry = signal<string | null>(null);
+  protected readonly hostQ2CountryInput = signal('');
+  protected readonly filteredHostCountries = computed(() => {
+    const q = this.hostQ2CountryInput().toLowerCase();
+    if (!q) return this.allCountries;
+    return this.allCountries.filter((c) => c.name.toLowerCase().includes(q));
+  });
 
   protected photoUrl(question: 'q1' | 'q2'): string {
     const id = this.quizStore.session()?.sessionId;
