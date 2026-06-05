@@ -205,7 +205,7 @@ describe('Results – arcade headline', () => {
 // ─── board row highlighting ───────────────────────────────────────────────────
 
 describe('Results – own board row highlighted', () => {
-  it("marks the current player's board row with the board-row--you class", async () => {
+  it("marks the current player's board row as aria-current for screen readers", async () => {
     localStorage.setItem(
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
@@ -238,11 +238,8 @@ describe('Results – own board row highlighted', () => {
     await drainMicrotasks();
     fixture.detectChanges();
 
-    const aliceRow = screen.getByText('Alice').closest('.board-row');
-    const bobRow = screen.getByText('Bob').closest('.board-row');
-
-    expect(aliceRow?.classList.contains('board-row--you')).toBe(true);
-    expect(bobRow?.classList.contains('board-row--you')).toBe(false);
+    expect(screen.getByText('Alice').closest('[aria-current="true"]')).toBeTruthy();
+    expect(screen.getByText('Bob').closest('[aria-current="true"]')).toBeNull();
   });
 });
 

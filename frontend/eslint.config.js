@@ -104,9 +104,7 @@ module.exports = defineConfig([
       "tailwindcss/enforces-negative-arbitrary-values": "error",
       "tailwindcss/enforces-shorthand": "error",
       "tailwindcss/no-contradicting-classname": "error",
-      "tailwindcss/no-custom-classname": ["error", {
-        whitelist: ["confetti", "pop", "rise", "q-card", "board-row", "board-q", "chunk-btn"],
-      }],
+      "tailwindcss/no-custom-classname": "error",
       "tailwindcss/no-unnecessary-arbitrary-value": "error",
       "@angular-eslint/template/prefer-self-closing-tags": "error",
       "@angular-eslint/template/no-empty-control-flow": "error",

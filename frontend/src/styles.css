@@ -53,6 +53,33 @@
   --dur-slow: 420ms;
 }
 
+/* =============================================================
+   Brand animation utilities — used across components.
+   motion-safe:animate-pop / motion-safe:animate-rise in templates.
+   ============================================================= */
+
+@utility animate-pop {
+  animation: popIn var(--dur-slow) var(--ease-bounce) both;
+}
+
+@utility animate-rise {
+  animation: riseIn var(--dur-base) var(--ease-out) both;
+}
+
+@utility tap-transparent {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+@keyframes riseIn {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
 /* Global heading font */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);

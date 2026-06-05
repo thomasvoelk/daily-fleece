@@ -3,7 +3,7 @@
     <div class="relative flex items-center justify-center overflow-hidden bg-plum px-6 py-10">
       @for (c of confetti; track $index) {
         <div
-          class="confetti"
+          class="pointer-events-none absolute rounded-[2px]"
           [style.left.%]="c.left"
           [style.top.%]="c.top"
           [style.width.px]="c.size"
@@ -14,12 +14,18 @@
       }
 
       <div class="relative z-10 flex w-full max-w-[360px] flex-col items-center gap-5 text-center">
-        <img src="/alpaca-mark.svg" alt="" width="96" height="96" class="pop rounded-[26px]" />
+        <img
+          src="/alpaca-mark.svg"
+          alt=""
+          width="96"
+          height="96"
+          class="rounded-[26px] motion-safe:animate-pop"
+        />
 
         @if (myResult(); as me) {
           @if (correctCount() === 2) {
             <h1
-              class="pop m-0 font-display text-[30px] leading-tight font-bold text-white"
+              class="m-0 font-display text-[30px] leading-tight font-bold text-white motion-safe:animate-pop"
               i18n="results|perfect score headline@@results.headlinePerfect"
             >
               Perfekt! 🦙
@@ -32,7 +38,7 @@
             </p>
           } @else if (correctCount() === 1) {
             <h1
-              class="pop m-0 font-display text-[30px] leading-tight font-bold text-white"
+              class="m-0 font-display text-[30px] leading-tight font-bold text-white motion-safe:animate-pop"
               i18n="results|partial score headline@@results.headlinePartial"
             >
               Gut dabei! 🦙
@@ -45,7 +51,7 @@
             </p>
           } @else {
             <h1
-              class="pop m-0 font-display text-[30px] leading-tight font-bold text-white"
+              class="m-0 font-display text-[30px] leading-tight font-bold text-white motion-safe:animate-pop"
               i18n="results|zero score headline@@results.headlineZero"
             >
               Weiter so! 🦙
@@ -58,11 +64,13 @@
             </p>
           }
 
-          <div class="rise flex w-full gap-3">
+          <div class="flex w-full gap-3 motion-safe:animate-rise">
             <div
-              class="q-card flex-1 rounded-2xl border-2 p-4 text-center"
-              [class.q-card--correct]="me.q1Correct"
-              [class.q-card--wrong]="!me.q1Correct"
+              class="flex-1 rounded-2xl border-2 p-4 text-center"
+              [class.border-white/20]="!me.q1Correct"
+              [class.bg-white/10]="!me.q1Correct"
+              [class.border-green]="me.q1Correct"
+              [class.bg-green/20]="me.q1Correct"
             >
               <div
                 class="mb-2 font-pixel text-[8px] text-white/60"
@@ -75,9 +83,11 @@
               </div>
             </div>
             <div
-              class="q-card flex-1 rounded-2xl border-2 p-4 text-center"
-              [class.q-card--correct]="me.q2Correct"
-              [class.q-card--wrong]="!me.q2Correct"
+              class="flex-1 rounded-2xl border-2 p-4 text-center"
+              [class.border-white/20]="!me.q2Correct"
+              [class.bg-white/10]="!me.q2Correct"
+              [class.border-green]="me.q2Correct"
+              [class.bg-green/20]="me.q2Correct"
             >
               <div
                 class="mb-2 font-pixel text-[8px] text-white/60"
@@ -91,7 +101,7 @@
             </div>
           </div>
 
-          <div class="rise flex items-center gap-4">
+          <div class="flex items-center gap-4 motion-safe:animate-rise">
             <div class="flex flex-col items-center">
               <div
                 class="font-pixel text-[7px] tracking-[.05em] text-white/50"
@@ -120,7 +130,7 @@
           </div>
         } @else {
           <h1
-            class="pop m-0 font-display text-[30px] leading-tight font-bold text-white"
+            class="m-0 font-display text-[30px] leading-tight font-bold text-white motion-safe:animate-pop"
             i18n="results|session done headline@@results.headlineDone"
           >
             Session vorbei! 🦙
@@ -145,8 +155,10 @@
       <div class="flex flex-col gap-2">
         @for (row of sortedResults(); track row.playerId; let i = $index) {
           <div
-            class="board-row flex items-center gap-3 rounded-xl bg-paper px-3.5 py-3"
+            class="flex items-center gap-3 rounded-xl px-3.5 py-3 shadow-[var(--shadow-1)]"
+            [class.bg-paper]="row.playerId !== entry.playerId()"
             [class.board-row--you]="row.playerId === entry.playerId()"
+            [attr.aria-current]="row.playerId === entry.playerId() ? 'true' : null"
           >
             <div class="w-7 shrink-0 text-center font-pixel text-[10px] text-plum-faint">
               #{{ i + 1 }}
@@ -155,14 +167,16 @@
               {{ row.displayName }}
             </div>
             <div
-              class="board-q w-6 text-center font-body text-sm font-extrabold text-coral-700"
-              [class.board-q--correct]="row.q1Correct"
+              class="w-6 text-center font-body text-sm font-extrabold"
+              [class.text-coral-700]="!row.q1Correct"
+              [class.text-green-700]="row.q1Correct"
             >
               {{ row.q1Correct ? '✓' : '✗' }}
             </div>
             <div
-              class="board-q w-6 text-center font-body text-sm font-extrabold text-coral-700"
-              [class.board-q--correct]="row.q2Correct"
+              class="w-6 text-center font-body text-sm font-extrabold"
+              [class.text-coral-700]="!row.q2Correct"
+              [class.text-green-700]="row.q2Correct"
             >
               {{ row.q2Correct ? '✓' : '✗' }}
             </div>
@@ -178,7 +192,7 @@
   <div class="bg-cream px-4 pt-2 pb-8">
     <button
       type="button"
-      class="chunk-btn"
+      class="w-full cursor-pointer rounded-full border-0 bg-marigold px-6 py-[15px] font-display text-[17px] font-semibold text-plum shadow-[var(--chunk-marigold)] transition-[transform,box-shadow] duration-[120ms] ease-[var(--ease-out)] tap-transparent active:translate-y-[5px] active:shadow-[0_0_0_var(--color-marigold-700)]"
       (click)="goToLeaderboard()"
       i18n="results|leaderboard button@@results.leaderboard"
     >
