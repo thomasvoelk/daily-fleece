@@ -3,6 +3,7 @@ import { KeyValuePipe } from '@angular/common';
 import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
+import { ApiConfiguration } from '../backend-client';
 import { QuizStore } from './quiz.store';
 
 @Component({
@@ -14,9 +15,15 @@ import { QuizStore } from './quiz.store';
 })
 export class Quiz {
   protected readonly quizStore = inject(QuizStore);
+  private readonly apiConfig = inject(ApiConfiguration);
 
   protected readonly selectedCorrectAnswer = signal<'A' | 'B' | 'C' | null>(null);
   protected readonly photoExpanded = signal(false);
+
+  protected photoUrl(question: 'q1' | 'q2'): string {
+    const id = this.quizStore.session()?.sessionId;
+    return id ? `${this.apiConfig.rootUrl}/sessions/${id}/photos/${question}` : '';
+  }
 
   protected submit(answer: 'A' | 'B' | 'C'): void {
     void this.quizStore.submitQ1Answer(answer);

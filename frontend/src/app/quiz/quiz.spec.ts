@@ -9,7 +9,7 @@ import {
   expectNoA11yViolations,
   mockLocalStorage,
 } from '../shared/testing';
-import { SessionResponse } from '../backend-client';
+import { ApiConfiguration, SessionResponse } from '../backend-client';
 
 mockLocalStorage();
 
@@ -70,6 +70,28 @@ describe('Quiz – Q1 photo', () => {
 
     const img = screen.getByRole('img', { name: /question 1/i });
     expect(img).toHaveAttribute('src', '/api/v1/sessions/abc/photos/q1');
+  });
+
+  it('derives the Q1 photo URL from ApiConfiguration.rootUrl', async () => {
+    const config = new ApiConfiguration();
+    config.rootUrl = '/proxy/api/v2';
+
+    await render(Quiz, {
+      providers: [
+        ...provideTestEnvironment(),
+        provideRouter([]),
+        {
+          provide: QuizStore,
+          useValue: makeStoreMock({ session: signal(makeSession({ sessionId: 'abc' })) }),
+        },
+        { provide: ApiConfiguration, useValue: config },
+      ],
+    });
+
+    expect(screen.getByRole('img', { name: /question 1/i })).toHaveAttribute(
+      'src',
+      '/proxy/api/v2/sessions/abc/photos/q1',
+    );
   });
 });
 
