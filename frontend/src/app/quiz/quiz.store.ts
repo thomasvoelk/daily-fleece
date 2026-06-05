@@ -27,6 +27,7 @@ export const QuizStore = signalStore(
     const entryStore = inject(EntryContext);
     return {
       q1Status: computed(() => store.session()?.voting.q1.status ?? null),
+      q2Status: computed(() => store.session()?.voting.q2.status ?? null),
       isHost: computed(() => {
         const session = store.session();
         const playerId = entryStore.playerId();

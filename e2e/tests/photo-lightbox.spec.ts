@@ -75,3 +75,41 @@ test('Escape schließt die Lightbox', async ({ page }) => {
 
   await expect(page.getByRole('dialog')).not.toBeVisible();
 });
+
+async function closeQ1AndNavigateToQ2(page: import('@playwright/test').Page) {
+  await navigateToQuiz(page);
+  await page.getByRole('region', { name: 'Host-Steuerung' }).getByRole('radio', { name: 'A' }).check();
+  await page.getByRole('button', { name: 'Abstimmung schließen' }).click();
+}
+
+test('Q2-Foto ist nach Schließen von Q1 sichtbar', async ({ page }) => {
+  await closeQ1AndNavigateToQ2(page);
+
+  await expect(page.getByRole('img', { name: 'Frage 2' })).toBeVisible();
+});
+
+test('tippen auf Q2-Foto öffnet Lightbox', async ({ page }) => {
+  await closeQ1AndNavigateToQ2(page);
+
+  await page.getByRole('img', { name: 'Frage 2' }).click();
+
+  await expect(page.getByRole('img', { name: 'Frage 2 vergrößert' })).toBeVisible();
+});
+
+test('tippen auf Foto in der Q2-Lightbox schließt sie', async ({ page }) => {
+  await closeQ1AndNavigateToQ2(page);
+
+  await page.getByRole('img', { name: 'Frage 2' }).click();
+  await page.getByRole('img', { name: 'Frage 2 vergrößert' }).click();
+
+  await expect(page.getByRole('img', { name: 'Frage 2 vergrößert' })).not.toBeVisible();
+});
+
+test('Schließen-Button schließt die Q2-Lightbox', async ({ page }) => {
+  await closeQ1AndNavigateToQ2(page);
+
+  await page.getByRole('img', { name: 'Frage 2' }).click();
+  await page.getByRole('button', { name: 'Lightbox schließen' }).click();
+
+  await expect(page.getByRole('img', { name: 'Frage 2 vergrößert' })).not.toBeVisible();
+});

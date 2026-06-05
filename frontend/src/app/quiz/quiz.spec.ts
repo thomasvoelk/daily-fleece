@@ -33,6 +33,7 @@ function makeStoreMock(
     session: signal(makeSession()),
     answerCount: signal({ answered: 0, total: 0 }),
     q1Status: signal('Open' as const),
+    q2Status: signal(null),
     myQ1Answer: signal(null),
     isHost: signal(false),
     submitQ1Answer: vi.fn(),
@@ -260,6 +261,92 @@ describe('Quiz – Q1 photo lightbox', () => {
     await user.keyboard('[Escape]');
 
     expect(screen.queryByRole('img', { name: 'Question 1 enlarged' })).toBeNull();
+  });
+});
+
+// ─── Q2 photo ────────────────────────────────────────────────────────────────
+
+describe('Quiz – Q2 photo', () => {
+  it('renders the Q2 photo when q2Status is Open', async () => {
+    await renderQuiz({
+      q2Status: signal('Open' as const),
+      session: signal(makeSession({ sessionId: 'abc' })),
+    });
+
+    const img = screen.getByRole('img', { name: /question 2/i });
+    expect(img).toHaveAttribute('src', '/api/v1/sessions/abc/photos/q2');
+  });
+
+  it('does not render the Q2 photo when q2Status is null', async () => {
+    await renderQuiz();
+
+    expect(screen.queryByRole('img', { name: /question 2/i })).toBeNull();
+  });
+});
+
+// ─── Q2 photo lightbox ───────────────────────────────────────────────────────
+
+describe('Quiz – Q2 photo lightbox', () => {
+  it('Q2 lightbox is not visible initially', async () => {
+    await renderQuiz({
+      q2Status: signal('Open' as const),
+      session: signal(makeSession({ sessionId: 'abc' })),
+    });
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('clicking the Q2 photo opens the lightbox', async () => {
+    const user = userEvent.setup();
+    await renderQuiz({
+      q2Status: signal('Open' as const),
+      session: signal(makeSession({ sessionId: 'abc' })),
+    });
+
+    await user.click(screen.getByRole('img', { name: 'Question 2' }));
+
+    expect(screen.getByRole('dialog')).toBeVisible();
+  });
+
+  it('clicking the photo inside the Q2 lightbox closes it', async () => {
+    const user = userEvent.setup();
+    await renderQuiz({
+      q2Status: signal('Open' as const),
+      session: signal(makeSession({ sessionId: 'abc' })),
+    });
+
+    await user.click(screen.getByRole('img', { name: 'Question 2' }));
+    await user.click(screen.getByRole('img', { name: 'Question 2 enlarged' }));
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('clicking the close button closes the Q2 lightbox', async () => {
+    const user = userEvent.setup();
+    await renderQuiz({
+      q2Status: signal('Open' as const),
+      session: signal(makeSession({ sessionId: 'abc' })),
+    });
+
+    await user.click(screen.getByRole('img', { name: 'Question 2' }));
+    await user.click(screen.getByRole('button', { name: 'Close lightbox' }));
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('pressing Escape closes the Q2 lightbox', async () => {
+    const user = userEvent.setup();
+    await renderQuiz({
+      q2Status: signal('Open' as const),
+      session: signal(makeSession({ sessionId: 'abc' })),
+    });
+
+    await user.click(screen.getByRole('img', { name: 'Question 2' }));
+    expect(screen.getByRole('img', { name: 'Question 2 enlarged' })).toBeVisible();
+
+    await user.keyboard('[Escape]');
+
+    expect(screen.queryByRole('img', { name: 'Question 2 enlarged' })).toBeNull();
   });
 });
 
