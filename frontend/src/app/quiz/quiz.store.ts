@@ -142,9 +142,6 @@ export const QuizStore = signalStore(
           body: { hostId: playerId, correctAnswer },
         });
         patchState(store, { session: updated, error: null });
-        if (updated.phase === 'Ended') {
-          await router.navigate(['/results']);
-        }
       },
     };
   }),

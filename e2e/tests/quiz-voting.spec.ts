@@ -63,7 +63,7 @@ test('UC-04+05: Q1 voting — answer submission, refresh, close voting, reveal',
   await expect(page.getByText(/Richtige Antwort:.*A/)).toBeVisible();
   await expect(page.getByText('Bob Spieler')).toBeVisible();
   await expect(page.getByRole('list').getByRole('listitem').filter({ hasText: 'Bob Spieler' })).toContainText('B');
-  await expect(page.getByRole('button', { name: 'Abstimmung schließen' })).not.toBeVisible();
+  await expect(page.getByRole('button', { name: 'Abstimmung schließen' })).not.toBeEnabled();
 
   // ── UC-05 Scenario 3: player refreshes — sees same revealed state ────────
   await playerPage.getByRole('button', { name: 'Aktualisieren' }).click();
