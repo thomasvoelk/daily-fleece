@@ -1,38 +1,60 @@
 <main class="min-h-svh bg-cream p-6">
-  <div class="mx-auto mt-8 max-w-sm">
-    <h1 class="mb-4 text-3xl" i18n="lobby|Heading for the waiting room@@lobby.heading">
+  <div class="mx-auto mt-8 flex max-w-sm flex-col gap-4">
+    <h1 class="text-3xl" i18n="lobby|Heading for the waiting room@@lobby.heading">
       Today's Session
     </h1>
-    <mat-list
+
+    <ul
       role="list"
+      class="m-0 flex list-none flex-col gap-2 p-0"
       aria-label="Players in session"
       i18n-aria-label="lobby|Accessible label for the player list@@lobby.playerListAriaLabel"
     >
-      @for (player of store.session()?.players ?? []; track player.playerId) {
-        <mat-list-item role="listitem">{{ player.displayName }}</mat-list-item>
+      @for (player of store.session()?.players ?? []; track player.playerId; let i = $index) {
+        <li class="flex items-center gap-3 rounded-xl bg-paper px-3.5 py-3 shadow-1">
+          <div
+            class="flex size-10 shrink-0 items-center justify-center rounded-full font-display text-base font-bold"
+            [style]="avatarStyle(i)"
+            aria-hidden="true"
+          >
+            {{ player.displayName.charAt(0).toUpperCase() }}
+          </div>
+          <span class="flex-1 font-body text-[15px] font-extrabold text-plum">
+            {{ player.displayName }}
+          </span>
+          @if (player.playerId === store.session()?.hostId) {
+            <span
+              class="rounded-full bg-marigold-200 px-2 py-0.5 font-pixel text-[7px] tracking-[.04em] text-marigold-700"
+              i18n="lobby|Badge on the host player row@@lobby.hostBadge"
+            >
+              HOST
+            </span>
+          }
+        </li>
       }
-    </mat-list>
-    <div class="mt-4 flex gap-3">
+    </ul>
+
+    @if (store.isHost()) {
       <button
         type="button"
-        mat-stroked-button
+        (click)="store.startQuiz()"
+        class="duration-fast w-full cursor-pointer rounded-full border-0 bg-grape px-6 py-[15px] font-display text-[17px] font-semibold text-white shadow-chunk-grape transition-[transform,box-shadow] ease-smooth tap-transparent active:translate-y-[5px] active:shadow-chunk-grape-pressed"
+        i18n="lobby|Button for host to start the quiz@@lobby.startQuizButton"
+      >
+        Start Quiz
+      </button>
+    } @else {
+      <button
+        type="button"
         (click)="store.goToQuiz()"
+        class="duration-fast w-full cursor-pointer rounded-full border-0 bg-grape px-6 py-[15px] font-display text-[17px] font-semibold text-white shadow-chunk-grape transition-[transform,box-shadow] ease-smooth tap-transparent active:translate-y-[5px] active:shadow-chunk-grape-pressed"
         i18n="lobby|Button to navigate to the quiz@@lobby.goToQuizButton"
       >
         Go to Quiz
       </button>
-      @if (store.isHost()) {
-        <button
-          type="button"
-          mat-flat-button
-          (click)="store.startQuiz()"
-          i18n="lobby|Button for host to start the quiz@@lobby.startQuizButton"
-        >
-          Start Quiz
-        </button>
-      }
-    </div>
-    <p class="mt-2 text-sm text-coral-700" role="alert" aria-live="assertive">
+    }
+
+    <p class="text-sm text-coral-700" role="alert" aria-live="assertive">
       {{ store.error() ?? '' }}
     </p>
   </div>

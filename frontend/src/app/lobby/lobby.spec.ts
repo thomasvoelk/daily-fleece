@@ -106,7 +106,7 @@ describe('Lobby – Start Quiz button', () => {
 // ─── Go to Quiz button ────────────────────────────────────────────────────────
 
 describe('Lobby – Go to Quiz button', () => {
-  it('is visible to all players including non-host', async () => {
+  it('is visible to non-host players', async () => {
     localStorage.setItem(
       'lobby-player',
       JSON.stringify({ playerId: 'player-2', companyId: 'acme', displayName: 'Bob' }),

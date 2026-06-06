@@ -40,10 +40,6 @@ test('full pre-game flow: lobby creation, player join, and quiz start', async ({
   // Step 6: "Quiz starten" button is not visible in the Player's Lobby (player is not the host)
   await expect(playerPage.getByRole('button', { name: 'Quiz starten' })).not.toBeVisible();
 
-  // Step 7: Host clicks "Zum Quiz" — fetches latest session; Bob now visible in host's list
-  await page.getByRole('button', { name: 'Zum Quiz' }).click();
-  await expect(hostPlayerList.getByRole('listitem').filter({ hasText: 'Bob Spieler' })).toBeVisible();
-
   // Player clicks "Zum Quiz" before host starts → inline error, stays on Lobby
   await playerPage.getByRole('button', { name: 'Zum Quiz' }).click();
   await expect(playerPage.getByRole('alert')).toHaveText('Quiz noch nicht gestartet. Bitte warten.');

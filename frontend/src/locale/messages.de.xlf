@@ -78,6 +78,10 @@
         <source>Players in session</source>
         <target>Spieler in der Session</target>
       </trans-unit>
+      <trans-unit id="lobby.hostBadge" datatype="html">
+        <source>HOST</source>
+        <target>HOST</target>
+      </trans-unit>
       <trans-unit id="lobby.goToQuizButton" datatype="html">
         <source> Go to Quiz </source>
         <target> Zum Quiz </target>

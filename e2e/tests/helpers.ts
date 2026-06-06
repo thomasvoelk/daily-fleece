@@ -23,7 +23,6 @@ export async function navigateToQuiz(page: Page): Promise<void> {
   await page.getByLabel('F2 — Geografie (Ort)').setInputFiles(Q2_PHOTO);
   await page.getByRole('button', { name: 'Session erstellen' }).click();
   await expect(page).toHaveURL(/\/lobby/);
-  await page.getByRole('button', { name: 'Zum Quiz' }).click();
   await page.getByRole('button', { name: 'Quiz starten' }).click();
   await expect(page).toHaveURL(/\/quiz/);
 }
@@ -50,7 +49,6 @@ export async function navigateToQuizWithPlayer(
   await playerPage.getByRole('button', { name: 'Lobby beitreten' }).click();
   await expect(playerPage).toHaveURL(/\/lobby/);
 
-  await page.getByRole('button', { name: 'Zum Quiz' }).click();
   await page.getByRole('button', { name: 'Quiz starten' }).click();
   await expect(page).toHaveURL(/\/quiz/);
   await playerPage.getByRole('button', { name: 'Zum Quiz' }).click();
