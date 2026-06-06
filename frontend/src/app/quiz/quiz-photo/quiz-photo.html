@@ -1,0 +1,60 @@
+<button
+  type="button"
+  class="block w-full cursor-pointer border-0 bg-transparent p-0"
+  (click)="expanded.set(true)"
+>
+  @if (question() === 'q1') {
+    <img
+      [src]="src()"
+      alt="Question 1"
+      i18n-alt="quiz|Alt text for the Q1 photo@@quiz.q1PhotoAlt"
+      class="block max-h-[60vh] w-full bg-plum object-contain"
+    />
+  } @else {
+    <img
+      [src]="src()"
+      alt="Question 2"
+      i18n-alt="quiz|Alt text for the Q2 photo@@quiz.q2PhotoAlt"
+      class="block max-h-[50vh] w-full bg-plum object-contain"
+    />
+  }
+</button>
+
+@if (expanded()) {
+  <div
+    role="dialog"
+    aria-modal="true"
+    tabindex="-1"
+    aria-label="Photo lightbox"
+    i18n-aria-label="
+      quiz|Accessible label for the photo lightbox dialog@@quiz.lightboxDialogAriaLabel"
+    class="fixed inset-0 z-50 flex cursor-pointer items-center justify-center bg-black/90"
+    (click)="expanded.set(false)"
+    (keydown.escape)="expanded.set(false)"
+  >
+    <button
+      type="button"
+      class="absolute top-4 right-4 cursor-pointer border-0 bg-transparent text-2xl leading-none text-white"
+      aria-label="Close lightbox"
+      i18n-aria-label="quiz|Close button for the photo lightbox@@quiz.lightboxCloseButton"
+      (click)="$event.stopPropagation(); expanded.set(false)"
+    >
+      ✕
+    </button>
+    @if (question() === 'q1') {
+      <img
+        [src]="src()"
+        alt="Question 1 enlarged"
+        i18n-alt="quiz|Alt text for the enlarged Q1 photo in the lightbox@@quiz.q1PhotoExpandedAlt"
+        class="max-h-full max-w-full cursor-default object-contain"
+      />
+    } @else {
+      <img
+        [src]="src()"
+        alt="Question 2 enlarged"
+        i18n-alt="quiz|Alt text for the enlarged Q2 photo in the lightbox@@quiz.q2PhotoExpandedAlt"
+        class="max-h-full max-w-full cursor-default object-contain"
+      />
+    }
+  </div>
+}

@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  HostListener,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
@@ -14,6 +7,8 @@ import { MatAutocomplete, MatAutocompleteTrigger, MatOption } from '@angular/mat
 import { ApiConfiguration } from '../backend-client';
 import { QuizStore } from './quiz.store';
 import { QuizAnswerReveal } from './quiz-answer-reveal';
+import { QuizPhoto } from './quiz-photo/quiz-photo';
+import { QuizHostReveal } from './quiz-host-reveal/quiz-host-reveal';
 
 const ISO_CODES = [
   'AD',
@@ -287,6 +282,8 @@ function buildCountries(): readonly { code: string; name: string }[] {
     MatAutocompleteTrigger,
     MatOption,
     QuizAnswerReveal,
+    QuizPhoto,
+    QuizHostReveal,
   ],
   templateUrl: './quiz.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -295,9 +292,6 @@ export class Quiz {
   protected readonly quizStore = inject(QuizStore);
   private readonly apiConfig = inject(ApiConfiguration);
 
-  protected readonly selectedCorrectAnswer = signal<'A' | 'B' | 'C' | null>(null);
-  protected readonly photoExpanded = signal(false);
-
   protected readonly allCountries = buildCountries();
   protected readonly q2CountryInput = signal('');
   protected readonly filteredCountries = computed(() => {
@@ -305,13 +299,9 @@ export class Quiz {
     if (!q) return this.allCountries;
     return this.allCountries.filter((c) => c.name.toLowerCase().includes(q));
   });
-  protected readonly selectedQ2CorrectCountry = signal<string | null>(null);
-  protected readonly hostQ2CountryInput = signal('');
-  protected readonly filteredHostCountries = computed(() => {
-    const q = this.hostQ2CountryInput().toLowerCase();
-    if (!q) return this.allCountries;
-    return this.allCountries.filter((c) => c.name.toLowerCase().includes(q));
-  });
+  protected readonly currentQuestion = computed<'q1' | 'q2'>(() =>
+    this.quizStore.q2Status() === 'Open' ? 'q2' : 'q1',
+  );
 
   protected readonly q1AnswerEntries = computed(() =>
     Object.values(this.quizStore.session()?.voting.q1.answers ?? {}),
@@ -340,22 +330,15 @@ export class Quiz {
     void this.quizStore.refresh();
   }
 
-  protected closeVoting(): void {
-    const answer = this.selectedCorrectAnswer();
-    if (answer) void this.quizStore.setQ1CorrectAnswer(answer);
+  protected onCloseQ1Voting(answer: 'A' | 'B' | 'C'): void {
+    void this.quizStore.setQ1CorrectAnswer(answer);
   }
 
-  protected closeQ2Voting(): void {
-    const country = this.selectedQ2CorrectCountry();
-    if (country) void this.quizStore.setQ2CorrectAnswer(country);
+  protected onCloseQ2Voting(countryCode: string): void {
+    void this.quizStore.setQ2CorrectAnswer(countryCode);
   }
 
   protected countryName(code: string): string {
     return this.allCountries.find((c) => c.code === code)?.name ?? code;
-  }
-
-  @HostListener('document:keydown.escape')
-  protected onEscape(): void {
-    this.photoExpanded.set(false);
   }
 }

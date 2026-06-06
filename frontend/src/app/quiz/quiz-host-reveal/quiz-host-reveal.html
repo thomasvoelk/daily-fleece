@@ -1,0 +1,57 @@
+<section
+  class="mx-4 mt-3 flex flex-col gap-3 rounded-2xl bg-cream-deep p-4"
+  aria-label="Host controls"
+  i18n-aria-label="quiz|Accessible label for the host controls section@@quiz.hostControlsAriaLabel"
+>
+  @if (q1Status() === 'Open') {
+    <mat-radio-group class="flex gap-4">
+      @for (option of ['A', 'B', 'C']; track option) {
+        <mat-radio-button [value]="option" (change)="selectedQ1Answer.set($any(option))">
+          {{ option }}
+        </mat-radio-button>
+      }
+    </mat-radio-group>
+    <button
+      type="button"
+      mat-flat-button
+      [disabled]="!selectedQ1Answer()"
+      (click)="onCloseQ1()"
+      i18n="quiz|Button to close the voting and reveal the correct answer@@quiz.closeVotingButton"
+    >
+      Close voting
+    </button>
+  }
+
+  @if (q2Status() === 'Open') {
+    <mat-form-field class="w-full">
+      <mat-label i18n="quiz|Label for the host Q2 correct-country picker@@quiz.hostCountryLabel"
+        >Country</mat-label
+      >
+      <input
+        type="text"
+        matInput
+        [matAutocomplete]="q2HostAuto"
+        [value]="selectedCountry() ? countryName(selectedCountry()!) : hostCountryInput()"
+        (input)="hostCountryInput.set($any($event.target).value); selectedCountry.set(null)"
+      />
+      <mat-autocomplete
+        #q2HostAuto
+        (optionSelected)="selectedCountry.set($event.option.value); hostCountryInput.set('')"
+      >
+        @for (country of filteredCountries(); track country.code) {
+          <mat-option [value]="country.code">{{ country.name }}</mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+    <button
+      type="button"
+      mat-flat-button
+      disabledInteractive
+      [disabled]="!selectedCountry()"
+      (click)="onCloseQ2()"
+      i18n="quiz|Button to close Q2 voting and reveal the correct country@@quiz.closeQ2VotingButton"
+    >
+      Close voting
+    </button>
+  }
+</section>

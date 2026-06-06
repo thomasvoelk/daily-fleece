@@ -1,96 +1,8 @@
 <main class="flex min-h-svh flex-col bg-cream">
   @if (quizStore.session(); as session) {
-    @if (quizStore.q2Status() !== 'Open') {
-      <button
-        type="button"
-        class="block w-full cursor-pointer border-0 bg-transparent p-0"
-        (click)="photoExpanded.set(true)"
-      >
-        <img
-          [src]="photoUrl('q1')"
-          alt="Question 1"
-          i18n-alt="quiz|Alt text for the Q1 photo@@quiz.q1PhotoAlt"
-          class="block max-h-[60vh] w-full bg-plum object-contain"
-        />
-      </button>
-
-      @if (photoExpanded()) {
-        <div
-          role="dialog"
-          aria-modal="true"
-          tabindex="-1"
-          aria-label="Photo lightbox"
-          i18n-aria-label="
-            quiz|Accessible label for the photo lightbox dialog@@quiz.lightboxDialogAriaLabel"
-          class="fixed inset-0 z-50 flex cursor-pointer items-center justify-center bg-black/90"
-          (click)="photoExpanded.set(false)"
-          (keydown.escape)="photoExpanded.set(false)"
-        >
-          <button
-            type="button"
-            class="absolute top-4 right-4 cursor-pointer border-0 bg-transparent text-2xl leading-none text-white"
-            aria-label="Close lightbox"
-            i18n-aria-label="quiz|Close button for the photo lightbox@@quiz.lightboxCloseButton"
-            (click)="$event.stopPropagation(); photoExpanded.set(false)"
-          >
-            ✕
-          </button>
-          <img
-            [src]="photoUrl('q1')"
-            alt="Question 1 enlarged"
-            i18n-alt="
-              quiz|Alt text for the enlarged Q1 photo in the lightbox@@quiz.q1PhotoExpandedAlt"
-            class="max-h-full max-w-full cursor-default object-contain"
-          />
-        </div>
-      }
-    }
+    <app-quiz-photo [src]="photoUrl(currentQuestion())" [question]="currentQuestion()" />
 
     @if (quizStore.q2Status() === 'Open') {
-      <button
-        type="button"
-        class="block w-full cursor-pointer border-0 bg-transparent p-0"
-        (click)="photoExpanded.set(true)"
-      >
-        <img
-          [src]="photoUrl('q2')"
-          alt="Question 2"
-          i18n-alt="quiz|Alt text for the Q2 photo@@quiz.q2PhotoAlt"
-          class="block max-h-[50vh] w-full bg-plum object-contain"
-        />
-      </button>
-
-      @if (photoExpanded()) {
-        <div
-          role="dialog"
-          aria-modal="true"
-          tabindex="-1"
-          aria-label="Photo lightbox"
-          i18n-aria-label="
-            quiz|Accessible label for the photo lightbox dialog@@quiz.lightboxDialogAriaLabel"
-          class="fixed inset-0 z-50 flex cursor-pointer items-center justify-center bg-black/90"
-          (click)="photoExpanded.set(false)"
-          (keydown.escape)="photoExpanded.set(false)"
-        >
-          <button
-            type="button"
-            class="absolute top-4 right-4 cursor-pointer border-0 bg-transparent text-2xl leading-none text-white"
-            aria-label="Close lightbox"
-            i18n-aria-label="quiz|Close button for the photo lightbox@@quiz.lightboxCloseButton"
-            (click)="$event.stopPropagation(); photoExpanded.set(false)"
-          >
-            ✕
-          </button>
-          <img
-            [src]="photoUrl('q2')"
-            alt="Question 2 enlarged"
-            i18n-alt="
-              quiz|Alt text for the enlarged Q2 photo in the lightbox@@quiz.q2PhotoExpandedAlt"
-            class="max-h-full max-w-full cursor-default object-contain"
-          />
-        </div>
-      }
-
       <div class="px-4 pt-2">
         <mat-form-field class="w-full">
           <mat-label i18n="quiz|Label for the Q2 country picker@@quiz.countryLabel"
@@ -173,77 +85,13 @@
     }
 
     @if (quizStore.isHost()) {
-      <section
-        class="mx-4 mt-3 flex flex-col gap-3 rounded-2xl bg-cream-deep p-4"
-        aria-label="Host controls"
-        i18n-aria-label="
-          quiz|Accessible label for the host controls section@@quiz.hostControlsAriaLabel"
-      >
-        @if (quizStore.q1Status() === 'Open') {
-          <mat-radio-group class="flex gap-4">
-            @for (option of ['A', 'B', 'C']; track option) {
-              <mat-radio-button [value]="option" (change)="selectedCorrectAnswer.set($any(option))">
-                {{ option }}
-              </mat-radio-button>
-            }
-          </mat-radio-group>
-          <button
-            type="button"
-            mat-flat-button
-            [disabled]="!selectedCorrectAnswer()"
-            (click)="closeVoting()"
-            i18n="
-              quiz|Button to close the voting and reveal the correct answer@@quiz.closeVotingButton"
-          >
-            Close voting
-          </button>
-        }
-
-        @if (quizStore.q2Status() === 'Open') {
-          <mat-form-field class="w-full">
-            <mat-label
-              i18n="quiz|Label for the host Q2 correct-country picker@@quiz.hostCountryLabel"
-              >Country</mat-label
-            >
-            <input
-              type="text"
-              matInput
-              [matAutocomplete]="q2HostAuto"
-              [value]="
-                selectedQ2CorrectCountry()
-                  ? countryName(selectedQ2CorrectCountry()!)
-                  : hostQ2CountryInput()
-              "
-              (input)="
-                hostQ2CountryInput.set($any($event.target).value);
-                selectedQ2CorrectCountry.set(null)
-              "
-            />
-            <mat-autocomplete
-              #q2HostAuto
-              (optionSelected)="
-                selectedQ2CorrectCountry.set($event.option.value); hostQ2CountryInput.set('')
-              "
-            >
-              @for (country of filteredHostCountries(); track country.code) {
-                <mat-option [value]="country.code">{{ country.name }}</mat-option>
-              }
-            </mat-autocomplete>
-          </mat-form-field>
-          <button
-            type="button"
-            mat-flat-button
-            disabledInteractive
-            [disabled]="!selectedQ2CorrectCountry()"
-            (click)="closeQ2Voting()"
-            i18n="
-              quiz|Button to close Q2 voting and reveal the correct
-              country@@quiz.closeQ2VotingButton"
-          >
-            Close voting
-          </button>
-        }
-      </section>
+      <app-quiz-host-reveal
+        [q1Status]="quizStore.q1Status()"
+        [q2Status]="quizStore.q2Status()"
+        [allCountries]="allCountries"
+        (closeQ1Voting)="onCloseQ1Voting($event)"
+        (closeQ2Voting)="onCloseQ2Voting($event)"
+      />
     }
 
     <button
