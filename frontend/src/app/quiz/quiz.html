@@ -84,16 +84,13 @@
       </mat-radio-group>
     }
 
-    @if (quizStore.q1Status() === 'Closed' && session.voting.q1.correctAnswer) {
-      <app-quiz-answer-reveal
-        [correctAnswer]="session.voting.q1.correctAnswer"
-        [entries]="q1AnswerEntries()"
-      />
+    @if (q1Revealed(); as q1) {
+      <app-quiz-answer-reveal [correctAnswer]="q1.correctAnswer" [entries]="q1AnswerEntries()" />
     }
 
-    @if (quizStore.q2Status() === 'Closed' && session.voting.q2.correctAnswer) {
+    @if (q2Revealed(); as q2) {
       <app-quiz-answer-reveal
-        [correctAnswer]="countryName(session.voting.q2.correctAnswer)"
+        [correctAnswer]="countryName(q2.correctAnswer)"
         [entries]="q2AnswerEntries()"
       />
     }

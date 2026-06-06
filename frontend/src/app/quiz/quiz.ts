@@ -1,13 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
 import { MatButton } from '@angular/material/button';
-import { ApiConfiguration } from '../backend-client';
+import { ApiConfiguration, QuestionVoting } from '../backend-client';
 import { QuizStore } from './quiz.store';
 import { QuizAnswerReveal } from './quiz-answer-reveal/quiz-answer-reveal';
 import { QuizPhoto } from './quiz-photo/quiz-photo';
 import { QuizHostReveal } from './quiz-host-reveal/quiz-host-reveal';
 import { CountryList } from './country-list';
 import { CountryAutocomplete } from './country-autocomplete/country-autocomplete';
+
+type ClosedQuestionVoting = QuestionVoting & { status: 'Closed'; correctAnswer: string };
 
 @Component({
   selector: 'app-quiz',
@@ -32,14 +34,20 @@ export class Quiz {
     this.quizStore.q2Status() === 'Open' ? 'q2' : 'q1',
   );
 
-  protected readonly bothRevealed = computed(() => {
-    const session = this.quizStore.session();
-    return (
-      this.quizStore.q1Status() === 'Closed' &&
-      !!session?.voting.q1.correctAnswer &&
-      this.quizStore.q2Status() === 'Closed' &&
-      !!session.voting.q2.correctAnswer
-    );
+  protected readonly bothRevealed = computed(
+    () => this.quizStore.q1Status() === 'Closed' && this.quizStore.q2Status() === 'Closed',
+  );
+
+  protected readonly q1Revealed = computed((): ClosedQuestionVoting | null => {
+    const q1 = this.quizStore.session()?.voting.q1;
+    return q1?.status === 'Closed' && this.quizStore.q2Status() === 'Closed'
+      ? (q1 as ClosedQuestionVoting)
+      : null;
+  });
+
+  protected readonly q2Revealed = computed((): ClosedQuestionVoting | null => {
+    const q2 = this.quizStore.session()?.voting.q2;
+    return q2?.status === 'Closed' ? (q2 as ClosedQuestionVoting) : null;
   });
 
   protected readonly q1AnswerEntries = computed(() =>

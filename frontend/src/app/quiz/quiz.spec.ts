@@ -389,9 +389,10 @@ describe('Quiz – host controls', () => {
 // ─── reveal state ────────────────────────────────────────────────────────────
 
 describe('Quiz – reveal state', () => {
-  it('shows correct answer and player answers when Q1 is Closed', async () => {
+  it('shows correct answer and player answers when both questions are Closed', async () => {
     await renderQuiz({
       q1Status: signal('Closed' as const),
+      q2Status: signal('Closed' as const),
       session: signal(
         makeSession({
           voting: {
@@ -403,15 +404,36 @@ describe('Quiz – reveal state', () => {
                 p2: { answer: 'C', displayName: 'Bob' },
               },
             },
+            q2: { status: 'Closed', correctAnswer: 'DE' },
+          },
+        }),
+      ),
+    });
+
+    const q1Reveal = screen.getByRole('region', { name: 'Correct answer: A' });
+    within(q1Reveal).getByText('Alice');
+    within(q1Reveal).getByText('Bob');
+  });
+
+  it('does not show Q1 reveal while Q2 voting is Open', async () => {
+    await renderQuiz({
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Open' as const),
+      session: signal(
+        makeSession({
+          voting: {
+            q1: {
+              status: 'Closed',
+              correctAnswer: 'A',
+              answers: { p1: { answer: 'A', displayName: 'Alice' } },
+            },
             q2: { status: 'Open' },
           },
         }),
       ),
     });
 
-    screen.getByText(/correct answer/i);
-    screen.getByText('Alice');
-    screen.getByText('Bob');
+    expect(screen.queryByText(/correct answer/i)).toBeNull();
   });
 
   it('does not show reveal section when Q1 is still Open', async () => {

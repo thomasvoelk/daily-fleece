@@ -1,6 +1,11 @@
-<mat-card class="mx-4 mt-3 rounded-2xl">
+<mat-card
+  role="region"
+  [attr.aria-labelledby]="'quiz-reveal-' + correctAnswer()"
+  class="mx-4 mt-3 rounded-2xl"
+>
   <mat-card-content>
     <p
+      [id]="'quiz-reveal-' + correctAnswer()"
       class="mb-3 font-body text-base font-bold text-plum"
       i18n="quiz|Correct answer label in answer reveal card@@quiz.correctAnswerLabel"
     >
@@ -8,9 +13,27 @@
     </p>
     <ul class="m-0 flex list-none flex-col gap-2 p-0">
       @for (entry of entries(); track entry.displayName) {
-        <li class="flex gap-2 font-body text-[15px] text-plum-soft">
-          <span class="font-bold text-plum">{{ entry.displayName }}</span
-          >: {{ entry.answer }}
+        @let correct = entry.answer === correctAnswer();
+        <li
+          class="flex items-center gap-2 rounded-[10px] px-2.5 py-2"
+          [class.bg-green-200]="correct"
+          [class.bg-coral-200]="!correct"
+        >
+          <span
+            aria-hidden="true"
+            class="material-symbols-rounded text-[18px] leading-none"
+            [class.text-green-700]="correct"
+            [class.text-coral-700]="!correct"
+            style="font-variation-settings: 'FILL' 1"
+            >{{ correct ? 'check_circle' : 'cancel' }}</span
+          >
+          <span
+            class="flex-1 font-body text-[14px] font-bold"
+            [class.text-green-700]="correct"
+            [class.text-coral-700]="!correct"
+            >{{ entry.displayName }}</span
+          >
+          <span class="font-body text-[13px] text-plum-soft">{{ entry.answer }}</span>
         </li>
       }
     </ul>
