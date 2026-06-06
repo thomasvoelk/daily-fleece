@@ -1,14 +1,12 @@
+import { signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MaybeAsync, GuardResult, Router, UrlTree, provideRouter } from '@angular/router';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { lobbyGuard } from './lobby.guard';
 import { LobbyStore } from './lobby.store';
-import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
+import { EntryContext } from '../entry';
+import { provideTestEnvironment } from '../shared/testing';
 import { SessionResponse } from '../backend-client';
-
-mockLocalStorage();
-
-const PROVIDERS = [...provideTestEnvironment(), provideRouter([]), LobbyStore];
 
 function makeSession(sessionId = 's1'): SessionResponse {
   return {
@@ -23,35 +21,32 @@ function makeSession(sessionId = 's1'): SessionResponse {
 }
 
 describe('lobbyGuard', () => {
+  let playerId: WritableSignal<string | null>;
+
   function runGuard(): MaybeAsync<GuardResult> {
     return TestBed.runInInjectionContext(() => lobbyGuard({} as never, {} as never));
   }
 
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: PROVIDERS });
-  });
-
-  it('redirects to / when localStorage has no lobby-player entry', async () => {
-    const result = await runGuard();
-    expect(result).toBeInstanceOf(UrlTree);
-    expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe('/');
+    playerId = signal(null);
+    TestBed.configureTestingModule({
+      providers: [
+        ...provideTestEnvironment(),
+        provideRouter([]),
+        LobbyStore,
+        { provide: EntryContext, useValue: { playerId } },
+      ],
+    });
   });
 
   it('redirects to / when playerId is null', async () => {
-    localStorage.setItem(
-      'lobby-player',
-      JSON.stringify({ playerId: null, companyId: 'acme', displayName: 'Alice' }),
-    );
     const result = await runGuard();
     expect(result).toBeInstanceOf(UrlTree);
     expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe('/');
   });
 
   it('redirects to / when GET /sessions/today fails', async () => {
-    localStorage.setItem(
-      'lobby-player',
-      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
-    );
+    playerId.set('p1');
     const http = TestBed.inject(HttpTestingController);
 
     const promise = runGuard() as Promise<GuardResult>;
@@ -65,10 +60,7 @@ describe('lobbyGuard', () => {
   });
 
   it('returns true and initializes the store when playerId is set and session exists', async () => {
-    localStorage.setItem(
-      'lobby-player',
-      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
-    );
+    playerId.set('p1');
     const http = TestBed.inject(HttpTestingController);
     const store = TestBed.inject(LobbyStore);
 
