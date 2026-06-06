@@ -488,24 +488,7 @@
         <note priority="1" from="description">zero score subtitle</note>
         <note priority="1" from="meaning">results</note>
       </trans-unit>
-      <trans-unit id="results.q1" datatype="html">
-        <source> F1 </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/results/results.html</context>
-          <context context-type="linenumber">79,81</context>
-        </context-group>
-        <note priority="1" from="description">question 1 label</note>
-        <note priority="1" from="meaning">results</note>
-      </trans-unit>
-      <trans-unit id="results.q2" datatype="html">
-        <source> F2 </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/results/results.html</context>
-          <context context-type="linenumber">96,98</context>
-        </context-group>
-        <note priority="1" from="description">question 2 label</note>
-        <note priority="1" from="meaning">results</note>
-      </trans-unit>
+
       <trans-unit id="results.statsPoints" datatype="html">
         <source> PUNKTE </source>
         <context-group purpose="location">

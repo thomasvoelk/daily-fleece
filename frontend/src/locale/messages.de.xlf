@@ -194,14 +194,7 @@
         <source>Name</source>
         <target>Name</target>
       </trans-unit>
-      <trans-unit id="results.q1" datatype="html">
-        <source>F1</source>
-        <target>F1</target>
-      </trans-unit>
-      <trans-unit id="results.q2" datatype="html">
-        <source>F2</source>
-        <target>F2</target>
-      </trans-unit>
+
       <trans-unit id="results.points" datatype="html">
         <source>Punkte</source>
         <target>Punkte</target>
