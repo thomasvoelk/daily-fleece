@@ -164,6 +164,15 @@
         <note priority="1" from="description">Error shown when session creation fails</note>
         <note priority="1" from="meaning">hostSetup</note>
       </trans-unit>
+      <trans-unit id="leaderboard.rank" datatype="html">
+        <source>Rang</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/leaderboard/leaderboard.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+        <note priority="1" from="description">rank column header</note>
+        <note priority="1" from="meaning">leaderboard</note>
+      </trans-unit>
       <trans-unit id="leaderboard.title" datatype="html">
         <source> Rangliste </source>
         <context-group purpose="location">

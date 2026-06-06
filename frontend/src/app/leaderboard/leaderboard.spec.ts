@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/angular';
+import { render, screen, within } from '@testing-library/angular';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
@@ -91,17 +91,20 @@ describe('Leaderboard – stats columns', () => {
     await drainMicrotasks();
     fixture.detectChanges();
 
-    screen.getByText('7');
-    screen.getByText('14');
-    screen.getByText('3');
-    screen.getByText('4');
+    const aliceRow = screen.getByRole('row', { name: 'Alice' });
+    within(aliceRow).getByText('7 Sessions');
+    within(aliceRow).getByText('14');
+
+    const bobRow = screen.getByRole('row', { name: 'Bob' });
+    within(bobRow).getByText('3 Sessions');
+    within(bobRow).getByText('4');
   });
 });
 
 // ─── own-row highlight ────────────────────────────────────────────────────────
 
 describe('Leaderboard – own-row highlight', () => {
-  it('highlights the current player row with bg-grape-200 and leaves others plain', async () => {
+  it('marks the current player row as aria-current and leaves others plain', async () => {
     localStorage.setItem(
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
@@ -120,9 +123,8 @@ describe('Leaderboard – own-row highlight', () => {
     await drainMicrotasks();
     fixture.detectChanges();
 
-    const rows = screen.getAllByRole('listitem');
-    expect(rows[0].getAttribute('aria-current')).toBe('true');
-    expect(rows[1].getAttribute('aria-current')).toBeNull();
+    expect(screen.getByRole('row', { name: 'Alice' }).getAttribute('aria-current')).toBe('true');
+    expect(screen.getByRole('row', { name: 'Bob' }).getAttribute('aria-current')).toBeNull();
   });
 });
 
@@ -148,7 +150,7 @@ describe('Leaderboard – entries rendered', () => {
     await drainMicrotasks();
     fixture.detectChanges();
 
-    screen.getByText('Alice');
-    screen.getByText('Bob');
+    screen.getByRole('row', { name: 'Alice' });
+    screen.getByRole('row', { name: 'Bob' });
   });
 });

@@ -226,6 +226,10 @@
         <source> Heutige Ergebnisse </source>
         <target> Heutige Ergebnisse </target>
       </trans-unit>
+      <trans-unit id="leaderboard.rank" datatype="html">
+        <source>Rang</source>
+        <target>Rang</target>
+      </trans-unit>
       <trans-unit id="leaderboard.name" datatype="html">
         <source>Name</source>
         <target>Name</target>

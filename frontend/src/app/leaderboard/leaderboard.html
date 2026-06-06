@@ -19,69 +19,92 @@
       }
     </div>
 
-    <!-- ── Ranked list ── -->
+    <!-- ── Ranked table ── -->
     <section class="flex-1 bg-cream p-4">
-      <ul role="list" class="m-0 flex list-none flex-col gap-2 p-0">
-        @for (row of leaderboard.entries; track row.playerId; let i = $index) {
-          <li
-            class="flex items-center gap-3 rounded-xl px-3.5 py-3 motion-safe:animate-rise"
-            [class.shadow-1]="row.playerId !== entry.playerId()"
-            [class.bg-paper]="row.playerId !== entry.playerId()"
-            [class.border-2]="i === 0"
-            [class.border-marigold]="i === 0"
-            [class.bg-grape-200]="row.playerId === entry.playerId()"
-            [class.shadow-ring-grape]="row.playerId === entry.playerId()"
-            [style.animation-delay.ms]="i * 40"
-            [attr.aria-current]="row.playerId === entry.playerId() ? 'true' : null"
-            [attr.aria-label]="row.displayName"
-          >
-            <!-- Rank -->
-            <div
-              class="w-7 shrink-0 text-center font-pixel text-[10px]"
-              [class.text-marigold-700]="i === 0"
-              [class.text-plum-faint]="i !== 0"
+      <table class="w-full border-separate border-spacing-y-2">
+        <thead class="sr-only">
+          <tr>
+            <th scope="col" i18n="leaderboard|rank column header@@leaderboard.rank">Rang</th>
+            <th scope="col" i18n="leaderboard|player column header@@leaderboard.name">Name</th>
+            <th scope="col" i18n="leaderboard|points column header@@leaderboard.points">Punkte</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of leaderboard.entries; track row.playerId; let i = $index) {
+            <tr
+              class="motion-safe:animate-rise"
+              [class.bg-paper]="row.playerId !== entry.playerId()"
+              [class.shadow-1]="row.playerId !== entry.playerId()"
+              [class.bg-grape-200]="row.playerId === entry.playerId()"
+              [class.shadow-ring-grape]="row.playerId === entry.playerId()"
+              [style.animation-delay.ms]="i * 40"
+              [attr.aria-current]="row.playerId === entry.playerId() ? 'true' : null"
+              [attr.aria-label]="row.displayName"
             >
-              #{{ i + 1 }}
-            </div>
-
-            <!-- Avatar initial -->
-            <div
-              class="flex size-10 shrink-0 items-center justify-center rounded-full font-display text-base font-bold"
-              [style]="avatarStyle(i)"
-              aria-hidden="true"
-            >
-              {{ row.displayName.charAt(0).toUpperCase() }}
-            </div>
-
-            <!-- Name + sessions -->
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-1 font-body text-[15px] font-extrabold text-plum">
-                <span class="truncate">{{ row.displayName }}</span>
-                @if (i === 0) {
-                  <span aria-hidden="true">👑</span>
-                }
-              </div>
-              <div
-                class="font-body text-xs font-bold text-plum-faint"
-                i18n="leaderboard|sessions count@@leaderboard.sessionCount"
+              <!-- Rank -->
+              <td
+                class="w-7 rounded-l-xl py-3 pr-3 pl-3.5 text-center font-pixel text-[10px]"
+                [class.text-marigold-700]="i === 0"
+                [class.text-plum-faint]="i !== 0"
+                [class.border-l-2]="i === 0"
+                [class.border-y-2]="i === 0"
+                [class.border-marigold]="i === 0"
               >
-                {{ row.sessionsParticipated }} Sessions
-              </div>
-            </div>
+                #{{ i + 1 }}
+              </td>
 
-            <!-- Points -->
-            <div class="shrink-0 text-right">
-              <div class="font-pixel text-[11px] text-marigold-700">{{ row.totalPoints }}</div>
-              <div
-                class="font-body text-[10px] font-bold text-plum-faint"
-                i18n="leaderboard|points unit@@leaderboard.pts"
+              <!-- Avatar + name + sessions -->
+              <td
+                class="w-full min-w-0 py-3"
+                [class.border-y-2]="i === 0"
+                [class.border-marigold]="i === 0"
               >
-                Pkt.
-              </div>
-            </div>
-          </li>
-        }
-      </ul>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex size-10 shrink-0 items-center justify-center rounded-full font-display text-base font-bold"
+                    [style]="avatarStyle(i)"
+                    aria-hidden="true"
+                  >
+                    {{ row.displayName.charAt(0).toUpperCase() }}
+                  </div>
+                  <div class="min-w-0">
+                    <div
+                      class="flex items-center gap-1 font-body text-[15px] font-extrabold text-plum"
+                    >
+                      <span class="truncate">{{ row.displayName }}</span>
+                      @if (i === 0) {
+                        <span aria-hidden="true">👑</span>
+                      }
+                    </div>
+                    <div
+                      class="font-body text-xs font-bold text-plum-faint"
+                      i18n="leaderboard|sessions count@@leaderboard.sessionCount"
+                    >
+                      {{ row.sessionsParticipated }} Sessions
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Points -->
+              <td
+                class="rounded-r-xl py-3 pr-3.5 text-right"
+                [class.border-r-2]="i === 0"
+                [class.border-y-2]="i === 0"
+                [class.border-marigold]="i === 0"
+              >
+                <div class="font-pixel text-[11px] text-marigold-700">{{ row.totalPoints }}</div>
+                <div
+                  class="font-body text-[10px] font-bold text-plum-faint"
+                  i18n="leaderboard|points unit@@leaderboard.pts"
+                >
+                  Pkt.
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </section>
   </main>
 }
