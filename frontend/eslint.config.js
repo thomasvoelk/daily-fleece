@@ -122,6 +122,8 @@ module.exports = defineConfig([
             "accept",     // MIME types on file inputs
             "aria-live",  // ARIA token values (assertive, polite)
             "scope",      // HTML table attribute (col/row enum, not user-facing text)
+            "variant",    // ChunkyButton enum input, not user-facing text
+            "color",      // ChunkyButton enum input, not user-facing text
           ],
         },
       ],

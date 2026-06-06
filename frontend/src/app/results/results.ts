@@ -7,12 +7,13 @@ import {
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { ChunkyButton } from '../shared';
 import { Api, getTodaySession, getSessionResults, SessionResultsResponse } from '../backend-client';
 import { EntryContext } from '../entry';
 
 @Component({
   selector: 'app-results',
-  imports: [],
+  imports: [ChunkyButton],
   templateUrl: './results.html',
   styleUrl: './results.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

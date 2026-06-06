@@ -106,16 +106,15 @@
 
     @if (bothRevealed()) {
       <div class="px-4 pt-4 pb-8">
-        <button
-          type="button"
-          class="duration-fast w-full cursor-pointer rounded-full border-0 bg-marigold px-6 py-[15px] font-display text-[17px] font-semibold text-plum shadow-chunk-marigold transition-[transform,box-shadow] ease-smooth tap-transparent active:translate-y-[5px] active:shadow-chunk-marigold-pressed"
+        <app-chunky-button
+          color="marigold"
           (click)="refresh()"
           i18n="
             quiz|Button shown after both answers are revealed, navigates to
             results@@quiz.proceedToResults"
         >
           Proceed to results
-        </button>
+        </app-chunky-button>
       </div>
     } @else {
       <button

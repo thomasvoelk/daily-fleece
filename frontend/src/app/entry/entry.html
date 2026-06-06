@@ -46,23 +46,20 @@
       {{ store.phase() === 'error' ? store.errorMessage() : '' }}
     </p>
 
-    <button
-      type="button"
+    <app-chunky-button
       (click)="onJoinLobby()"
       [disabled]="store.phase() === 'loading'"
-      class="duration-fast w-full cursor-pointer rounded-full border-0 bg-grape px-6 py-[15px] font-display text-[17px] font-semibold text-white shadow-chunk-grape transition-[transform,box-shadow] ease-smooth tap-transparent active:translate-y-[5px] active:shadow-chunk-grape-pressed disabled:opacity-50"
       i18n="entry|Button to join an existing lobby@@entry.joinLobbyButton"
     >
       Join Lobby
-    </button>
-    <button
-      type="button"
+    </app-chunky-button>
+    <app-chunky-button
+      variant="outline"
       (click)="onCreateLobby()"
       [disabled]="store.phase() === 'loading'"
-      class="w-full cursor-pointer rounded-full border-2 border-grape bg-transparent px-5 py-[11px] font-display text-[14px] font-semibold text-grape tap-transparent disabled:opacity-50"
       i18n="entry|Button to create a new lobby@@entry.createLobbyButton"
     >
       Create Lobby
-    </button>
+    </app-chunky-button>
   </form>
 </main>

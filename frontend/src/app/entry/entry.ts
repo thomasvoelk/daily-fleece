@@ -2,11 +2,12 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { form, FormField, submit, required, maxLength } from '@angular/forms/signals';
 import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
+import { ChunkyButton } from '../shared';
 import { EntryStore } from './entry.store';
 
 @Component({
   selector: 'app-entry',
-  imports: [FormField, MatFormField, MatLabel, MatInput, MatError],
+  imports: [FormField, MatFormField, MatLabel, MatInput, MatError, ChunkyButton],
   templateUrl: './entry.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

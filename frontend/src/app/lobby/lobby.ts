@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChunkyButton } from '../shared';
 import { LobbyStore } from './lobby.store';
 
 const AVATAR_TONES = [
@@ -10,7 +11,7 @@ const AVATAR_TONES = [
 
 @Component({
   selector: 'app-lobby',
-  imports: [],
+  imports: [ChunkyButton],
   templateUrl: './lobby.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
