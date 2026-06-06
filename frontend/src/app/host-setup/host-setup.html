@@ -16,7 +16,13 @@
       >
         Q1 — Knowledge (calendar page)
       </label>
-      <input id="q1" type="file" accept="image/*" (change)="onQ1Change($event)" />
+      <input
+        id="q1"
+        type="file"
+        accept="image/*"
+        (change)="onQ1Change($event)"
+        class="file:font-display file:font-semibold file:text-sm file:bg-grape-200 file:text-grape-700 file:border-0 file:rounded-full file:py-1.5 file:px-3.5 file:cursor-pointer file:mr-2.5 file:transition-colors file:duration-fast hover:file:bg-grape hover:file:text-white"
+      />
       @if (q1Preview()) {
         <img
           [src]="q1Preview()"
@@ -35,7 +41,13 @@
       >
         Q2 — Geography (location)
       </label>
-      <input id="q2" type="file" accept="image/*" (change)="onQ2Change($event)" />
+      <input
+        id="q2"
+        type="file"
+        accept="image/*"
+        (change)="onQ2Change($event)"
+        class="file:font-display file:font-semibold file:text-sm file:bg-grape-200 file:text-grape-700 file:border-0 file:rounded-full file:py-1.5 file:px-3.5 file:cursor-pointer file:mr-2.5 file:transition-colors file:duration-fast hover:file:bg-grape hover:file:text-white"
+      />
       @if (q2Preview()) {
         <img
           [src]="q2Preview()"

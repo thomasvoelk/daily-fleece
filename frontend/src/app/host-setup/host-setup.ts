@@ -6,7 +6,6 @@ import { HostSetupStore } from './host-setup.store';
   selector: 'app-host-setup',
   imports: [MatButton],
   templateUrl: './host-setup.html',
-  styleUrl: './host-setup.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HostSetup {
