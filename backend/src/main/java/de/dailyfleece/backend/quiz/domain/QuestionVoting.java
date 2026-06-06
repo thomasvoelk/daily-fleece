@@ -3,6 +3,7 @@ package de.dailyfleece.backend.quiz.domain;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /** Tracks voting for one question: status, each player's answer, and the correct answer once declared. */
@@ -48,5 +49,13 @@ public final class QuestionVoting {
 
     public @Nullable String correctAnswer() {
         return correctAnswer;
+    }
+
+    public Optional<Map<String, String>> visibleAnswers() {
+        return status == VotingStatus.CLOSED ? Optional.of(Collections.unmodifiableMap(answers)) : Optional.empty();
+    }
+
+    public Optional<String> visibleCorrectAnswer() {
+        return status == VotingStatus.CLOSED ? Optional.ofNullable(correctAnswer) : Optional.empty();
     }
 }

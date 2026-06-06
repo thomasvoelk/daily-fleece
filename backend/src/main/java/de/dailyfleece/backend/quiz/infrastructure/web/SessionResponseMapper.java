@@ -47,14 +47,14 @@ class SessionResponseMapper {
                         ? QuestionVoting.StatusEnum.OPEN
                         : QuestionVoting.StatusEnum.CLOSED);
         dto.setAnswerCount(domain.answers().size());
-        if (domain.status() == VotingStatus.CLOSED) {
-            dto.setCorrectAnswer(domain.correctAnswer());
-            Map<String, PlayerAnswer> answers = domain.answers().entrySet().stream()
+        domain.visibleCorrectAnswer().ifPresent(dto::setCorrectAnswer);
+        domain.visibleAnswers().ifPresent(visible -> {
+            Map<String, PlayerAnswer> answers = visible.entrySet().stream()
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             e -> new PlayerAnswer(playerNames.getOrDefault(e.getKey(), ""), e.getValue())));
             dto.setAnswers(answers);
-        }
+        });
         return dto;
     }
 
