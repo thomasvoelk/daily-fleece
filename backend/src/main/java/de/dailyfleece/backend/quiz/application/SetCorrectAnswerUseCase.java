@@ -4,6 +4,7 @@ import de.dailyfleece.backend.quiz.api.SessionEndedDomainEvent;
 import de.dailyfleece.backend.quiz.api.SessionEndedDomainEvent.PlayerScore;
 import de.dailyfleece.backend.quiz.domain.QuestionKey;
 import de.dailyfleece.backend.quiz.domain.Session;
+import de.dailyfleece.backend.quiz.domain.SessionPhase;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -36,7 +37,7 @@ public class SetCorrectAnswerUseCase {
         }
         session.setCorrectAnswer(question, correctAnswer);
         sessionRepository.save(session);
-        if (question == QuestionKey.Q2) {
+        if (session.phase() == SessionPhase.ENDED) {
             List<PlayerScore> scores = session.results().stream()
                     .map(r -> new PlayerScore(r.playerId(), r.displayName(), r.totalPoints()))
                     .toList();
