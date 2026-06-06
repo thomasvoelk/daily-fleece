@@ -102,7 +102,8 @@
    Material view-encapsulation boundary without ::ng-deep
    ============================================================= */
 
-app-quiz mat-radio-button .mdc-form-field {
+app-quiz mat-radio-button .mdc-form-field,
+app-quiz-host-reveal mat-radio-button .mdc-form-field {
   display: grid;
   place-items: center;
   padding: 18px 22px;
@@ -120,16 +121,19 @@ app-quiz mat-radio-button .mdc-form-field {
   -webkit-tap-highlight-color: transparent;
 }
 
-app-quiz mat-radio-button .mdc-form-field:active {
+app-quiz mat-radio-button .mdc-form-field:active,
+app-quiz-host-reveal mat-radio-button .mdc-form-field:active {
   transform: translateY(4px);
   box-shadow: 0 0 0 var(--color-wool-line);
 }
 
-app-quiz mat-radio-button .mdc-radio {
+app-quiz mat-radio-button .mdc-radio,
+app-quiz-host-reveal mat-radio-button .mdc-radio {
   display: none;
 }
 
-app-quiz mat-radio-button label {
+app-quiz mat-radio-button label,
+app-quiz-host-reveal mat-radio-button label {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 30px;
@@ -140,12 +144,14 @@ app-quiz mat-radio-button label {
   margin: 0 !important;
 }
 
-app-quiz mat-radio-button.mat-mdc-radio-checked .mdc-form-field {
+app-quiz mat-radio-button.mat-mdc-radio-checked .mdc-form-field,
+app-quiz-host-reveal mat-radio-button.mat-mdc-radio-checked .mdc-form-field {
   border-color: var(--color-grape);
   background: var(--color-grape-200);
   box-shadow: 0 4px 0 var(--color-grape-700);
 }
 
-app-quiz mat-radio-button.mat-mdc-radio-checked label {
+app-quiz mat-radio-button.mat-mdc-radio-checked label,
+app-quiz-host-reveal mat-radio-button.mat-mdc-radio-checked label {
   color: var(--color-grape-700);
 }

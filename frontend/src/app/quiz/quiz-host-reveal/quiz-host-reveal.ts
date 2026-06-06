@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
-import { MatButton } from '@angular/material/button';
 import { CountryAutocomplete } from '../country-autocomplete/country-autocomplete';
 
 @Component({
   selector: 'app-quiz-host-reveal',
-  imports: [MatRadioGroup, MatRadioButton, MatButton, CountryAutocomplete],
+  imports: [MatRadioGroup, MatRadioButton, CountryAutocomplete],
   templateUrl: './quiz-host-reveal.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

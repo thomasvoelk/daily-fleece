@@ -13,7 +13,7 @@
     </mat-radio-group>
     <button
       type="button"
-      mat-flat-button
+      class="duration-fast w-full cursor-pointer rounded-full border-0 bg-coral px-6 py-[15px] font-display text-[17px] font-semibold text-white shadow-chunk-coral transition-[transform,box-shadow] ease-smooth tap-transparent active:translate-y-[5px] active:shadow-chunk-coral-pressed disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
       [disabled]="!selectedQ1Answer()"
       (click)="onCloseQ1()"
       i18n="quiz|Button to close the voting and reveal the correct answer@@quiz.closeVotingButton"
@@ -26,8 +26,7 @@
     <app-country-autocomplete (countrySelected)="selectedCountry.set($event)" />
     <button
       type="button"
-      mat-flat-button
-      disabledInteractive
+      class="duration-fast w-full cursor-pointer rounded-full border-0 bg-coral px-6 py-[15px] font-display text-[17px] font-semibold text-white shadow-chunk-coral transition-[transform,box-shadow] ease-smooth tap-transparent active:translate-y-[5px] active:shadow-chunk-coral-pressed disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
       [disabled]="!selectedCountry()"
       (click)="onCloseQ2()"
       i18n="quiz|Button to close Q2 voting and reveal the correct country@@quiz.closeQ2VotingButton"
