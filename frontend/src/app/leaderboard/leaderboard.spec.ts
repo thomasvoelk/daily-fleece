@@ -120,7 +120,7 @@ describe('Leaderboard – own-row highlight', () => {
     await drainMicrotasks();
     fixture.detectChanges();
 
-    const rows = fixture.nativeElement.querySelectorAll('tbody tr') as NodeListOf<HTMLElement>;
+    const rows = screen.getAllByRole('listitem');
     expect(rows[0].classList).toContain('bg-grape-200');
     expect(rows[0].getAttribute('aria-current')).toBe('true');
     expect(rows[1].classList).not.toContain('bg-grape-200');

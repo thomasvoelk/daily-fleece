@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { Api, getLeaderboard, LeaderboardResponse } from '../backend-client';
-import { EntryContext } from '../entry/entry-context';
+import { EntryContext } from '../entry';
 
 const AVATAR_TONES = [
   { background: 'var(--color-marigold-200)', color: 'var(--color-marigold-700)' },

@@ -9,7 +9,10 @@
         Rangliste
       </h1>
       @if (myRank(); as rank) {
-        <p class="mt-2 font-body text-sm font-semibold text-white/60">
+        <p
+          class="mt-2 font-body text-sm font-semibold text-white/60"
+          i18n="leaderboard|Current player rank display@@leaderboard.myRankText"
+        >
           Du bist aktuell auf
           <span class="font-pixel text-[11px] text-marigold">Platz {{ rank }}</span>
         </p>
@@ -17,8 +20,8 @@
     </div>
 
     <!-- ── Ranked list ── -->
-    <section class="flex-1 bg-cream px-4 py-4">
-      <ul role="list" class="m-0 list-none flex flex-col gap-2 p-0">
+    <section class="flex-1 bg-cream p-4">
+      <ul role="list" class="m-0 flex list-none flex-col gap-2 p-0">
         @for (row of leaderboard.entries; track row.playerId; let i = $index) {
           <li
             class="flex items-center gap-3 rounded-xl px-3.5 py-3 motion-safe:animate-rise"
@@ -43,7 +46,7 @@
 
             <!-- Avatar initial -->
             <div
-              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-display text-base font-bold"
+              class="flex size-10 shrink-0 items-center justify-center rounded-full font-display text-base font-bold"
               [style]="avatarStyle(i)"
               aria-hidden="true"
             >

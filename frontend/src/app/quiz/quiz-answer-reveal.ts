@@ -13,6 +13,6 @@ export interface AnswerEntry {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuizAnswerReveal {
-  correctAnswer = input.required<string>();
-  entries = input.required<AnswerEntry[]>();
+  readonly correctAnswer = input.required<string>();
+  readonly entries = input.required<AnswerEntry[]>();
 }
