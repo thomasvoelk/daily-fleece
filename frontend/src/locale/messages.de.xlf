@@ -154,6 +154,22 @@
         <source> Close voting </source>
         <target> Abstimmung schließen </target>
       </trans-unit>
+      <trans-unit id="quiz.iconPublic" datatype="html">
+        <source>public</source>
+        <target>public</target>
+      </trans-unit>
+      <trans-unit id="quiz.iconPsychology" datatype="html">
+        <source>psychology</source>
+        <target>psychology</target>
+      </trans-unit>
+      <trans-unit id="quiz.categoryChipKnowledge" datatype="html">
+        <source>KNOWLEDGE</source>
+        <target>WER WEISS DENN SOWAS?</target>
+      </trans-unit>
+      <trans-unit id="quiz.categoryChipGeography" datatype="html">
+        <source>GEOGRAPHY</source>
+        <target>ERDKUNDE</target>
+      </trans-unit>
       <trans-unit id="quiz.refreshButton" datatype="html">
         <source>Refresh</source>
         <target>Neu laden</target>
