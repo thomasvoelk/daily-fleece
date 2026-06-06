@@ -6,7 +6,7 @@
         <source> Daily Fleece </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/entry/entry.html</context>
-          <context context-type="linenumber">8,12</context>
+          <context context-type="linenumber">7,11</context>
         </context-group>
         <note priority="1" from="description">Heading on the entry screen</note>
         <note priority="1" from="meaning">entry</note>
@@ -15,7 +15,7 @@
         <source>Company ID</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/entry/entry.html</context>
-          <context context-type="linenumber">13,17</context>
+          <context context-type="linenumber">12,14</context>
         </context-group>
         <note priority="1" from="description">Label for the Company ID input</note>
         <note priority="1" from="meaning">entry</note>
@@ -24,7 +24,7 @@
         <source>Display name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/entry/entry.html</context>
-          <context context-type="linenumber">27,31</context>
+          <context context-type="linenumber">22,24</context>
         </context-group>
         <note priority="1" from="description">Label for the Display name input</note>
         <note priority="1" from="meaning">entry</note>
@@ -33,7 +33,7 @@
         <source> Join Lobby </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/entry/entry.html</context>
-          <context context-type="linenumber">51,55</context>
+          <context context-type="linenumber">43,47</context>
         </context-group>
         <note priority="1" from="description">Button to join an existing lobby</note>
         <note priority="1" from="meaning">entry</note>
@@ -42,7 +42,7 @@
         <source> Create Lobby </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/entry/entry.html</context>
-          <context context-type="linenumber">60,65</context>
+          <context context-type="linenumber">53,58</context>
         </context-group>
         <note priority="1" from="description">Button to create a new lobby</note>
         <note priority="1" from="meaning">entry</note>
@@ -51,7 +51,7 @@
         <source>Something went wrong. Please try again.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/entry/entry.store.ts</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">45</context>
         </context-group>
         <note priority="1" from="description">Generic error on create</note>
         <note priority="1" from="meaning">entry</note>
@@ -60,7 +60,7 @@
         <source>Something went wrong. Please try again.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/entry/entry.store.ts</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">67</context>
         </context-group>
         <note priority="1" from="description">Generic error on join</note>
         <note priority="1" from="meaning">entry</note>
@@ -69,7 +69,7 @@
         <source>Required</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/entry/entry.ts</context>
-          <context context-type="linenumber">22</context>
+          <context context-type="linenumber">24</context>
         </context-group>
         <note priority="1" from="description">Validation error when Company ID is empty</note>
         <note priority="1" from="meaning">entry</note>
@@ -78,7 +78,7 @@
         <source>Required</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/entry/entry.ts</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <note priority="1" from="description">Validation error when Display name is empty</note>
         <note priority="1" from="meaning">entry</note>
@@ -87,7 +87,7 @@
         <source>Maximum 20 characters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/entry/entry.ts</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">30</context>
         </context-group>
         <note priority="1" from="description">Validation error when Display name exceeds 20 characters</note>
         <note priority="1" from="meaning">entry</note>
@@ -96,7 +96,7 @@
         <source> Host Setup </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/host-setup/host-setup.html</context>
-          <context context-type="linenumber">11,15</context>
+          <context context-type="linenumber">8,11</context>
         </context-group>
         <note priority="1" from="description">Heading on the host setup screen</note>
         <note priority="1" from="meaning">hostSetup</note>
@@ -105,36 +105,45 @@
         <source> Q1 — Knowledge (calendar page) </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/host-setup/host-setup.html</context>
-          <context context-type="linenumber">16,20</context>
+          <context context-type="linenumber">17,21</context>
         </context-group>
         <note priority="1" from="description">Label for the Q1 file picker</note>
+        <note priority="1" from="meaning">hostSetup</note>
+      </trans-unit>
+      <trans-unit id="hostSetup.q1PreviewAlt" datatype="html">
+        <source>Q1 photo preview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/host-setup/host-setup.html</context>
+          <context context-type="linenumber">29,30</context>
+        </context-group>
+        <note priority="1" from="description">Alt text for Q1 photo preview</note>
         <note priority="1" from="meaning">hostSetup</note>
       </trans-unit>
       <trans-unit id="hostSetup.q2Label" datatype="html">
         <source> Q2 — Geography (location) </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/host-setup/host-setup.html</context>
-          <context context-type="linenumber">37,41</context>
+          <context context-type="linenumber">42,46</context>
         </context-group>
         <note priority="1" from="description">Label for the Q2 file picker</note>
+        <note priority="1" from="meaning">hostSetup</note>
+      </trans-unit>
+      <trans-unit id="hostSetup.q2PreviewAlt" datatype="html">
+        <source>Q2 photo preview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/host-setup/host-setup.html</context>
+          <context context-type="linenumber">54,55</context>
+        </context-group>
+        <note priority="1" from="description">Alt text for Q2 photo preview</note>
         <note priority="1" from="meaning">hostSetup</note>
       </trans-unit>
       <trans-unit id="hostSetup.createSessionButton" datatype="html">
         <source> Create Session </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/host-setup/host-setup.html</context>
-          <context context-type="linenumber">71,75</context>
+          <context context-type="linenumber">77,81</context>
         </context-group>
         <note priority="1" from="description">Button to create a session</note>
-        <note priority="1" from="meaning">hostSetup</note>
-      </trans-unit>
-      <trans-unit id="hostSetup.createError" datatype="html">
-        <source>Something went wrong. Please try again.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/host-setup/host-setup.store.ts</context>
-          <context context-type="linenumber">56</context>
-        </context-group>
-        <note priority="1" from="description">Error shown when session creation fails</note>
         <note priority="1" from="meaning">hostSetup</note>
       </trans-unit>
       <trans-unit id="hostSetup.missingIdentity" datatype="html">
@@ -145,6 +154,42 @@
         </context-group>
         <note priority="1" from="description">Error shown when player identity is missing</note>
         <note priority="1" from="meaning">hostSetup</note>
+      </trans-unit>
+      <trans-unit id="hostSetup.createError" datatype="html">
+        <source>Something went wrong. Please try again.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/host-setup/host-setup.store.ts</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+        <note priority="1" from="description">Error shown when session creation fails</note>
+        <note priority="1" from="meaning">hostSetup</note>
+      </trans-unit>
+      <trans-unit id="leaderboard.title" datatype="html">
+        <source> Rangliste </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/leaderboard/leaderboard.html</context>
+          <context context-type="linenumber">9,12</context>
+        </context-group>
+        <note priority="1" from="description">page title</note>
+        <note priority="1" from="meaning">leaderboard</note>
+      </trans-unit>
+      <trans-unit id="leaderboard.sessionCount" datatype="html">
+        <source> <x id="INTERPOLATION" equiv-text="{{ row.sessionsParticipated }}"/> Sessions </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/leaderboard/leaderboard.html</context>
+          <context context-type="linenumber">65,66</context>
+        </context-group>
+        <note priority="1" from="description">sessions count</note>
+        <note priority="1" from="meaning">leaderboard</note>
+      </trans-unit>
+      <trans-unit id="leaderboard.pts" datatype="html">
+        <source> Pkt. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/leaderboard/leaderboard.html</context>
+          <context context-type="linenumber">76,78</context>
+        </context-group>
+        <note priority="1" from="description">points unit</note>
+        <note priority="1" from="meaning">leaderboard</note>
       </trans-unit>
       <trans-unit id="lobby.heading" datatype="html">
         <source> Today&apos;s Session </source>
@@ -159,7 +204,7 @@
         <source>Players in session</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/lobby/lobby.html</context>
-          <context context-type="linenumber">9,11</context>
+          <context context-type="linenumber">8,9</context>
         </context-group>
         <note priority="1" from="description">Accessible label for the player list</note>
         <note priority="1" from="meaning">lobby</note>
@@ -168,7 +213,7 @@
         <source> Go to Quiz </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/lobby/lobby.html</context>
-          <context context-type="linenumber">17,21</context>
+          <context context-type="linenumber">22,26</context>
         </context-group>
         <note priority="1" from="description">Button to navigate to the quiz</note>
         <note priority="1" from="meaning">lobby</note>
@@ -177,31 +222,69 @@
         <source> Start Quiz </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/lobby/lobby.html</context>
-          <context context-type="linenumber">25,29</context>
+          <context context-type="linenumber">31,35</context>
         </context-group>
         <note priority="1" from="description">Button for host to start the quiz</note>
         <note priority="1" from="meaning">lobby</note>
       </trans-unit>
-      <trans-unit id="quiz.lightboxCloseButton" datatype="html">
-        <source>Close lightbox</source>
+      <trans-unit id="lobby.quizNotStarted" datatype="html">
+        <source>Quiz not started yet. Please wait.</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="sourcefile">src/app/lobby/lobby.store.ts</context>
+          <context context-type="linenumber">45</context>
         </context-group>
-        <note priority="1" from="description">Close button for the photo lightbox</note>
+        <note priority="1" from="description">Error shown when quiz has not started yet</note>
+        <note priority="1" from="meaning">lobby</note>
+      </trans-unit>
+      <trans-unit id="quiz.correctAnswerLabel" datatype="html">
+        <source> Correct answer: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION" equiv-text="{{ correctAnswer() }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz-answer-reveal.html</context>
+          <context context-type="linenumber">7,9</context>
+        </context-group>
+        <note priority="1" from="description">Correct answer label in answer reveal card</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
       <trans-unit id="quiz.q1PhotoAlt" datatype="html">
         <source>Question 1</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">11,12</context>
         </context-group>
         <note priority="1" from="description">Alt text for the Q1 photo</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.lightboxDialogAriaLabel" datatype="html">
+        <source>Photo lightbox</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">22,24</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">68,70</context>
+        </context-group>
+        <note priority="1" from="description">Accessible label for the photo lightbox dialog</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.lightboxCloseButton" datatype="html">
+        <source>Close lightbox</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">32,33</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">78,79</context>
+        </context-group>
+        <note priority="1" from="description">Close button for the photo lightbox</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
       <trans-unit id="quiz.q1PhotoExpandedAlt" datatype="html">
         <source>Question 1 enlarged</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">40,42</context>
         </context-group>
         <note priority="1" from="description">Alt text for the enlarged Q1 photo in the lightbox</note>
         <note priority="1" from="meaning">quiz</note>
@@ -210,6 +293,7 @@
         <source>Question 2</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">57,58</context>
         </context-group>
         <note priority="1" from="description">Alt text for the Q2 photo</note>
         <note priority="1" from="meaning">quiz</note>
@@ -218,122 +302,227 @@
         <source>Question 2 enlarged</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">86,88</context>
         </context-group>
         <note priority="1" from="description">Alt text for the enlarged Q2 photo in the lightbox</note>
-        <note priority="1" from="meaning">quiz</note>
-      </trans-unit>
-      <trans-unit id="quiz.q2AnswerCount" datatype="html">
-        <source><x id="INTERPOLATION" equiv-text="{{ quizStore.q2AnswerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.q2AnswerCount().total }}"/> answered</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
-        </context-group>
-        <note priority="1" from="description">Number of Q2 answers submitted out of total</note>
-        <note priority="1" from="meaning">quiz</note>
-      </trans-unit>
-      <trans-unit id="quiz.answerCount" datatype="html">
-        <source><x id="INTERPOLATION" equiv-text="{{ quizStore.answerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.answerCount().total }}"/> answered</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
-        </context-group>
-        <note priority="1" from="description">Number of answers submitted out of total</note>
-        <note priority="1" from="meaning">quiz</note>
-      </trans-unit>
-      <trans-unit id="quiz.answerPrompt" datatype="html">
-        <source>Please choose your answer</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
-        </context-group>
-        <note priority="1" from="description">Prompt shown when the player has not yet answered</note>
-        <note priority="1" from="meaning">quiz</note>
-      </trans-unit>
-      <trans-unit id="quiz.correctAnswer" datatype="html">
-        <source>Correct answer: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION" equiv-text="{{ session.voting.q1.correctAnswer }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
-        </context-group>
-        <note priority="1" from="description">Reveals the correct answer after voting closes</note>
-        <note priority="1" from="meaning">quiz</note>
-      </trans-unit>
-      <trans-unit id="quiz.hostControlsAriaLabel" datatype="html">
-        <source>Host controls</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
-        </context-group>
-        <note priority="1" from="description">Accessible label for the host controls section</note>
-        <note priority="1" from="meaning">quiz</note>
-      </trans-unit>
-      <trans-unit id="quiz.closeVotingButton" datatype="html">
-        <source>Close voting</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
-        </context-group>
-        <note priority="1" from="description">Button to close the voting and reveal the correct answer</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
       <trans-unit id="quiz.countryLabel" datatype="html">
         <source>Country</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">97,101</context>
         </context-group>
         <note priority="1" from="description">Label for the Q2 country picker</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.q2AnswerCount" datatype="html">
+        <source> <x id="INTERPOLATION" equiv-text="{{ quizStore.q2AnswerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.q2AnswerCount().total }}"/> answered </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">125,127</context>
+        </context-group>
+        <note priority="1" from="description">Number of Q2 answers submitted out of total</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.answerCount" datatype="html">
+        <source> <x id="INTERPOLATION" equiv-text="{{ quizStore.answerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.answerCount().total }}"/> answered </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">132,135</context>
+        </context-group>
+        <note priority="1" from="description">Number of answers submitted out of total</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.answerPrompt" datatype="html">
+        <source> Please choose your answer </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">142,147</context>
+        </context-group>
+        <note priority="1" from="description">Prompt shown when the player has not yet answered</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.answerGroupAriaLabel" datatype="html">
+        <source>Answer</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">150,151</context>
+        </context-group>
+        <note priority="1" from="description">Accessible label for the player answer radio group</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.hostControlsAriaLabel" datatype="html">
+        <source>Host controls</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">178,180</context>
+        </context-group>
+        <note priority="1" from="description">Accessible label for the host controls section</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.closeVotingButton" datatype="html">
+        <source> Close voting </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">198,203</context>
+        </context-group>
+        <note priority="1" from="description">Button to close the voting and reveal the correct answer</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
       <trans-unit id="quiz.hostCountryLabel" datatype="html">
         <source>Country</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">206,210</context>
         </context-group>
         <note priority="1" from="description">Label for the host Q2 correct-country picker</note>
-        <note priority="1" from="meaning">quiz</note>
-      </trans-unit>
-      <trans-unit id="quiz.q2CorrectAnswer" datatype="html">
-        <source> Correct answer: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION" equiv-text="{{ countryName(session.voting.q2.correctAnswer) }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
-        </context-group>
-        <note priority="1" from="description">Reveals the correct Q2 country after voting closes</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
       <trans-unit id="quiz.closeQ2VotingButton" datatype="html">
         <source> Close voting </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">243,251</context>
         </context-group>
-        <note priority="1" from="description">Button to close Q2 voting and reveal the correct country</note>
+        <note priority="1" from="description">Button to close Q2 voting and reveal the correct
+              country</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
       <trans-unit id="quiz.refreshButton" datatype="html">
-        <source>Refresh</source>
+        <source> Refresh </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">256,260</context>
         </context-group>
         <note priority="1" from="description">Button to reload the current quiz state</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
-      <trans-unit id="hostSetup.q1PreviewAlt" datatype="html">
-        <source>Q1 photo preview</source>
+      <trans-unit id="results.headlinePerfect" datatype="html">
+        <source> Perfekt! 🦙 </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/host-setup/host-setup.html</context>
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">31,34</context>
         </context-group>
-        <note priority="1" from="description">Alt text for Q1 photo preview</note>
-        <note priority="1" from="meaning">hostSetup</note>
+        <note priority="1" from="description">perfect score headline</note>
+        <note priority="1" from="meaning">results</note>
       </trans-unit>
-      <trans-unit id="hostSetup.q2PreviewAlt" datatype="html">
-        <source>Q2 photo preview</source>
+      <trans-unit id="results.subtitlePerfect" datatype="html">
+        <source> Beide Fragen richtig — stark! </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/host-setup/host-setup.html</context>
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">37,39</context>
         </context-group>
-        <note priority="1" from="description">Alt text for Q2 photo preview</note>
-        <note priority="1" from="meaning">hostSetup</note>
+        <note priority="1" from="description">perfect score subtitle</note>
+        <note priority="1" from="meaning">results</note>
       </trans-unit>
-      <trans-unit id="lobby.quizNotStarted" datatype="html">
-        <source>Quiz not started yet. Please wait.</source>
+      <trans-unit id="results.headlinePartial" datatype="html">
+        <source> Gut dabei! 🦙 </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/lobby/lobby.store.ts</context>
-          <context context-type="linenumber">46</context>
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">44,47</context>
         </context-group>
-        <note priority="1" from="description">Error shown when quiz has not started yet</note>
-        <note priority="1" from="meaning">lobby</note>
+        <note priority="1" from="description">partial score headline</note>
+        <note priority="1" from="meaning">results</note>
+      </trans-unit>
+      <trans-unit id="results.subtitlePartial" datatype="html">
+        <source> Eine von zwei — morgen holst du auf. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">50,54</context>
+        </context-group>
+        <note priority="1" from="description">partial score subtitle</note>
+        <note priority="1" from="meaning">results</note>
+      </trans-unit>
+      <trans-unit id="results.headlineZero" datatype="html">
+        <source> Weiter so! 🦙 </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">57,60</context>
+        </context-group>
+        <note priority="1" from="description">zero score headline</note>
+        <note priority="1" from="meaning">results</note>
+      </trans-unit>
+      <trans-unit id="results.subtitleZero" datatype="html">
+        <source> Morgen ist ein frischer Start. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">63,67</context>
+        </context-group>
+        <note priority="1" from="description">zero score subtitle</note>
+        <note priority="1" from="meaning">results</note>
+      </trans-unit>
+      <trans-unit id="results.q1" datatype="html">
+        <source> F1 </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">79,81</context>
+        </context-group>
+        <note priority="1" from="description">question 1 label</note>
+        <note priority="1" from="meaning">results</note>
+      </trans-unit>
+      <trans-unit id="results.q2" datatype="html">
+        <source> F2 </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">96,98</context>
+        </context-group>
+        <note priority="1" from="description">question 2 label</note>
+        <note priority="1" from="meaning">results</note>
+      </trans-unit>
+      <trans-unit id="results.statsPoints" datatype="html">
+        <source> PUNKTE </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">110,112</context>
+        </context-group>
+        <note priority="1" from="description">points earned label</note>
+        <note priority="1" from="meaning">results</note>
+      </trans-unit>
+      <trans-unit id="results.statsRank" datatype="html">
+        <source> RANG </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">123,125</context>
+        </context-group>
+        <note priority="1" from="description">rank label</note>
+        <note priority="1" from="meaning">results</note>
+      </trans-unit>
+      <trans-unit id="results.headlineDone" datatype="html">
+        <source> Session vorbei! 🦙 </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">136,139</context>
+        </context-group>
+        <note priority="1" from="description">session done headline</note>
+        <note priority="1" from="meaning">results</note>
+      </trans-unit>
+      <trans-unit id="results.subtitleDone" datatype="html">
+        <source> Schau dir die Ergebnisse an. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">142,148</context>
+        </context-group>
+        <note priority="1" from="description">session done subtitle</note>
+        <note priority="1" from="meaning">results</note>
+      </trans-unit>
+      <trans-unit id="results.boardHeading" datatype="html">
+        <source> Heutige Ergebnisse </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">153,155</context>
+        </context-group>
+        <note priority="1" from="description">board section heading</note>
+        <note priority="1" from="meaning">results</note>
+      </trans-unit>
+      <trans-unit id="results.leaderboard" datatype="html">
+        <source> Zum Leaderboard </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/results/results.html</context>
+          <context context-type="linenumber">202,206</context>
+        </context-group>
+        <note priority="1" from="description">leaderboard button</note>
+        <note priority="1" from="meaning">results</note>
       </trans-unit>
     </body>
   </file>
