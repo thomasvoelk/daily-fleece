@@ -134,7 +134,7 @@ class SessionTest {
     void submitting_answer_to_closed_voting_throws() {
         Session session = Session.create(DATE, HOST_ID, HOST_NAME);
         session.start();
-        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "A");
+        session.setCorrectAnswer(QuestionKey.Q1, "A");
 
         assertThatThrownBy(() -> session.submitAnswer(QuestionKey.Q1, PLAYER_1, "B"))
                 .isInstanceOf(VotingClosed.class);
@@ -145,7 +145,7 @@ class SessionTest {
         Session session = Session.create(DATE, HOST_ID, HOST_NAME);
         session.start();
 
-        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.setCorrectAnswer(QuestionKey.Q1, "B");
 
         assertThat(session.q1Voting().get().status()).isEqualTo(VotingStatus.CLOSED);
         assertThat(session.q1Voting().get().correctAnswer()).isEqualTo("B");
@@ -158,9 +158,9 @@ class SessionTest {
     void setCorrectAnswer_on_q2_closes_q2_and_ends_session() {
         Session session = Session.create(DATE, HOST_ID, HOST_NAME);
         session.start();
-        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "A");
+        session.setCorrectAnswer(QuestionKey.Q1, "A");
 
-        session.setCorrectAnswer(QuestionKey.Q2, HOST_ID, "DE");
+        session.setCorrectAnswer(QuestionKey.Q2, "DE");
 
         assertThat(session.q2Voting().get().status()).isEqualTo(VotingStatus.CLOSED);
         assertThat(session.q2Voting().get().correctAnswer()).isEqualTo("DE");
@@ -172,9 +172,9 @@ class SessionTest {
         Session session = Session.create(DATE, HOST_ID, HOST_NAME);
         session.start();
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
-        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.setCorrectAnswer(QuestionKey.Q1, "B");
         session.submitAnswer(QuestionKey.Q2, HOST_ID, "DE");
-        session.setCorrectAnswer(QuestionKey.Q2, HOST_ID, "DE");
+        session.setCorrectAnswer(QuestionKey.Q2, "DE");
 
         List<PlayerResult> results = session.results();
 
@@ -191,8 +191,8 @@ class SessionTest {
         Session session = Session.create(DATE, HOST_ID, HOST_NAME);
         session.join(PLAYER_1, new PlayerName("Anna"));
         session.start();
-        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
-        session.setCorrectAnswer(QuestionKey.Q2, HOST_ID, "DE");
+        session.setCorrectAnswer(QuestionKey.Q1, "B");
+        session.setCorrectAnswer(QuestionKey.Q2, "DE");
 
         List<PlayerResult> results = session.results();
 
@@ -210,9 +210,9 @@ class SessionTest {
         Session session = Session.create(DATE, HOST_ID, HOST_NAME);
         session.start();
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
-        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.setCorrectAnswer(QuestionKey.Q1, "B");
         session.submitAnswer(QuestionKey.Q2, HOST_ID, "FR");
-        session.setCorrectAnswer(QuestionKey.Q2, HOST_ID, "DE");
+        session.setCorrectAnswer(QuestionKey.Q2, "DE");
 
         List<PlayerResult> results = session.results();
 

@@ -89,7 +89,7 @@ public final class Session {
         voting.submitAnswer(playerId.toString(), answer);
     }
 
-    public void setCorrectAnswer(QuestionKey question, UUID hostId, String correctAnswer) {
+    public void setCorrectAnswer(QuestionKey question, String correctAnswer) {
         votingFor(question).close(correctAnswer);
         if (question == QuestionKey.Q1) {
             q2Voting = QuestionVoting.open();

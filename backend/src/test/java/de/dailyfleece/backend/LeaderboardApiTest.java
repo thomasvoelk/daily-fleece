@@ -164,7 +164,7 @@ class LeaderboardApiTest {
                 Session.create(LocalDate.now(ZoneId.systemDefault()).plusDays(sessionDateOffset++), hostId, hostName);
         session.start();
         if (q1Answer != null) session.submitAnswer(QuestionKey.Q1, hostId, q1Answer);
-        session.setCorrectAnswer(QuestionKey.Q1, hostId, "B");
+        session.setCorrectAnswer(QuestionKey.Q1, "B");
         if (q2Answer != null) session.submitAnswer(QuestionKey.Q2, hostId, q2Answer);
         sessionRepository.save(session);
 
@@ -181,7 +181,7 @@ class LeaderboardApiTest {
         session.join(PLAYER_ID, new PlayerName("Anna"));
         session.start();
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
-        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.setCorrectAnswer(QuestionKey.Q1, "B");
         session.submitAnswer(QuestionKey.Q2, HOST_ID, "DE");
         sessionRepository.save(session);
 

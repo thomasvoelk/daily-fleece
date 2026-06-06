@@ -350,7 +350,7 @@ class SessionApiTest {
     void setCorrectAnswer_on_q2_returns_200_with_session_ended() {
         Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
         session.start();
-        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "A");
+        session.setCorrectAnswer(QuestionKey.Q1, "A");
         sessionRepository.save(session);
 
         ResponseEntity<Map<String, Object>> response = http.post()
@@ -368,7 +368,7 @@ class SessionApiTest {
         Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
         session.start();
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
-        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.setCorrectAnswer(QuestionKey.Q1, "B");
         session.submitAnswer(QuestionKey.Q2, HOST_ID, "DE");
         sessionRepository.save(session);
 
@@ -439,7 +439,7 @@ class SessionApiTest {
     void submitAnswer_returns_409_when_voting_is_closed() {
         Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
         session.start();
-        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "A");
+        session.setCorrectAnswer(QuestionKey.Q1, "A");
         sessionRepository.save(session);
 
         ResponseEntity<Map<String, Object>> response = http.put()
@@ -456,9 +456,9 @@ class SessionApiTest {
         Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
         session.start();
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
-        session.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.setCorrectAnswer(QuestionKey.Q1, "B");
         session.submitAnswer(QuestionKey.Q2, HOST_ID, "DE");
-        session.setCorrectAnswer(QuestionKey.Q2, HOST_ID, "DE");
+        session.setCorrectAnswer(QuestionKey.Q2, "DE");
         sessionRepository.save(session);
 
         ResponseEntity<Map<String, Object>> response = http.get()

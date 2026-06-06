@@ -47,9 +47,9 @@ class GetSessionResultsUseCaseTest {
         saved.join(PLAYER_1, new PlayerName("Anna"));
         saved.start();
         saved.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
-        saved.setCorrectAnswer(QuestionKey.Q1, HOST_ID, "B");
+        saved.setCorrectAnswer(QuestionKey.Q1, "B");
         saved.submitAnswer(QuestionKey.Q2, HOST_ID, "DE");
-        saved.setCorrectAnswer(QuestionKey.Q2, HOST_ID, "DE");
+        saved.setCorrectAnswer(QuestionKey.Q2, "DE");
         sessionRepository.save(saved);
 
         Session session = useCase.get(saved.sessionId());

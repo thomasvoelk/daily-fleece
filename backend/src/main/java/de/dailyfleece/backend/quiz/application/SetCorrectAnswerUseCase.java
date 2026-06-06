@@ -34,7 +34,7 @@ public class SetCorrectAnswerUseCase {
         if (!session.hostId().equals(requestingPlayerId)) {
             throw new NotTheHost(sessionId, requestingPlayerId);
         }
-        session.setCorrectAnswer(question, requestingPlayerId, correctAnswer);
+        session.setCorrectAnswer(question, correctAnswer);
         sessionRepository.save(session);
         if (question == QuestionKey.Q2) {
             List<PlayerScore> scores = session.results().stream()
