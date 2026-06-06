@@ -130,7 +130,12 @@ describe('Quiz – answer radio buttons', () => {
   });
 
   it('hides Q1 A/B/C radio group when Q2 voting is open', async () => {
-    await renderQuiz({ q2Status: signal('Open' as const) });
+    await renderQuiz({ q1Status: signal('Closed' as const), q2Status: signal('Open' as const) });
+    expect(screen.queryByRole('radiogroup', { name: /answer/i })).toBeNull();
+  });
+
+  it('hides Q1 A/B/C radio group when Q1 voting is Closed', async () => {
+    await renderQuiz({ q1Status: signal('Closed' as const) });
     expect(screen.queryByRole('radiogroup', { name: /answer/i })).toBeNull();
   });
 

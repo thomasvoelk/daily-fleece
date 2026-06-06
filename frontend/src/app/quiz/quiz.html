@@ -45,8 +45,8 @@
       </div>
     }
 
-    @if (quizStore.q2Status() !== 'Open') {
-      @if (quizStore.q1Status() === 'Open' && !quizStore.myQ1Answer()) {
+    @if (quizStore.q1Status() === 'Open') {
+      @if (!quizStore.myQ1Answer()) {
         <p
           class="px-4 py-1 text-center font-body text-sm font-bold text-plum-soft"
           i18n="quiz|Prompt shown when the player has not yet answered@@quiz.answerPrompt"
