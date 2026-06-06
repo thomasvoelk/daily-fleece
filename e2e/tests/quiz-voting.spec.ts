@@ -52,7 +52,7 @@ test('UC-04+05: Q1 voting — answer submission, refresh, close voting, reveal',
   await expect(playerAnswerGroup.getByRole('radio', { name: 'A', exact: true })).not.toBeChecked();
 
   // ── UC-04 Scenario 4: host refreshes — answer count shows 1/2 ──────────
-  await page.getByRole('button', { name: 'Aktualisieren' }).click();
+  await page.getByRole('button', { name: 'Neu laden' }).click();
   await expect(page.getByText('1/2 beantwortet')).toBeVisible();
 
   // ── UC-05 Scenario 1: host picks correct answer A and closes voting ──────
@@ -66,7 +66,7 @@ test('UC-04+05: Q1 voting — answer submission, refresh, close voting, reveal',
   await expect(page.getByRole('button', { name: 'Abstimmung schließen' })).not.toBeEnabled();
 
   // ── UC-05 Scenario 3: player refreshes — sees same revealed state ────────
-  await playerPage.getByRole('button', { name: 'Aktualisieren' }).click();
+  await playerPage.getByRole('button', { name: 'Neu laden' }).click();
   await expect(playerPage.getByText(/Richtige Antwort:.*A/)).toBeVisible();
   await expect(playerPage.getByRole('list').getByRole('listitem').filter({ hasText: 'Bob Spieler' })).toContainText('B');
 

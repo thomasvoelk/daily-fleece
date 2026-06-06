@@ -303,6 +303,16 @@ export class Quiz {
     this.quizStore.q2Status() === 'Open' ? 'q2' : 'q1',
   );
 
+  protected readonly bothRevealed = computed(() => {
+    const session = this.quizStore.session();
+    return (
+      this.quizStore.q1Status() === 'Closed' &&
+      !!session?.voting.q1.correctAnswer &&
+      this.quizStore.q2Status() === 'Closed' &&
+      !!session.voting.q2.correctAnswer
+    );
+  });
+
   protected readonly q1AnswerEntries = computed(() =>
     Object.values(this.quizStore.session()?.voting.q1.answers ?? {}),
   );

@@ -46,7 +46,7 @@ test('UC-06+07+08+09: Q2 geography voting — player submits country, host close
 
   // ── UC-06 Scenario 1: both see Q2 photo ─────────────────────────────────
   await expect(page.getByRole('img', { name: 'Frage 2' })).toBeVisible();
-  await playerPage.getByRole('button', { name: 'Aktualisieren' }).click();
+  await playerPage.getByRole('button', { name: 'Neu laden' }).click();
   await expect(playerPage.getByRole('img', { name: 'Frage 2' })).toBeVisible();
 
   // ── UC-06 Scenario 2: Q1 A/B/C radio group is no longer shown ───────────
@@ -59,7 +59,7 @@ test('UC-06+07+08+09: Q2 geography voting — player submits country, host close
   await playerPage.getByRole('option', { name: 'Deutschland' }).click();
 
   // ── UC-07 Scenario 1: host sees Q2 answer count update ──────────────────
-  await page.getByRole('button', { name: 'Aktualisieren' }).click();
+  await page.getByRole('button', { name: 'Neu laden' }).click();
   await expect(page.getByText('1/2 beantwortet')).toBeVisible();
 
   // ── UC-07 Scenario 2: host selects correct country via typeahead ─────────
@@ -77,11 +77,11 @@ test('UC-06+07+08+09: Q2 geography voting — player submits country, host close
   await expect(page.getByText('Bob Spieler')).toBeVisible();
 
   // ── UC-07 Scenario 5 / UC-08 Scenario 1: player refreshes — session is Ended → navigates to /results ──
-  await playerPage.getByRole('button', { name: 'Aktualisieren' }).click();
+  await playerPage.getByRole('button', { name: 'Zu den Ergebnissen' }).click();
   await expect(playerPage).toHaveURL(/\/results/);
 
-  // ── UC-08 Scenario 2: host navigates to /results via Aktualisieren ───────
-  await page.getByRole('button', { name: 'Aktualisieren' }).click();
+  // ── UC-08 Scenario 2: host navigates to /results via Zu den Ergebnissen ──
+  await page.getByRole('button', { name: 'Zu den Ergebnissen' }).click();
   await expect(page).toHaveURL(/\/results/);
 
   // ── UC-08 Scenario 3: Results screen shows 'Heutige Ergebnisse' with both players ──

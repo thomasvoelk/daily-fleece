@@ -148,7 +148,11 @@
       </trans-unit>
       <trans-unit id="quiz.refreshButton" datatype="html">
         <source>Refresh</source>
-        <target>Aktualisieren</target>
+        <target>Neu laden</target>
+      </trans-unit>
+      <trans-unit id="quiz.proceedToResults" datatype="html">
+        <source>Proceed to results</source>
+        <target>Zu den Ergebnissen</target>
       </trans-unit>
       <trans-unit id="hostSetup.q1PreviewAlt" datatype="html">
         <source>Q1 photo preview</source>

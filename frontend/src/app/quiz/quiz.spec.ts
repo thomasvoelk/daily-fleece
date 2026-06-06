@@ -151,15 +151,55 @@ describe('Quiz – answer radio buttons', () => {
   });
 });
 
-// ─── Aktualisieren ───────────────────────────────────────────────────────────
+// ─── refresh button ───────────────────────────────────────────────────────────
 
-describe('Quiz – Aktualisieren', () => {
-  it('calls refresh when Aktualisieren is clicked', async () => {
+describe('Quiz – refresh button', () => {
+  it('shows "Refresh" during voting and calls refresh when clicked', async () => {
     const user = userEvent.setup();
     const refresh = vi.fn();
     await renderQuiz({ refresh });
 
     await user.click(screen.getByRole('button', { name: /refresh/i }));
+
+    expect(refresh).toHaveBeenCalled();
+  });
+
+  it('shows "Proceed to results" when both answers are revealed', async () => {
+    await renderQuiz({
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Closed' as const),
+      session: signal(
+        makeSession({
+          voting: {
+            q1: { status: 'Closed', correctAnswer: 'A' },
+            q2: { status: 'Closed', correctAnswer: 'DE' },
+          },
+        }),
+      ),
+    });
+
+    screen.getByRole('button', { name: /proceed to results/i });
+    expect(screen.queryByRole('button', { name: /refresh/i })).toBeNull();
+  });
+
+  it('calls refresh when "Proceed to results" is clicked', async () => {
+    const user = userEvent.setup();
+    const refresh = vi.fn();
+    await renderQuiz({
+      refresh,
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Closed' as const),
+      session: signal(
+        makeSession({
+          voting: {
+            q1: { status: 'Closed', correctAnswer: 'A' },
+            q2: { status: 'Closed', correctAnswer: 'DE' },
+          },
+        }),
+      ),
+    });
+
+    await user.click(screen.getByRole('button', { name: /proceed to results/i }));
 
     expect(refresh).toHaveBeenCalled();
   });

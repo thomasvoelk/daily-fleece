@@ -94,14 +94,19 @@
       />
     }
 
-    <button
-      type="button"
-      mat-button
-      (click)="refresh()"
-      class="mx-auto mt-4"
-      i18n="quiz|Button to reload the current quiz state@@quiz.refreshButton"
-    >
-      Refresh
+    <button type="button" mat-button (click)="refresh()" class="mx-auto mt-4">
+      @if (bothRevealed()) {
+        <ng-container
+          i18n="
+            quiz|Button shown after both answers are revealed, navigates to
+            results@@quiz.proceedToResults"
+          >Proceed to results</ng-container
+        >
+      } @else {
+        <ng-container i18n="quiz|Button to reload the current quiz state@@quiz.refreshButton"
+          >Refresh</ng-container
+        >
+      }
     </button>
   }
 </main>
