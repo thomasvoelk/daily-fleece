@@ -250,6 +250,10 @@
         <source>Pkt.</source>
         <target>Pkt.</target>
       </trans-unit>
+      <trans-unit id="leaderboard.myRankText" datatype="html">
+        <source> Du bist aktuell auf <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>Platz <x id="INTERPOLATION" equiv-text="{{ rank }}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> </source>
+        <target> Du bist aktuell auf <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>Platz <x id="INTERPOLATION" equiv-text="{{ rank }}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> </target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

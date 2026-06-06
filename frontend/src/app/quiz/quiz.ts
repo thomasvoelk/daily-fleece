@@ -6,7 +6,7 @@ import { MatInput } from '@angular/material/input';
 import { MatAutocomplete, MatAutocompleteTrigger, MatOption } from '@angular/material/autocomplete';
 import { ApiConfiguration } from '../backend-client';
 import { QuizStore } from './quiz.store';
-import { QuizAnswerReveal } from './quiz-answer-reveal';
+import { QuizAnswerReveal } from './quiz-answer-reveal/quiz-answer-reveal';
 import { QuizPhoto } from './quiz-photo/quiz-photo';
 import { QuizHostReveal } from './quiz-host-reveal/quiz-host-reveal';
 
