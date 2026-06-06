@@ -66,15 +66,12 @@
       <p role="alert" aria-live="assertive" class="hidden"></p>
     }
 
-    <button
-      mat-flat-button
-      type="button"
-      disabledInteractive
-      (click)="store.createSession()"
+    <app-chunky-button
       [disabled]="!store.canSubmit()"
+      (click)="store.createSession()"
       i18n="hostSetup|Button to create a session@@hostSetup.createSessionButton"
     >
       Create Session
-    </button>
+    </app-chunky-button>
   </form>
 </main>

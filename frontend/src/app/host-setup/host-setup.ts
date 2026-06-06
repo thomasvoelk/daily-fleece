@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { MatButton } from '@angular/material/button';
+import { ChunkyButton } from '../shared';
 import { HostSetupStore } from './host-setup.store';
 
 @Component({
   selector: 'app-host-setup',
-  imports: [MatButton],
+  imports: [ChunkyButton],
   templateUrl: './host-setup.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

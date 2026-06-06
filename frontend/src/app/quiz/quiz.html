@@ -117,15 +117,16 @@
         </app-chunky-button>
       </div>
     } @else {
-      <button
-        type="button"
-        mat-button
-        (click)="refresh()"
-        class="mx-auto mt-4"
-        i18n="quiz|Button to reload the current quiz state@@quiz.refreshButton"
-      >
-        Refresh
-      </button>
+      <div class="px-4 pt-4 pb-8">
+        <app-chunky-button
+          variant="outline"
+          color="grape"
+          (click)="refresh()"
+          i18n="quiz|Button to reload the current quiz state@@quiz.refreshButton"
+        >
+          Refresh
+        </app-chunky-button>
+      </div>
     }
   }
 </main>
