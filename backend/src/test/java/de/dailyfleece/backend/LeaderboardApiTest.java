@@ -21,6 +21,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
@@ -52,6 +53,19 @@ class LeaderboardApiTest {
                 .baseUrl("http://localhost:" + port + "/api/v1")
                 .defaultStatusHandler(status -> true, (req, res) -> {})
                 .build();
+    }
+
+    // --- Behavior 0: correct content negotiation ---
+
+    @Test
+    void getLeaderboard_returns_200_when_accept_is_application_json() {
+        ResponseEntity<Map<String, Object>> response = http.get()
+                .uri("/leaderboard")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     // --- Behavior 1: empty leaderboard ---

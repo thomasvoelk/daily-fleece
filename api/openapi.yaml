@@ -594,7 +594,7 @@ paths:
   /leaderboard:
     get:
       operationId: getLeaderboard
-      tags: [Results]
+      tags: [Leaderboard]
       summary: Get the project leaderboard
       description: |
         Returns cumulative standings for all players who have participated in
