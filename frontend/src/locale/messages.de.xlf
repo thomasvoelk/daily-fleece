@@ -242,6 +242,18 @@
         <source>Punkte</source>
         <target>Punkte</target>
       </trans-unit>
+      <trans-unit id="leaderboard.title" datatype="html">
+        <source>Rangliste</source>
+        <target>Rangliste</target>
+      </trans-unit>
+      <trans-unit id="leaderboard.sessionCount" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ row.sessionsParticipated }}"/> Sessions</source>
+        <target><x id="INTERPOLATION" equiv-text="{{ row.sessionsParticipated }}"/> Sessions</target>
+      </trans-unit>
+      <trans-unit id="leaderboard.pts" datatype="html">
+        <source>Pkt.</source>
+        <target>Pkt.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -1,25 +1,84 @@
 @if (data(); as leaderboard) {
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th i18n="leaderboard|name column@@leaderboard.name">Name</th>
-        <th i18n="leaderboard|sessions column@@leaderboard.sessions">Sessions</th>
-        <th i18n="leaderboard|points column@@leaderboard.points">Punkte</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (row of leaderboard.entries; track row.playerId; let i = $index) {
-        <tr
-          [class.bg-grape-200]="row.playerId === entry.playerId()"
-          [attr.aria-current]="row.playerId === entry.playerId() ? 'true' : null"
-        >
-          <td>#{{ i + 1 }}</td>
-          <td>{{ row.displayName }}</td>
-          <td>{{ row.sessionsParticipated }}</td>
-          <td>{{ row.totalPoints }}</td>
-        </tr>
+  <main class="flex min-h-svh flex-col">
+    <!-- ── Hero header ── -->
+    <div class="bg-plum px-6 pt-8 pb-6 text-center">
+      <h1
+        class="font-display text-[26px] font-bold text-white"
+        i18n="leaderboard|page title@@leaderboard.title"
+      >
+        Rangliste
+      </h1>
+      @if (myRank(); as rank) {
+        <p class="mt-2 font-body text-sm font-semibold text-white/60">
+          Du bist aktuell auf
+          <span class="font-pixel text-[11px] text-marigold">Platz {{ rank }}</span>
+        </p>
       }
-    </tbody>
-  </table>
+    </div>
+
+    <!-- ── Ranked list ── -->
+    <section class="flex-1 bg-cream px-4 py-4">
+      <ul role="list" class="m-0 list-none flex flex-col gap-2 p-0">
+        @for (row of leaderboard.entries; track row.playerId; let i = $index) {
+          <li
+            class="flex items-center gap-3 rounded-xl px-3.5 py-3 motion-safe:animate-rise"
+            [class.shadow-1]="row.playerId !== entry.playerId()"
+            [class.bg-paper]="row.playerId !== entry.playerId()"
+            [class.border-2]="i === 0"
+            [class.border-marigold]="i === 0"
+            [class.bg-grape-200]="row.playerId === entry.playerId()"
+            [class.shadow-ring-grape]="row.playerId === entry.playerId()"
+            [style.animation-delay.ms]="i * 40"
+            [attr.aria-current]="row.playerId === entry.playerId() ? 'true' : null"
+            [attr.aria-label]="row.displayName"
+          >
+            <!-- Rank -->
+            <div
+              class="w-7 shrink-0 text-center font-pixel text-[10px]"
+              [class.text-marigold-700]="i === 0"
+              [class.text-plum-faint]="i !== 0"
+            >
+              #{{ i + 1 }}
+            </div>
+
+            <!-- Avatar initial -->
+            <div
+              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-display text-base font-bold"
+              [style]="avatarStyle(i)"
+              aria-hidden="true"
+            >
+              {{ row.displayName.charAt(0).toUpperCase() }}
+            </div>
+
+            <!-- Name + sessions -->
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1 font-body text-[15px] font-extrabold text-plum">
+                <span class="truncate">{{ row.displayName }}</span>
+                @if (i === 0) {
+                  <span aria-hidden="true">👑</span>
+                }
+              </div>
+              <div
+                class="font-body text-xs font-bold text-plum-faint"
+                i18n="leaderboard|sessions count@@leaderboard.sessionCount"
+              >
+                {{ row.sessionsParticipated }} Sessions
+              </div>
+            </div>
+
+            <!-- Points -->
+            <div class="shrink-0 text-right">
+              <div class="font-pixel text-[11px] text-marigold-700">{{ row.totalPoints }}</div>
+              <div
+                class="font-body text-[10px] font-bold text-plum-faint"
+                i18n="leaderboard|points unit@@leaderboard.pts"
+              >
+                Pkt.
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+    </section>
+  </main>
 }

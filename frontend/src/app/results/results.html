@@ -155,9 +155,11 @@
       <ul role="list" class="m-0 list-none flex flex-col gap-2 p-0">
         @for (row of sortedResults(); track row.playerId; let i = $index) {
           <li
-            class="flex items-center gap-3 rounded-xl px-3.5 py-3 shadow-[var(--shadow-1)]"
+            class="flex items-center gap-3 rounded-xl px-3.5 py-3"
+            [class.shadow-1]="row.playerId !== entry.playerId()"
             [class.bg-paper]="row.playerId !== entry.playerId()"
-            [class.board-row--you]="row.playerId === entry.playerId()"
+            [class.bg-grape-200]="row.playerId === entry.playerId()"
+            [class.shadow-ring-grape]="row.playerId === entry.playerId()"
             [attr.aria-current]="row.playerId === entry.playerId() ? 'true' : null"
             [attr.aria-label]="row.displayName"
           >
