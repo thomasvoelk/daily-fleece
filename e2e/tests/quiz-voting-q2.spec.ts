@@ -10,7 +10,7 @@ test.beforeEach(async () => {
   await api.dispose();
 });
 
-test('UC-06+07: Q2 geography voting — player submits country, host closes voting, both see reveal', async ({
+test('UC-06+07+08+09: Q2 geography voting — player submits country, host closes voting, both see reveal, navigate to Results and Leaderboard', async ({
   page,
   browser,
 }) => {
@@ -76,9 +76,26 @@ test('UC-06+07: Q2 geography voting — player submits country, host closes voti
   await expect(page.getByText(/Richtige Antwort:.*Deutschland/)).toBeVisible();
   await expect(page.getByText('Bob Spieler')).toBeVisible();
 
-  // ── UC-07 Scenario 5: player refreshes — sees same Q2 reveal ────────────
+  // ── UC-07 Scenario 5 / UC-08 Scenario 1: player refreshes — session is Ended → navigates to /results ──
   await playerPage.getByRole('button', { name: 'Aktualisieren' }).click();
-  await expect(playerPage.getByText(/Richtige Antwort:.*Deutschland/)).toBeVisible();
+  await expect(playerPage).toHaveURL(/\/results/);
+
+  // ── UC-08 Scenario 2: host navigates to /results via Aktualisieren ───────
+  await page.getByRole('button', { name: 'Aktualisieren' }).click();
+  await expect(page).toHaveURL(/\/results/);
+
+  // ── UC-08 Scenario 3: Results screen shows 'Heutige Ergebnisse' with both players ──
+  await expect(page.getByRole('heading', { name: 'Heutige Ergebnisse' })).toBeVisible();
+  await expect(page.getByRole('listitem', { name: 'Alice Host' })).toBeVisible();
+  await expect(page.getByRole('listitem', { name: 'Bob Spieler' })).toBeVisible();
+
+  // ── UC-09 Scenario 1: host clicks 'Zum Leaderboard' → navigates to /leaderboard ──
+  await page.getByRole('button', { name: 'Zum Leaderboard' }).click();
+  await expect(page).toHaveURL(/\/leaderboard/);
+
+  // ── UC-09 Scenario 2: leaderboard shows ranked table with both players' cumulative points ──
+  await expect(page.getByRole('cell', { name: 'Alice Host' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Bob Spieler' })).toBeVisible();
 
   await playerContext.close();
 });
