@@ -17,11 +17,17 @@ const OUTLINE_CLASSES: Record<ChunkyButtonColor, string> = {
   coral: 'border-coral text-coral',
 };
 
-const SOLID_BASE =
-  'duration-fast w-full cursor-pointer rounded-full border-0 px-6 py-[15px] font-display text-[17px] font-semibold transition-[transform,box-shadow] ease-smooth tap-transparent active:translate-y-[5px] disabled:opacity-50 disabled:cursor-not-allowed';
+const SOLID_ENABLED =
+  'duration-fast w-full cursor-pointer rounded-full border-0 px-6 py-[15px] font-display text-[17px] font-semibold transition-[transform,box-shadow] ease-smooth tap-transparent active:translate-y-[5px]';
 
-const OUTLINE_BASE =
-  'w-full cursor-pointer rounded-full border-2 bg-transparent px-5 py-[11px] font-display text-[14px] font-semibold tap-transparent disabled:opacity-50 disabled:cursor-not-allowed';
+const SOLID_DISABLED =
+  'duration-fast w-full cursor-not-allowed rounded-full border-0 px-6 py-[15px] font-display text-[17px] font-semibold opacity-50';
+
+const OUTLINE_ENABLED =
+  'w-full cursor-pointer rounded-full border-2 bg-transparent px-5 py-[11px] font-display text-[14px] font-semibold tap-transparent';
+
+const OUTLINE_DISABLED =
+  'w-full cursor-not-allowed rounded-full border-2 bg-transparent px-5 py-[11px] font-display text-[14px] font-semibold opacity-50';
 
 @Component({
   selector: 'app-chunky-button',
@@ -37,8 +43,19 @@ export class ChunkyButton {
 
   readonly classes = computed(() => {
     const c = this.color();
-    return this.variant() === 'solid'
-      ? `${SOLID_BASE} ${SOLID_CLASSES[c]}`
-      : `${OUTLINE_BASE} ${OUTLINE_CLASSES[c]}`;
+    const dis = this.disabled();
+    const isSolid = this.variant() === 'solid';
+    const solidBase = dis ? SOLID_DISABLED : SOLID_ENABLED;
+    const outlineBase = dis ? OUTLINE_DISABLED : OUTLINE_ENABLED;
+    const base = isSolid ? solidBase : outlineBase;
+    const colorClass = isSolid ? SOLID_CLASSES[c] : OUTLINE_CLASSES[c];
+    return `${base} ${colorClass}`;
   });
+
+  protected handleClick(event: MouseEvent): void {
+    if (this.disabled()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
 }

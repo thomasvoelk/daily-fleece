@@ -49,7 +49,9 @@ export class Quiz {
 
   protected readonly q2Revealed = computed((): ClosedQuestionVoting | null => {
     const q2 = this.quizStore.session()?.voting.q2;
-    return q2?.status === 'Closed' ? (q2 as ClosedQuestionVoting) : null;
+    return q2?.status === 'Closed' && q2.correctAnswer != null
+      ? (q2 as ClosedQuestionVoting)
+      : null;
   });
 
   protected readonly q1AnswerEntries = computed(() =>

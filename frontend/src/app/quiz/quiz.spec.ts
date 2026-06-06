@@ -283,6 +283,22 @@ describe('Quiz – Q2 reveal', () => {
 
     expect(screen.queryByText(/deutschland/i)).toBeNull();
   });
+
+  it('does not show Q2 reveal while Q1 voting is in progress', async () => {
+    await renderQuiz({
+      q2Status: signal('Closed' as const),
+      session: signal(
+        makeSession({
+          voting: {
+            q1: { status: 'Open' },
+            q2: { status: 'Closed' },
+          },
+        }),
+      ),
+    });
+
+    expect(screen.queryByRole('region', { name: /correct answer/i })).toBeNull();
+  });
 });
 
 // ─── host controls ───────────────────────────────────────────────────────────
@@ -332,7 +348,10 @@ describe('Quiz – host controls', () => {
   it('Abstimmung schließen is disabled until a correct answer is selected', async () => {
     await renderQuiz({ isHost: signal(true) });
 
-    expect(screen.getByRole('button', { name: /close voting/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /close voting/i })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
   });
 
   it('calls setQ2CorrectAnswer when close Q2 voting is clicked with a country selected', async () => {
