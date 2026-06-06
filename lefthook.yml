@@ -14,3 +14,8 @@ pre-commit:
       exclude: "frontend/src/app/backend-client/**"
       run: frontend/node_modules/.bin/prettier --write {staged_files}
       stage_fixed: true
+    frontend-lint:
+      glob:
+        - "frontend/src/**/*.{ts,html}"
+      exclude: "frontend/src/app/backend-client/**"
+      run: cd frontend && npm run lint
