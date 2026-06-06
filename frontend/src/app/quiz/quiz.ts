@@ -292,7 +292,6 @@ function buildCountries(): readonly { code: string; name: string }[] {
     MatOption,
   ],
   templateUrl: './quiz.html',
-  styleUrl: './quiz.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Quiz {

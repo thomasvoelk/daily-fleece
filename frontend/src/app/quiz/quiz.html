@@ -161,13 +161,16 @@
     @if (quizStore.q1Status() === 'Closed') {
       <mat-card class="mx-4 mt-3 rounded-2xl">
         <mat-card-content>
-          <p i18n="quiz|Reveals the correct answer after voting closes@@quiz.correctAnswer">
+          <p
+            class="mb-3 font-body text-base font-bold text-plum"
+            i18n="quiz|Reveals the correct answer after voting closes@@quiz.correctAnswer"
+          >
             Correct answer: <strong>{{ session.voting.q1.correctAnswer }}</strong>
           </p>
-          <ul>
+          <ul class="m-0 flex list-none flex-col gap-2 p-0">
             @for (entry of session.voting.q1.answers | keyvalue; track entry.key) {
-              <li>
-                <span>{{ entry.value.displayName }}</span
+              <li class="flex gap-2 font-body text-[15px] text-plum-soft">
+                <span class="font-bold text-plum">{{ entry.value.displayName }}</span
                 >: {{ entry.value.answer }}
               </li>
             }
@@ -179,13 +182,16 @@
     @if (quizStore.q2Status() === 'Closed' && session.voting.q2.correctAnswer) {
       <mat-card class="mx-4 mt-3 rounded-2xl">
         <mat-card-content>
-          <p i18n="quiz|Reveals the correct Q2 country after voting closes@@quiz.q2CorrectAnswer">
+          <p
+            class="mb-3 font-body text-base font-bold text-plum"
+            i18n="quiz|Reveals the correct Q2 country after voting closes@@quiz.q2CorrectAnswer"
+          >
             Correct answer: <strong>{{ countryName(session.voting.q2.correctAnswer) }}</strong>
           </p>
-          <ul>
+          <ul class="m-0 flex list-none flex-col gap-2 p-0">
             @for (entry of session.voting.q2.answers | keyvalue; track entry.key) {
-              <li>
-                <span>{{ entry.value.displayName }}</span
+              <li class="flex gap-2 font-body text-[15px] text-plum-soft">
+                <span class="font-bold text-plum">{{ entry.value.displayName }}</span
                 >: {{ countryName(entry.value.answer) }}
               </li>
             }
