@@ -39,16 +39,15 @@ for (const order of ['player-first', 'host-first'] as const) {
       await page.getByRole('region', { name: 'Host-Steuerung' }).getByRole('radio', { name: 'A' }).check();
       await page.getByRole('button', { name: 'Abstimmung schließen' }).click();
 
-      // ── host sees reveal — correct answer and all answers ────────────────────
-      await expect(page.getByText(/Richtige Antwort:.*A/)).toBeVisible();
-      await expect(page.getByText('Bob Spieler')).toBeVisible();
-      await expect(page.getByRole('list').getByRole('listitem').filter({ hasText: 'Bob Spieler' })).toContainText('B');
+      // ── Q2 starts — host sees Q2 photo; Q2 close button is disabled ──────────
+      // Q1 reveal is deferred until Q2 is also closed (see 03-quiz-voting-q2)
+      await expect(page.getByRole('img', { name: 'Frage 2' })).toBeVisible();
       await expect(page.getByRole('button', { name: 'Abstimmung schließen' })).not.toBeEnabled();
 
-      // ── player refreshes — sees same revealed state ──────────────────────────
+      // ── player refreshes — also sees Q2; Q1 radio group is gone ─────────────
       await playerPage.getByRole('button', { name: 'Neu laden' }).click();
-      await expect(playerPage.getByText(/Richtige Antwort:.*A/)).toBeVisible();
-      await expect(playerPage.getByRole('list').getByRole('listitem').filter({ hasText: 'Bob Spieler' })).toContainText('B');
+      await expect(playerPage.getByRole('img', { name: 'Frage 2' })).toBeVisible();
+      await expect(playerPage.getByRole('radiogroup', { name: 'Antwort' })).not.toBeVisible();
 
       await playerContext.close();
     });

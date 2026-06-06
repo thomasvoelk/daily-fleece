@@ -60,7 +60,7 @@ export async function navigateToQuizWithPlayer(
 export async function closeQ1Voting(page: Page): Promise<void> {
   await page.getByRole('region', { name: 'Host-Steuerung' }).getByRole('radio', { name: 'A' }).check();
   await page.getByRole('button', { name: 'Abstimmung schließen' }).click();
-  await expect(page.getByText(/Richtige Antwort:.*A/)).toBeVisible();
+  await expect(page.getByRole('img', { name: 'Frage 2' })).toBeVisible();
 }
 
 export async function completeQuizWithPlayer(
