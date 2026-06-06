@@ -6,6 +6,10 @@
         <source> Daily Fleece </source>
         <target> Daily Fleece </target>
       </trans-unit>
+      <trans-unit id="entry.tagline" datatype="html">
+        <source>Two questions. Every standup.</source>
+        <target>Zwei Fragen. Jeden Standup.</target>
+      </trans-unit>
       <trans-unit id="entry.companyIdLabel" datatype="html">
         <source>Company ID</source>
         <target>Firmen-ID</target>

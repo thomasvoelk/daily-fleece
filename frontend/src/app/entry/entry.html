@@ -1,11 +1,26 @@
 <main class="flex min-h-svh flex-col items-center justify-center bg-cream p-6">
   <form class="flex w-full max-w-sm flex-col gap-4" (submit)="$event.preventDefault()" novalidate>
-    <h1
-      class="mb-2 text-center text-4xl leading-tight"
-      i18n="entry|Heading on the entry screen@@entry.heading"
-    >
-      Daily Fleece
-    </h1>
+    <div class="mb-2 flex flex-col items-center gap-3">
+      <img
+        src="/alpaca-mark.svg"
+        alt=""
+        width="80"
+        height="80"
+        class="rounded-[22px] motion-safe:animate-pop"
+      />
+      <h1
+        class="text-center text-[32px] leading-tight font-bold tracking-tight"
+        i18n="entry|Heading on the entry screen@@entry.heading"
+      >
+        Daily Fleece
+      </h1>
+      <p
+        class="-mt-2 text-center font-body text-sm font-semibold text-plum-faint"
+        i18n="entry|Tagline below the heading on the entry screen@@entry.tagline"
+      >
+        Two questions. Every standup.
+      </p>
+    </div>
 
     <mat-form-field appearance="outline">
       <mat-label i18n="entry|Label for the Company ID input@@entry.companyIdLabel"
@@ -31,27 +46,23 @@
       {{ store.phase() === 'error' ? store.errorMessage() : '' }}
     </p>
 
-    <div class="flex gap-3">
-      <button
-        mat-flat-button
-        type="button"
-        (click)="onJoinLobby()"
-        [disabled]="store.phase() === 'loading'"
-        class="flex-1"
-        i18n="entry|Button to join an existing lobby@@entry.joinLobbyButton"
-      >
-        Join Lobby
-      </button>
-      <button
-        mat-flat-button
-        type="button"
-        (click)="onCreateLobby()"
-        [disabled]="store.phase() === 'loading'"
-        class="flex-1"
-        i18n="entry|Button to create a new lobby@@entry.createLobbyButton"
-      >
-        Create Lobby
-      </button>
-    </div>
+    <button
+      type="button"
+      (click)="onJoinLobby()"
+      [disabled]="store.phase() === 'loading'"
+      class="duration-fast w-full cursor-pointer rounded-full border-0 bg-grape px-6 py-[15px] font-display text-[17px] font-semibold text-white shadow-chunk-grape transition-[transform,box-shadow] ease-smooth tap-transparent active:translate-y-[5px] active:shadow-chunk-grape-pressed disabled:opacity-50"
+      i18n="entry|Button to join an existing lobby@@entry.joinLobbyButton"
+    >
+      Join Lobby
+    </button>
+    <button
+      type="button"
+      (click)="onCreateLobby()"
+      [disabled]="store.phase() === 'loading'"
+      class="w-full cursor-pointer rounded-full border-2 border-grape bg-transparent px-5 py-[11px] font-display text-[14px] font-semibold text-grape tap-transparent disabled:opacity-50"
+      i18n="entry|Button to create a new lobby@@entry.createLobbyButton"
+    >
+      Create Lobby
+    </button>
   </form>
 </main>

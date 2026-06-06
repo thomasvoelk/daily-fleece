@@ -11,6 +11,15 @@
         <note priority="1" from="description">Heading on the entry screen</note>
         <note priority="1" from="meaning">entry</note>
       </trans-unit>
+      <trans-unit id="entry.tagline" datatype="html">
+        <source>Two questions. Every standup.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/entry/entry.html</context>
+          <context context-type="linenumber">21,23</context>
+        </context-group>
+        <note priority="1" from="description">Tagline below the heading on the entry screen</note>
+        <note priority="1" from="meaning">entry</note>
+      </trans-unit>
       <trans-unit id="entry.companyIdLabel" datatype="html">
         <source>Company ID</source>
         <context-group purpose="location">
