@@ -23,26 +23,7 @@
   }
 
   @if (q2Status() === 'Open') {
-    <mat-form-field class="w-full">
-      <mat-label i18n="quiz|Label for the host Q2 correct-country picker@@quiz.hostCountryLabel"
-        >Country</mat-label
-      >
-      <input
-        type="text"
-        matInput
-        [matAutocomplete]="q2HostAuto"
-        [value]="selectedCountry() ? countryName(selectedCountry()!) : hostCountryInput()"
-        (input)="hostCountryInput.set($any($event.target).value); selectedCountry.set(null)"
-      />
-      <mat-autocomplete
-        #q2HostAuto
-        (optionSelected)="selectedCountry.set($event.option.value); hostCountryInput.set('')"
-      >
-        @for (country of filteredCountries(); track country.code) {
-          <mat-option [value]="country.code">{{ country.name }}</mat-option>
-        }
-      </mat-autocomplete>
-    </mat-form-field>
+    <app-country-autocomplete (countrySelected)="selectedCountry.set($event)" />
     <button
       type="button"
       mat-flat-button

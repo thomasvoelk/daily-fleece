@@ -1,15 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
 import { MatButton } from '@angular/material/button';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
-import { MatAutocomplete, MatAutocompleteTrigger, MatOption } from '@angular/material/autocomplete';
 import { ApiConfiguration } from '../backend-client';
 import { QuizStore } from './quiz.store';
 import { QuizAnswerReveal } from './quiz-answer-reveal/quiz-answer-reveal';
 import { QuizPhoto } from './quiz-photo/quiz-photo';
 import { QuizHostReveal } from './quiz-host-reveal/quiz-host-reveal';
 import { CountryList } from './country-list';
+import { CountryAutocomplete } from './country-autocomplete/country-autocomplete';
 
 @Component({
   selector: 'app-quiz',
@@ -17,15 +15,10 @@ import { CountryList } from './country-list';
     MatRadioGroup,
     MatRadioButton,
     MatButton,
-    MatFormField,
-    MatLabel,
-    MatInput,
-    MatAutocomplete,
-    MatAutocompleteTrigger,
-    MatOption,
     QuizAnswerReveal,
     QuizPhoto,
     QuizHostReveal,
+    CountryAutocomplete,
   ],
   templateUrl: './quiz.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,10 +28,6 @@ export class Quiz {
   private readonly apiConfig = inject(ApiConfiguration);
   private readonly countryList = inject(CountryList);
 
-  protected readonly q2CountryInput = signal('');
-  protected readonly filteredCountries = computed(() =>
-    this.countryList.filter(this.q2CountryInput()),
-  );
   protected readonly currentQuestion = computed<'q1' | 'q2'>(() =>
     this.quizStore.q2Status() === 'Open' ? 'q2' : 'q1',
   );

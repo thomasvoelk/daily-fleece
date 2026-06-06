@@ -1,0 +1,15 @@
+<mat-form-field class="w-full">
+  <mat-label i18n="quiz|Label for the country picker@@quiz.countryLabel">Country</mat-label>
+  <input
+    type="text"
+    matInput
+    [matAutocomplete]="auto"
+    [value]="inputValue()"
+    (input)="onInput($any($event.target).value)"
+  />
+  <mat-autocomplete #auto (optionSelected)="onSelect($event)">
+    @for (country of filteredCountries(); track country.code) {
+      <mat-option [value]="country.code">{{ country.name }}</mat-option>
+    }
+  </mat-autocomplete>
+</mat-form-field>

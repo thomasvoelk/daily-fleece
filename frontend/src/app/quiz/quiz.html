@@ -4,28 +4,7 @@
 
     @if (quizStore.q2Status() === 'Open') {
       <div class="px-4 pt-2">
-        <mat-form-field class="w-full">
-          <mat-label i18n="quiz|Label for the Q2 country picker@@quiz.countryLabel"
-            >Country</mat-label
-          >
-          <input
-            type="text"
-            matInput
-            [matAutocomplete]="q2Auto"
-            [value]="q2CountryInput()"
-            (input)="q2CountryInput.set($any($event.target).value)"
-          />
-          <mat-autocomplete
-            #q2Auto
-            (optionSelected)="
-              submitQ2($event.option.value); q2CountryInput.set($event.option.viewValue)
-            "
-          >
-            @for (country of filteredCountries(); track country.code) {
-              <mat-option [value]="country.code">{{ country.name }}</mat-option>
-            }
-          </mat-autocomplete>
-        </mat-form-field>
+        <app-country-autocomplete (countrySelected)="submitQ2($event)" />
       </div>
     }
 
