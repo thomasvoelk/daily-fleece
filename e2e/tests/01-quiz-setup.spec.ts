@@ -44,16 +44,16 @@ test('full pre-game flow: lobby creation, player join, and quiz start', async ({
   await page.getByRole('button', { name: 'Zum Quiz' }).click();
   await expect(hostPlayerList.getByRole('listitem').filter({ hasText: 'Bob Spieler' })).toBeVisible();
 
-  // UC-03 Scenario 2: Player clicks "Zum Quiz" before host starts → inline error, stays on Lobby
+  // Player clicks "Zum Quiz" before host starts → inline error, stays on Lobby
   await playerPage.getByRole('button', { name: 'Zum Quiz' }).click();
   await expect(playerPage.getByRole('alert')).toHaveText('Quiz noch nicht gestartet. Bitte warten.');
   await expect(playerPage).toHaveURL(/\/lobby/);
 
-  // UC-03 Scenario 1: Host clicks "Quiz starten" → session Active, host auto-navigates to /quiz
+  // Host clicks "Quiz starten" → session Active, host auto-navigates to /quiz
   await page.getByRole('button', { name: 'Quiz starten' }).click();
   await expect(page).toHaveURL(/\/quiz/);
 
-  // UC-03 Scenario 3: Player clicks "Zum Quiz" after host started → navigates to /quiz
+  // Player clicks "Zum Quiz" after host started → navigates to /quiz
   await playerPage.getByRole('button', { name: 'Zum Quiz' }).click();
   await expect(playerPage).toHaveURL(/\/quiz/);
 

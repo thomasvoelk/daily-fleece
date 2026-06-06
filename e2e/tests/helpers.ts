@@ -64,3 +64,28 @@ export async function closeQ1Voting(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Abstimmung schließen' }).click();
   await expect(page.getByText(/Richtige Antwort:.*A/)).toBeVisible();
 }
+
+export async function completeQuizWithPlayer(
+  page: Page,
+  browser: Browser,
+): Promise<{ playerPage: Page; playerContext: BrowserContext }> {
+  const { playerPage, playerContext } = await navigateToQuizWithPlayer(page, browser);
+  await closeQ1Voting(page);
+
+  await playerPage.getByRole('button', { name: 'Neu laden' }).click();
+
+  const playerCountryInput = playerPage.getByRole('combobox', { name: 'Land' });
+  await playerCountryInput.click();
+  await playerCountryInput.fill('Deutsch');
+  await playerPage.getByRole('option', { name: 'Deutschland' }).click();
+
+  const hostControls = page.getByRole('region', { name: 'Host-Steuerung' });
+  const hostCountryInput = hostControls.getByRole('combobox', { name: 'Land' });
+  await hostCountryInput.click();
+  await hostCountryInput.fill('Deutsch');
+  await page.getByRole('option', { name: 'Deutschland' }).click();
+  await hostControls.getByRole('button', { name: 'Abstimmung schließen' }).click();
+  await expect(page.getByText(/Richtige Antwort:.*Deutschland/)).toBeVisible();
+
+  return { playerPage, playerContext };
+}
