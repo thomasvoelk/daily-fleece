@@ -611,6 +611,36 @@ describe('Quiz – Q2 country input', () => {
   });
 });
 
+// ─── category chip ───────────────────────────────────────────────────────────
+
+describe('Quiz – category chip', () => {
+  it('shows KNOWLEDGE chip during Q1 voting', async () => {
+    await renderQuiz({ q1Status: signal('Open' as const) });
+    screen.getByText(/knowledge/i);
+  });
+
+  it('hides the KNOWLEDGE chip when Q1 voting is Closed', async () => {
+    await renderQuiz({
+      q1Status: signal('Closed' as const),
+      q2Status: signal(null),
+    });
+    expect(screen.queryByText(/knowledge/i)).toBeNull();
+  });
+
+  it('shows GEOGRAPHY chip during Q2 voting', async () => {
+    await renderQuiz({ q2Status: signal('Open' as const) });
+    screen.getByText(/geography/i);
+  });
+
+  it('hides the GEOGRAPHY chip when Q2 voting is Closed', async () => {
+    await renderQuiz({
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Closed' as const),
+    });
+    expect(screen.queryByText(/geography/i)).toBeNull();
+  });
+});
+
 // ─── no-answer prompt ────────────────────────────────────────────────────────
 
 describe('Quiz – no-answer prompt', () => {
