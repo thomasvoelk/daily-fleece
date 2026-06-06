@@ -1,13 +1,8 @@
-import { test, expect, request } from '@playwright/test';
-import path from 'path';
-
-const FIXTURES = path.join(__dirname, '..', 'fixtures');
-const BACKEND = 'http://localhost:8080';
+import { test, expect } from '@playwright/test';
+import { Q1_PHOTO, Q2_PHOTO, clearSession } from './helpers';
 
 test.beforeEach(async () => {
-  const api = await request.newContext({ baseURL: BACKEND });
-  await api.delete('/api/v1/sessions/today');
-  await api.dispose();
+  await clearSession();
 });
 
 test('full pre-game flow: lobby creation, player join, and quiz start', async ({ page, browser }) => {
@@ -20,8 +15,8 @@ test('full pre-game flow: lobby creation, player join, and quiz start', async ({
 
   // Step 2: HostSetup — upload Q1 and Q2 photos, click Create Session
   await expect(page).toHaveURL(/\/host/);
-  await page.getByLabel('F1 — Wissen (Kalenderblatt)').setInputFiles(path.join(FIXTURES, 'photo-q1.jpg'));
-  await page.getByLabel('F2 — Geografie (Ort)').setInputFiles(path.join(FIXTURES, 'photo-q2.jpg'));
+  await page.getByLabel('F1 — Wissen (Kalenderblatt)').setInputFiles(Q1_PHOTO);
+  await page.getByLabel('F2 — Geografie (Ort)').setInputFiles(Q2_PHOTO);
   await page.getByRole('button', { name: 'Session erstellen' }).click();
 
   // Step 3: Lobby — host's display name appears in the player list

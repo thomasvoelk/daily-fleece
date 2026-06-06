@@ -1,28 +1,13 @@
-import { test, expect, request } from '@playwright/test';
-import path from 'path';
-
-const FIXTURES = path.join(__dirname, '..', 'fixtures');
-const BACKEND = 'http://localhost:8080';
+import { test, expect } from '@playwright/test';
+import { clearSession, navigateToQuiz, closeQ1Voting } from './helpers';
 
 test.beforeEach(async () => {
-  const api = await request.newContext({ baseURL: BACKEND });
-  await api.delete('/api/v1/sessions/today');
-  await api.dispose();
+  await clearSession();
 });
 
-async function navigateToQuiz(page: import('@playwright/test').Page) {
-  await page.goto('/');
-  await page.getByRole('textbox', { name: 'Firmen-ID' }).fill('test-company');
-  await page.getByRole('textbox', { name: 'Anzeigename' }).fill('Alice Host');
-  await page.getByRole('button', { name: 'Lobby erstellen' }).click();
-  await expect(page).toHaveURL(/\/host/);
-  await page.getByLabel('F1 — Wissen (Kalenderblatt)').setInputFiles(path.join(FIXTURES, 'photo-q1.jpg'));
-  await page.getByLabel('F2 — Geografie (Ort)').setInputFiles(path.join(FIXTURES, 'photo-q2.jpg'));
-  await page.getByRole('button', { name: 'Session erstellen' }).click();
-  await expect(page).toHaveURL(/\/lobby/);
-  await page.getByRole('button', { name: 'Zum Quiz' }).click();
-  await page.getByRole('button', { name: 'Quiz starten' }).click();
-  await expect(page).toHaveURL(/\/quiz/);
+async function closeQ1AndNavigateToQ2(page: import('@playwright/test').Page) {
+  await navigateToQuiz(page);
+  await closeQ1Voting(page);
 }
 
 test('Q1 photo is visible on quiz page', async ({ page }) => {
@@ -75,12 +60,6 @@ test('Escape schließt die Lightbox', async ({ page }) => {
 
   await expect(page.getByRole('dialog')).not.toBeVisible();
 });
-
-async function closeQ1AndNavigateToQ2(page: import('@playwright/test').Page) {
-  await navigateToQuiz(page);
-  await page.getByRole('region', { name: 'Host-Steuerung' }).getByRole('radio', { name: 'A' }).check();
-  await page.getByRole('button', { name: 'Abstimmung schließen' }).click();
-}
 
 test('Q2-Foto ist nach Schließen von Q1 sichtbar', async ({ page }) => {
   await closeQ1AndNavigateToQ2(page);
