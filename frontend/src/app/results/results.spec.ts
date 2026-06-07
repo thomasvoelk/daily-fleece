@@ -301,7 +301,7 @@ describe('Results – Zum Leaderboard button', () => {
     await drainMicrotasks();
     http.expectOne('/api/v1/sessions/s1/results').flush(makeResults());
 
-    const btn = screen.getByRole('button', { name: /leaderboard/i });
+    const btn = await screen.findByRole('button', { name: /leaderboard/i });
     await user.click(btn);
 
     expect(navigateSpy).toHaveBeenCalledWith(['/leaderboard']);
