@@ -25,6 +25,17 @@ export class Quiz {
     this.quizStore.q2Status() === 'Open' ? 'q2' : 'q1',
   );
 
+  protected readonly confetti = Array.from({ length: 22 }, (_, i) => {
+    const cols = ['#FFB422', '#14B8A6', '#FF5A5F', '#34C759', '#FFFBF4', '#7C3AF0'];
+    return {
+      left: ((i * 17 + 5) * 13) % 97,
+      top: ((i * 11 + 7) * 7) % 63,
+      size: 6 + (i % 6),
+      color: cols[i % cols.length],
+      rotate: (i * 23 + 10) % 65,
+    };
+  });
+
   protected readonly bothRevealed = computed(
     () => this.quizStore.q1Status() === 'Closed' && this.quizStore.q2Status() === 'Closed',
   );

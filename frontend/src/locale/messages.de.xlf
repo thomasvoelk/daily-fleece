@@ -186,6 +186,10 @@
         <source>GEOGRAPHY</source>
         <target>ERDKUNDE</target>
       </trans-unit>
+      <trans-unit id="quiz.resultsAreIn" datatype="html">
+        <source> That's a wrap! </source>
+        <target>Das war's!</target>
+      </trans-unit>
       <trans-unit id="quiz.refreshButton" datatype="html">
         <source>Refresh</source>
         <target>Neu laden</target>

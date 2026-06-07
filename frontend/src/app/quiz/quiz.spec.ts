@@ -345,6 +345,16 @@ describe('Quiz – host controls', () => {
     expect(screen.queryByRole('button', { name: /close voting/i })).toBeNull();
   });
 
+  it('hides host controls section when both questions are already Closed', async () => {
+    await renderQuiz({
+      isHost: signal(true),
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Closed' as const),
+    });
+
+    expect(screen.queryByRole('region', { name: /host controls/i })).toBeNull();
+  });
+
   it('Abstimmung schließen is disabled until a correct answer is selected', async () => {
     await renderQuiz({ isHost: signal(true) });
 
@@ -520,6 +530,53 @@ describe('Quiz – Q1 photo lightbox', () => {
     await user.keyboard('[Escape]');
 
     expect(screen.queryByRole('img', { name: 'Question 1 enlarged' })).toBeNull();
+  });
+});
+
+// ─── reveal header ───────────────────────────────────────────────────────────
+
+describe('Quiz – reveal header', () => {
+  const bothRevealedOverrides = {
+    q1Status: signal('Closed' as const),
+    q2Status: signal('Closed' as const),
+    session: signal(
+      makeSession({
+        voting: {
+          q1: { status: 'Closed', correctAnswer: 'A' },
+          q2: { status: 'Closed', correctAnswer: 'DE' },
+        },
+      }),
+    ),
+  };
+
+  it('shows "Results are in!" heading when both questions are revealed', async () => {
+    await renderQuiz(bothRevealedOverrides);
+
+    screen.getByRole('heading', { name: /that's a wrap/i });
+  });
+
+  it('hides the photo when both questions are revealed', async () => {
+    await renderQuiz({
+      ...bothRevealedOverrides,
+      session: signal(
+        makeSession({
+          sessionId: 'abc',
+          voting: {
+            q1: { status: 'Closed', correctAnswer: 'A' },
+            q2: { status: 'Closed', correctAnswer: 'DE' },
+          },
+        }),
+      ),
+    });
+
+    expect(screen.queryByRole('img', { name: /question 1/i })).toBeNull();
+    expect(screen.queryByRole('img', { name: /question 2/i })).toBeNull();
+  });
+
+  it('does not show the reveal header during voting', async () => {
+    await renderQuiz();
+
+    expect(screen.queryByRole('heading', { name: /that's a wrap/i })).toBeNull();
   });
 });
 

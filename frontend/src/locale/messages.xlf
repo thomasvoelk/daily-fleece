@@ -461,6 +461,15 @@
               country</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
+      <trans-unit id="quiz.resultsAreIn" datatype="html">
+        <source> That's a wrap! </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
+          <context context-type="linenumber">6,8</context>
+        </context-group>
+        <note priority="1" from="description">Heading shown on the answer reveal page</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
       <trans-unit id="quiz.refreshButton" datatype="html">
         <source> Refresh </source>
         <context-group purpose="location">

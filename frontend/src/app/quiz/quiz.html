@@ -1,6 +1,38 @@
 <main class="flex min-h-svh flex-col bg-cream">
   @if (quizStore.session(); as session) {
-    <app-quiz-photo [src]="photoUrl(currentQuestion())" [question]="currentQuestion()" />
+    @if (bothRevealed()) {
+      <div class="relative flex items-center justify-center overflow-hidden bg-plum px-6 py-10">
+        @for (c of confetti; track $index) {
+          <div
+            class="pointer-events-none absolute rounded-[2px]"
+            [style.left.%]="c.left"
+            [style.top.%]="c.top"
+            [style.width.px]="c.size"
+            [style.height.px]="c.size"
+            [style.background]="c.color"
+            [style.transform]="'rotate(' + c.rotate + 'deg)'"
+          ></div>
+        }
+        <div class="relative z-10 flex flex-col items-center gap-3 text-center">
+          <img
+            src="/alpaca-mark.svg"
+            alt=""
+            aria-hidden="true"
+            width="96"
+            height="96"
+            class="rounded-[26px] motion-safe:animate-pop"
+          />
+          <h2
+            class="m-0 font-display text-[30px] leading-tight font-bold text-white motion-safe:animate-pop"
+            i18n="quiz|Heading shown on the answer reveal page@@quiz.resultsAreIn"
+          >
+            That's a wrap!
+          </h2>
+        </div>
+      </div>
+    } @else {
+      <app-quiz-photo [src]="photoUrl(currentQuestion())" [question]="currentQuestion()" />
+    }
 
     <div class="flex items-center justify-between px-4 py-3">
       @if (quizStore.q2Status() === 'Open') {
@@ -108,7 +140,9 @@
       />
     }
 
-    @if (quizStore.isHost()) {
+    @if (
+      quizStore.isHost() && (quizStore.q1Status() === 'Open' || quizStore.q2Status() === 'Open')
+    ) {
       <app-quiz-host-reveal
         [q1Status]="quizStore.q1Status()"
         [q2Status]="quizStore.q2Status()"
