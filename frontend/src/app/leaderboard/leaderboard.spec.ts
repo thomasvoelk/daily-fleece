@@ -8,11 +8,6 @@ import { LeaderboardResponse } from '../backend-client';
 
 mockLocalStorage();
 
-const drainMicrotasks = () =>
-  new Promise<void>((r) => {
-    queueMicrotask(r);
-  });
-
 const PROVIDERS = [...provideTestEnvironment(), provideRouter([])];
 
 function makeLeaderboard(overrides: Partial<LeaderboardResponse> = {}): LeaderboardResponse {
@@ -31,12 +26,10 @@ describe('Leaderboard – API call', () => {
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
     );
-    const { fixture } = await render(Leaderboard, { providers: PROVIDERS });
+    await render(Leaderboard, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
 
     http.expectOne('/api/v1/leaderboard').flush(makeLeaderboard());
-    await drainMicrotasks();
-    fixture.detectChanges();
 
     http.verify();
   });
@@ -50,7 +43,7 @@ describe('Leaderboard – rank column', () => {
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
     );
-    const { fixture } = await render(Leaderboard, { providers: PROVIDERS });
+    await render(Leaderboard, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
 
     http.expectOne('/api/v1/leaderboard').flush(
@@ -61,10 +54,8 @@ describe('Leaderboard – rank column', () => {
         ],
       }),
     );
-    await drainMicrotasks();
-    fixture.detectChanges();
 
-    screen.getByText('#1');
+    await screen.findByText('#1');
     screen.getByText('#2');
   });
 });
@@ -77,7 +68,7 @@ describe('Leaderboard – stats columns', () => {
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
     );
-    const { fixture } = await render(Leaderboard, { providers: PROVIDERS });
+    await render(Leaderboard, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
 
     http.expectOne('/api/v1/leaderboard').flush(
@@ -88,10 +79,8 @@ describe('Leaderboard – stats columns', () => {
         ],
       }),
     );
-    await drainMicrotasks();
-    fixture.detectChanges();
 
-    const aliceRow = screen.getByRole('row', { name: 'Alice' });
+    const aliceRow = await screen.findByRole('row', { name: 'Alice' });
     within(aliceRow).getByText('7 Sessions');
     within(aliceRow).getByText('14');
 
@@ -109,7 +98,7 @@ describe('Leaderboard – own-row highlight', () => {
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
     );
-    const { fixture } = await render(Leaderboard, { providers: PROVIDERS });
+    await render(Leaderboard, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
 
     http.expectOne('/api/v1/leaderboard').flush(
@@ -120,11 +109,12 @@ describe('Leaderboard – own-row highlight', () => {
         ],
       }),
     );
-    await drainMicrotasks();
-    fixture.detectChanges();
 
-    expect(screen.getByRole('row', { name: 'Alice' }).getAttribute('aria-current')).toBe('true');
-    expect(screen.getByRole('row', { name: 'Bob' }).getAttribute('aria-current')).toBeNull();
+    expect(await screen.findByRole('row', { name: 'Alice' })).toHaveAttribute(
+      'aria-current',
+      'true',
+    );
+    expect(screen.getByRole('row', { name: 'Bob' })).not.toHaveAttribute('aria-current');
   });
 });
 
@@ -136,7 +126,7 @@ describe('Leaderboard – entries rendered', () => {
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
     );
-    const { fixture } = await render(Leaderboard, { providers: PROVIDERS });
+    await render(Leaderboard, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
 
     http.expectOne('/api/v1/leaderboard').flush(
@@ -147,10 +137,8 @@ describe('Leaderboard – entries rendered', () => {
         ],
       }),
     );
-    await drainMicrotasks();
-    fixture.detectChanges();
 
-    screen.getByRole('row', { name: 'Alice' });
+    await screen.findByRole('row', { name: 'Alice' });
     screen.getByRole('row', { name: 'Bob' });
   });
 });

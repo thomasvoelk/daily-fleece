@@ -40,7 +40,7 @@ describe('Results – player table', () => {
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
     );
-    const { fixture } = await render(Results, { providers: PROVIDERS });
+    await render(Results, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
 
     http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
@@ -65,10 +65,8 @@ describe('Results – player table', () => {
         ],
       }),
     );
-    await drainMicrotasks();
-    fixture.detectChanges();
 
-    screen.getByText('Alice');
+    await screen.findByText('Alice');
     screen.getByText('Bob');
   });
 
@@ -77,7 +75,7 @@ describe('Results – player table', () => {
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
     );
-    const { fixture } = await render(Results, { providers: PROVIDERS });
+    await render(Results, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
 
     http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
@@ -102,10 +100,8 @@ describe('Results – player table', () => {
         ],
       }),
     );
-    await drainMicrotasks();
-    fixture.detectChanges();
 
-    expect(screen.getByText('2')).toBeTruthy();
+    expect(await screen.findByText('2')).toBeTruthy();
     expect(screen.getByText('0')).toBeTruthy();
   });
 });
@@ -119,7 +115,7 @@ describe('Results – arcade headline', () => {
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
     );
-    const { fixture } = await render(Results, { providers: PROVIDERS });
+    await render(Results, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
 
     http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
@@ -137,10 +133,8 @@ describe('Results – arcade headline', () => {
         ],
       }),
     );
-    await drainMicrotasks();
-    fixture.detectChanges();
 
-    expect(screen.getByText(/Perfekt/)).toBeTruthy();
+    expect(await screen.findByText(/Perfekt/)).toBeTruthy();
   });
 
   it('shows Gut dabei! when current player answered exactly one question correctly', async () => {
@@ -148,7 +142,7 @@ describe('Results – arcade headline', () => {
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
     );
-    const { fixture } = await render(Results, { providers: PROVIDERS });
+    await render(Results, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
 
     http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
@@ -166,10 +160,8 @@ describe('Results – arcade headline', () => {
         ],
       }),
     );
-    await drainMicrotasks();
-    fixture.detectChanges();
 
-    expect(screen.getByText(/Gut dabei/)).toBeTruthy();
+    expect(await screen.findByText(/Gut dabei/)).toBeTruthy();
   });
 
   it('shows Weiter so! when current player answered no questions correctly', async () => {
@@ -177,7 +169,7 @@ describe('Results – arcade headline', () => {
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
     );
-    const { fixture } = await render(Results, { providers: PROVIDERS });
+    await render(Results, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
 
     http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
@@ -195,10 +187,8 @@ describe('Results – arcade headline', () => {
         ],
       }),
     );
-    await drainMicrotasks();
-    fixture.detectChanges();
 
-    expect(screen.getByText(/Weiter so/)).toBeTruthy();
+    expect(await screen.findByText(/Weiter so/)).toBeTruthy();
   });
 });
 
@@ -210,7 +200,7 @@ describe('Results – own board row highlighted', () => {
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
     );
-    const { fixture } = await render(Results, { providers: PROVIDERS });
+    await render(Results, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
 
     http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
@@ -235,10 +225,11 @@ describe('Results – own board row highlighted', () => {
         ],
       }),
     );
-    await drainMicrotasks();
-    fixture.detectChanges();
 
-    expect(screen.getByRole('listitem', { name: /Alice/ })).toHaveAttribute('aria-current', 'true');
+    expect(await screen.findByRole('listitem', { name: /Alice/ })).toHaveAttribute(
+      'aria-current',
+      'true',
+    );
     expect(screen.getByRole('listitem', { name: /Bob/ })).not.toHaveAttribute('aria-current');
   });
 });
@@ -251,7 +242,7 @@ describe('Results – board sort order', () => {
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
     );
-    const { fixture } = await render(Results, { providers: PROVIDERS });
+    await render(Results, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
 
     http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
@@ -271,10 +262,8 @@ describe('Results – board sort order', () => {
         ],
       }),
     );
-    await drainMicrotasks();
-    fixture.detectChanges();
 
-    const bobRow = screen.getByRole('listitem', { name: /Bob/ });
+    const bobRow = await screen.findByRole('listitem', { name: /Bob/ });
     const aliceRow = screen.getByRole('listitem', { name: /Alice/ });
     // Node.DOCUMENT_POSITION_FOLLOWING (4): Alice comes after Bob → Bob renders first
     expect(
