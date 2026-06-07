@@ -1,5 +1,5 @@
 <main class="flex min-h-svh flex-col md:h-svh md:flex-row md:overflow-hidden">
-  @if (results(); as data) {
+  @if (store.data()) {
     <!-- Left: plum hero (fixed column on desktop) -->
     <div
       class="relative flex items-center justify-center overflow-hidden bg-plum px-6 py-10 md:w-[42%] md:shrink-0"
@@ -25,8 +25,8 @@
           class="rounded-[26px] motion-safe:animate-pop"
         />
 
-        @if (myResult(); as me) {
-          @if (correctCount() === 2) {
+        @if (store.myResult(); as me) {
+          @if (store.correctCount() === 2) {
             <h1
               class="m-0 font-display text-[30px] leading-tight font-bold text-white motion-safe:animate-pop"
               i18n="results|perfect score headline@@results.headlinePerfect"
@@ -39,7 +39,7 @@
             >
               Beide Fragen richtig — stark!
             </p>
-          } @else if (correctCount() === 1) {
+          } @else if (store.correctCount() === 1) {
             <h1
               class="m-0 font-display text-[30px] leading-tight font-bold text-white motion-safe:animate-pop"
               i18n="results|partial score headline@@results.headlinePartial"
@@ -118,7 +118,7 @@
                 +{{ me.totalPoints }}
               </div>
             </div>
-            @if (myRank(); as rank) {
+            @if (store.myRank(); as rank) {
               <div class="h-12 w-px bg-white/20"></div>
               <div class="flex flex-col items-center">
                 <div
@@ -160,7 +160,7 @@
           Heutige Ergebnisse
         </h2>
         <ul role="list" class="m-0 flex list-none flex-col gap-2 p-0">
-          @for (row of sortedResults(); track row.playerId; let i = $index) {
+          @for (row of store.sortedResults(); track row.playerId; let i = $index) {
             <li
               class="flex items-center gap-3 rounded-xl px-3.5 py-3"
               [class.shadow-1]="row.playerId !== entry.playerId()"

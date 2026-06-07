@@ -1,15 +1,8 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChunkyButton } from '../shared';
-import { Api, getTodaySession, getSessionResults, SessionResultsResponse } from '../backend-client';
 import { EntryContext } from '../entry';
+import { ResultsStore } from './results.store';
 
 @Component({
   selector: 'app-results',
@@ -19,11 +12,9 @@ import { EntryContext } from '../entry';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Results implements OnInit {
-  private readonly api = inject(Api);
-  private readonly router = inject(Router);
+  protected readonly store = inject(ResultsStore);
   protected readonly entry = inject(EntryContext);
-
-  protected readonly results = signal<SessionResultsResponse | null>(null);
+  private readonly router = inject(Router);
 
   protected readonly confetti = Array.from({ length: 22 }, (_, i) => {
     const cols = ['#FFB422', '#14B8A6', '#FF5A5F', '#34C759', '#FFFBF4', '#7C3AF0'];
@@ -36,40 +27,8 @@ export class Results implements OnInit {
     };
   });
 
-  protected readonly myResult = computed(() => {
-    const data = this.results();
-    if (!data) return null;
-    return data.results.find((r) => r.playerId === this.entry.playerId()) ?? null;
-  });
-
-  protected readonly correctCount = computed(() => {
-    const r = this.myResult();
-    if (!r) return 0;
-    return (r.q1Correct ? 1 : 0) + (r.q2Correct ? 1 : 0);
-  });
-
-  protected readonly myRank = computed(() => {
-    const data = this.results();
-    const me = this.myResult();
-    if (!data || !me) return null;
-    const sorted = [...data.results].sort((a, b) => b.totalPoints - a.totalPoints);
-    return sorted.findIndex((r) => r.playerId === me.playerId) + 1;
-  });
-
-  protected readonly sortedResults = computed(() => {
-    const data = this.results();
-    if (!data) return [];
-    return [...data.results].sort((a, b) => b.totalPoints - a.totalPoints);
-  });
-
   ngOnInit(): void {
-    void this.load();
-  }
-
-  private async load(): Promise<void> {
-    const session = await this.api.invoke(getTodaySession);
-    const data = await this.api.invoke(getSessionResults, { sessionId: session.sessionId });
-    this.results.set(data);
+    void this.store.load();
   }
 
   protected goToLeaderboard(): void {
