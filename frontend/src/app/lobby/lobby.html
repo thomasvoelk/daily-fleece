@@ -1,12 +1,12 @@
 <main class="min-h-svh bg-cream p-6">
-  <div class="mx-auto mt-8 flex max-w-sm flex-col gap-4">
+  <div class="mx-auto mt-8 flex max-w-sm flex-col gap-4 md:mt-12 md:max-w-lg">
     <h1 class="text-3xl" i18n="lobby|Heading for the waiting room@@lobby.heading">
       Today's Session
     </h1>
 
     <ul
       role="list"
-      class="m-0 flex list-none flex-col gap-2 p-0"
+      class="m-0 flex list-none flex-col gap-2 p-0 md:grid md:grid-cols-2 md:gap-3"
       aria-label="Players in session"
       i18n-aria-label="lobby|Accessible label for the player list@@lobby.playerListAriaLabel"
     >
@@ -34,21 +34,23 @@
       }
     </ul>
 
-    @if (store.isHost()) {
-      <app-chunky-button
-        (click)="store.startQuiz()"
-        i18n="lobby|Button for host to start the quiz@@lobby.startQuizButton"
-      >
-        Start Quiz
-      </app-chunky-button>
-    } @else {
-      <app-chunky-button
-        (click)="store.goToQuiz()"
-        i18n="lobby|Button to navigate to the quiz@@lobby.goToQuizButton"
-      >
-        Go to Quiz
-      </app-chunky-button>
-    }
+    <div class="md:max-w-xs">
+      @if (store.isHost()) {
+        <app-chunky-button
+          (click)="store.startQuiz()"
+          i18n="lobby|Button for host to start the quiz@@lobby.startQuizButton"
+        >
+          Start Quiz
+        </app-chunky-button>
+      } @else {
+        <app-chunky-button
+          (click)="store.goToQuiz()"
+          i18n="lobby|Button to navigate to the quiz@@lobby.goToQuizButton"
+        >
+          Go to Quiz
+        </app-chunky-button>
+      }
+    </div>
 
     <p class="text-sm text-coral-700" role="alert" aria-live="assertive">
       {{ store.error() ?? '' }}
