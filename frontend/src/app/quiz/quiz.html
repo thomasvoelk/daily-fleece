@@ -2,12 +2,6 @@
   @if (quizStore.session(); as session) {
     <app-quiz-photo [src]="photoUrl(currentQuestion())" [question]="currentQuestion()" />
 
-    @if (quizStore.q2Status() === 'Open') {
-      <div class="px-4 pt-2">
-        <app-country-autocomplete (countrySelected)="submitQ2($event)" />
-      </div>
-    }
-
     <div class="flex items-center justify-between px-4 py-3">
       @if (quizStore.q2Status() === 'Open') {
         <span
@@ -58,6 +52,12 @@
         >
       }
     </div>
+
+    @if (quizStore.q2Status() === 'Open') {
+      <div class="px-4 pt-2">
+        <app-country-autocomplete (countrySelected)="submitQ2($event)" />
+      </div>
+    }
 
     @if (quizStore.q1Status() === 'Open') {
       <fieldset class="flex flex-col gap-2 border-0 px-4 py-2" role="radiogroup">
