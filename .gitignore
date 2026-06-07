@@ -1,4 +1,5 @@
 .DS_Store
+test-results/
 
 # Beads / Dolt files (added by bd init)
 .dolt/
