@@ -60,28 +60,35 @@
     </div>
 
     @if (quizStore.q1Status() === 'Open') {
-      @if (!quizStore.myQ1Answer()) {
-        <p
-          class="px-4 py-1 text-center font-body text-sm font-bold text-plum-soft"
-          i18n="quiz|Prompt shown when the player has not yet answered@@quiz.answerPrompt"
+      <fieldset class="flex flex-col gap-2 border-0 px-4 py-2" role="radiogroup">
+        <legend
+          class="sr-only"
+          i18n="
+            quiz|Visually hidden legend for the answer radio fieldset@@quiz.answerFieldsetLegend"
         >
-          Please choose your answer
-        </p>
-      }
-
-      <mat-radio-group
-        class="flex justify-center gap-3 px-4 py-2"
-        [value]="quizStore.myQ1Answer()"
-        aria-label="Answer"
-        i18n-aria-label="
-          quiz|Accessible label for the player answer radio group@@quiz.answerGroupAriaLabel"
-      >
+          Choose your answer
+        </legend>
         @for (option of ['A', 'B', 'C']; track option) {
-          <mat-radio-button [value]="option" (change)="submit($any(option))">
-            {{ option }}
-          </mat-radio-button>
+          <div class="relative">
+            <input
+              type="radio"
+              class="peer absolute size-px opacity-0 focus:outline-none"
+              name="q1-player"
+              tabindex="0"
+              [id]="'q1-' + option"
+              [value]="option"
+              [checked]="quizStore.myQ1Answer() === option"
+              (change)="submit($any(option))"
+            />
+            <label
+              [for]="'q1-' + option"
+              class="duration-fast flex cursor-pointer items-center justify-center rounded-2xl border-2 border-wool-line bg-paper px-3 py-[18px] font-display text-[28px] font-bold text-plum shadow-1 transition-[transform,border-color,background] tap-transparent peer-checked:border-grape peer-checked:bg-grape-200 peer-checked:text-grape peer-focus-visible:ring-2 peer-focus-visible:ring-grape peer-focus-visible:ring-offset-2 active:translate-y-[3px]"
+            >
+              {{ option }}
+            </label>
+          </div>
         }
-      </mat-radio-group>
+      </fieldset>
     }
 
     @if (q1Revealed(); as q1) {

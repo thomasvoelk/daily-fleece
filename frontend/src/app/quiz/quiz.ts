@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
 import { ChunkyButton } from '../shared';
 import { ApiConfiguration, QuestionVoting } from '../backend-client';
 import { QuizStore } from './quiz.store';
@@ -13,15 +12,7 @@ type ClosedQuestionVoting = QuestionVoting & { status: 'Closed'; correctAnswer: 
 
 @Component({
   selector: 'app-quiz',
-  imports: [
-    MatRadioGroup,
-    MatRadioButton,
-    ChunkyButton,
-    QuizAnswerReveal,
-    QuizPhoto,
-    QuizHostReveal,
-    CountryAutocomplete,
-  ],
+  imports: [ChunkyButton, QuizAnswerReveal, QuizPhoto, QuizHostReveal, CountryAutocomplete],
   templateUrl: './quiz.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

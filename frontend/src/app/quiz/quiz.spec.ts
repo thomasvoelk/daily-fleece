@@ -681,19 +681,3 @@ describe('Quiz – category chip', () => {
     expect(screen.queryByText(/geography/i)).toBeNull();
   });
 });
-
-// ─── no-answer prompt ────────────────────────────────────────────────────────
-
-describe('Quiz – no-answer prompt', () => {
-  it('shows prompt when Q1 is Open and player has not answered', async () => {
-    await renderQuiz();
-
-    screen.getByText(/please choose your answer/i);
-  });
-
-  it('hides prompt once player has answered', async () => {
-    await renderQuiz({ myQ1Answer: signal('A' as const) });
-
-    expect(screen.queryByText(/please choose your answer/i)).toBeNull();
-  });
-});

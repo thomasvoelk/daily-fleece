@@ -122,13 +122,13 @@
         <source><x id="INTERPOLATION" equiv-text="{{ quizStore.answerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.answerCount().total }}"/> answered</source>
         <target><x id="INTERPOLATION" equiv-text="{{ quizStore.answerCount().answered }}"/>/<x id="INTERPOLATION_1" equiv-text="{{ quizStore.answerCount().total }}"/> beantwortet</target>
       </trans-unit>
-      <trans-unit id="quiz.answerGroupAriaLabel" datatype="html">
-        <source>Answer</source>
-        <target>Antwort</target>
+      <trans-unit id="quiz.answerFieldsetLegend" datatype="html">
+        <source>Choose your answer</source>
+        <target>Antwort auswählen</target>
       </trans-unit>
-      <trans-unit id="quiz.answerPrompt" datatype="html">
-        <source>Please choose your answer</source>
-        <target>Bitte wähle deine Antwort</target>
+      <trans-unit id="quiz.hostAnswerFieldsetLegend" datatype="html">
+        <source>Pick correct answer</source>
+        <target>Richtige Antwort auswählen</target>
       </trans-unit>
       <trans-unit id="quiz.correctAnswerLabel" datatype="html">
         <source> Correct answer: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION" equiv-text="{{ correctAnswer() }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>

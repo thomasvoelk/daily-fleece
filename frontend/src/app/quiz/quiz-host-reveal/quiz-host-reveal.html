@@ -4,13 +4,36 @@
   i18n-aria-label="quiz|Accessible label for the host controls section@@quiz.hostControlsAriaLabel"
 >
   @if (q1Status() === 'Open') {
-    <mat-radio-group class="flex gap-4">
+    <fieldset class="flex flex-col gap-2 border-0" role="radiogroup">
+      <legend
+        class="sr-only"
+        i18n="
+          quiz|Visually hidden legend for the host correct-answer radio
+          fieldset@@quiz.hostAnswerFieldsetLegend"
+      >
+        Pick correct answer
+      </legend>
       @for (option of ['A', 'B', 'C']; track option) {
-        <mat-radio-button [value]="option" (change)="selectedQ1Answer.set($any(option))">
-          {{ option }}
-        </mat-radio-button>
+        <div class="relative">
+          <input
+            type="radio"
+            class="peer absolute size-px opacity-0 focus:outline-none"
+            name="q1-correct"
+            tabindex="0"
+            [id]="'q1c-' + option"
+            [value]="option"
+            [checked]="selectedQ1Answer() === option"
+            (change)="selectedQ1Answer.set($any(option))"
+          />
+          <label
+            [for]="'q1c-' + option"
+            class="duration-fast flex cursor-pointer items-center justify-center rounded-2xl border-2 border-wool-line bg-paper px-3 py-[18px] font-display text-[28px] font-bold text-plum shadow-1 transition-[transform,border-color,background] tap-transparent peer-checked:border-grape peer-checked:bg-grape-200 peer-checked:text-grape peer-focus-visible:ring-2 peer-focus-visible:ring-grape peer-focus-visible:ring-offset-2 active:translate-y-[3px]"
+          >
+            {{ option }}
+          </label>
+        </div>
       }
-    </mat-radio-group>
+    </fieldset>
     <app-chunky-button
       color="coral"
       [disabled]="!selectedQ1Answer()"
