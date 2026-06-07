@@ -1,65 +1,105 @@
-<main class="flex min-h-svh flex-col items-center justify-center bg-cream p-6">
-  <form class="flex w-full max-w-sm flex-col gap-4" (submit)="$event.preventDefault()" novalidate>
-    <div class="mb-2 flex flex-col items-center gap-3">
-      <img
-        src="/alpaca-mark.svg"
-        alt=""
-        width="80"
-        height="80"
-        class="rounded-[22px] motion-safe:animate-pop"
-      />
-      <h1
-        class="text-center text-[32px] leading-tight font-bold tracking-tight"
-        i18n="entry|Heading on the entry screen@@entry.heading"
+<main
+  class="flex min-h-svh flex-col items-center justify-center bg-cream p-6 md:flex-row md:items-stretch md:p-0"
+>
+  <!-- Left brand panel — desktop only, aria-hidden since the form heading is the semantic h1 -->
+  <div
+    aria-hidden="true"
+    class="hidden md:flex md:w-1/2 md:shrink-0 md:flex-col md:items-center md:justify-center md:gap-7 md:bg-plum md:px-14 md:py-16"
+  >
+    <img src="/alpaca-mark.svg" alt="" width="108" height="108" class="rounded-[28px]" />
+    <div class="flex flex-col items-center gap-2 text-center">
+      <p
+        class="font-display text-[42px] leading-none font-bold text-white"
+        i18n="entry|App name in the desktop brand panel@@entry.brandHeading"
       >
         Daily Fleece
-      </h1>
+      </p>
       <p
-        class="-mt-2 text-center font-body text-sm font-semibold text-plum-faint"
-        i18n="entry|Tagline below the heading on the entry screen@@entry.tagline"
+        class="font-body text-sm font-semibold text-white/55"
+        i18n="entry|Tagline in the desktop brand panel@@entry.brandTagline"
       >
-        Two questions. Every standup.
+        One standup. Two questions.
       </p>
     </div>
-
-    <mat-form-field appearance="outline">
-      <mat-label i18n="entry|Label for the Company ID input@@entry.companyIdLabel"
-        >Company ID</mat-label
+    <div class="flex gap-2">
+      <span
+        class="rounded-full bg-white/10 px-3 py-1 font-pixel text-[8px] tracking-wide text-grape-200"
+        i18n="quiz|Knowledge category chip label@@quiz.categoryChipKnowledge"
+        >KNOWLEDGE</span
       >
-      <input matInput [formField]="entryForm.companyId" />
-      @for (err of entryForm.companyId().errors(); track $index) {
-        <mat-error>{{ err.message }}</mat-error>
-      }
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label i18n="entry|Label for the Display name input@@entry.displayNameLabel"
-        >Display name</mat-label
+      <span
+        class="rounded-full bg-white/10 px-3 py-1 font-pixel text-[8px] tracking-wide text-teal-200"
+        i18n="quiz|Geography category chip label@@quiz.categoryChipGeography"
+        >GEOGRAPHY</span
       >
-      <input matInput [formField]="entryForm.displayName" />
-      @for (err of entryForm.displayName().errors(); track $index) {
-        <mat-error>{{ err.message }}</mat-error>
-      }
-    </mat-form-field>
+    </div>
+  </div>
 
-    <p class="min-h-5 text-center text-sm text-coral-700" role="alert" aria-live="assertive">
-      {{ store.phase() === 'error' ? store.errorMessage() : '' }}
-    </p>
+  <!-- Right form panel -->
+  <div class="flex w-full flex-col items-center justify-center md:w-1/2 md:px-14 md:py-16">
+    <form class="flex w-full max-w-sm flex-col gap-4" (submit)="$event.preventDefault()" novalidate>
+      <!-- Mobile-only brand block — hidden on desktop where the left panel takes over -->
+      <div class="mb-2 flex flex-col items-center gap-3 md:hidden">
+        <img
+          src="/alpaca-mark.svg"
+          alt=""
+          width="80"
+          height="80"
+          class="rounded-[22px] motion-safe:animate-pop"
+        />
+        <h1
+          class="text-center text-[32px] leading-tight font-bold tracking-tight"
+          i18n="entry|Heading on the entry screen@@entry.heading"
+        >
+          Daily Fleece
+        </h1>
+        <p
+          class="-mt-2 text-center font-body text-sm font-semibold text-plum-faint"
+          i18n="entry|Tagline below the heading on the entry screen@@entry.tagline"
+        >
+          One standup. Two questions.
+        </p>
+      </div>
 
-    <app-chunky-button
-      (click)="onJoinLobby()"
-      [disabled]="store.phase() === 'loading'"
-      i18n="entry|Button to join an existing lobby@@entry.joinLobbyButton"
-    >
-      Join Lobby
-    </app-chunky-button>
-    <app-chunky-button
-      variant="outline"
-      (click)="onCreateLobby()"
-      [disabled]="store.phase() === 'loading'"
-      i18n="entry|Button to create a new lobby@@entry.createLobbyButton"
-    >
-      Create Lobby
-    </app-chunky-button>
-  </form>
+      <mat-form-field appearance="outline">
+        <mat-label i18n="entry|Label for the Company ID input@@entry.companyIdLabel"
+          >Company ID</mat-label
+        >
+        <input matInput [formField]="entryForm.companyId" />
+        @for (err of entryForm.companyId().errors(); track $index) {
+          <mat-error>{{ err.message }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label i18n="entry|Label for the Display name input@@entry.displayNameLabel"
+          >Display name</mat-label
+        >
+        <input matInput [formField]="entryForm.displayName" />
+        @for (err of entryForm.displayName().errors(); track $index) {
+          <mat-error>{{ err.message }}</mat-error>
+        }
+      </mat-form-field>
+
+      <p class="min-h-5 text-center text-sm text-coral-700" role="alert" aria-live="assertive">
+        {{ store.phase() === 'error' ? store.errorMessage() : '' }}
+      </p>
+
+      <app-chunky-button
+        (click)="onJoinLobby()"
+        [disabled]="store.phase() === 'loading'"
+        i18n="entry|Button to join an existing lobby@@entry.joinLobbyButton"
+      >
+        Join Lobby
+      </app-chunky-button>
+      <app-chunky-button
+        variant="outline"
+        (click)="onCreateLobby()"
+        [disabled]="store.phase() === 'loading'"
+        i18n="entry|Button to create a new lobby@@entry.createLobbyButton"
+      >
+        Create Lobby
+      </app-chunky-button>
+    </form>
+  </div>
 </main>

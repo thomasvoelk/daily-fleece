@@ -7,8 +7,16 @@
         <target> Daily Fleece </target>
       </trans-unit>
       <trans-unit id="entry.tagline" datatype="html">
-        <source>Two questions. Every standup.</source>
-        <target>Zwei Fragen. Jeden Standup.</target>
+        <source>One standup. Two questions.</source>
+        <target>Ein Standup. Zwei Fragen.</target>
+      </trans-unit>
+      <trans-unit id="entry.brandHeading" datatype="html">
+        <source>Daily Fleece</source>
+        <target>Daily Fleece</target>
+      </trans-unit>
+      <trans-unit id="entry.brandTagline" datatype="html">
+        <source>One standup. Two questions.</source>
+        <target>Ein Standup. Zwei Fragen.</target>
       </trans-unit>
       <trans-unit id="entry.companyIdLabel" datatype="html">
         <source>Company ID</source>
