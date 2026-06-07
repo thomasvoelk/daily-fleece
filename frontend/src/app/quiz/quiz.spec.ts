@@ -297,7 +297,7 @@ describe('Quiz – Q2 reveal', () => {
       ),
     });
 
-    expect(screen.queryByRole('region', { name: /correct answer/i })).toBeNull();
+    expect(screen.queryByRole('region', { name: /geography/i })).toBeNull();
   });
 });
 
@@ -429,7 +429,7 @@ describe('Quiz – reveal state', () => {
       ),
     });
 
-    const q1Reveal = screen.getByRole('region', { name: 'Correct answer: A' });
+    const q1Reveal = screen.getByRole('region', { name: /knowledge/i });
     within(q1Reveal).getByText('Alice');
     within(q1Reveal).getByText('Bob');
   });

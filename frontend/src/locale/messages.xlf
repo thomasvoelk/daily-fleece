@@ -272,13 +272,13 @@
         <note priority="1" from="description">Error shown when quiz has not started yet</note>
         <note priority="1" from="meaning">lobby</note>
       </trans-unit>
-      <trans-unit id="quiz.correctAnswerLabel" datatype="html">
-        <source> Correct answer: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION" equiv-text="{{ correctAnswer() }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
+      <trans-unit id="quiz.revealCorrectPart" datatype="html">
+        <source> — correct: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION" equiv-text="{{ correctAnswer() }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/quiz/quiz-answer-reveal.html</context>
-          <context context-type="linenumber">7,9</context>
+          <context context-type="sourcefile">src/app/quiz/quiz-answer-reveal/quiz-answer-reveal.html</context>
+          <context context-type="linenumber">22</context>
         </context-group>
-        <note priority="1" from="description">Correct answer label in answer reveal card</note>
+        <note priority="1" from="description">Correct answer suffix in reveal card header</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
       <trans-unit id="quiz.q1PhotoAlt" datatype="html">

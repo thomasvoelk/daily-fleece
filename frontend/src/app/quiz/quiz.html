@@ -92,11 +92,16 @@
     }
 
     @if (q1Revealed(); as q1) {
-      <app-quiz-answer-reveal [correctAnswer]="q1.correctAnswer" [entries]="q1AnswerEntries()" />
+      <app-quiz-answer-reveal
+        [category]="'q1'"
+        [correctAnswer]="q1.correctAnswer"
+        [entries]="q1AnswerEntries()"
+      />
     }
 
     @if (q2Revealed(); as q2) {
       <app-quiz-answer-reveal
+        [category]="'q2'"
         [correctAnswer]="countryName(q2.correctAnswer)"
         [entries]="q2AnswerEntries()"
       />

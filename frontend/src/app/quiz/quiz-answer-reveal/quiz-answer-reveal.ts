@@ -13,6 +13,7 @@ export interface AnswerEntry {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuizAnswerReveal {
+  readonly category = input.required<'q1' | 'q2'>();
   readonly correctAnswer = input.required<string>();
   readonly entries = input.required<AnswerEntry[]>();
 }

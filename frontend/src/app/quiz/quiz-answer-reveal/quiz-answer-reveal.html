@@ -1,16 +1,52 @@
 <mat-card
   role="region"
-  [attr.aria-labelledby]="'quiz-reveal-' + correctAnswer()"
+  [attr.aria-labelledby]="'quiz-reveal-header-' + category()"
   class="mx-4 mt-3 rounded-2xl"
 >
   <mat-card-content>
-    <p
-      [id]="'quiz-reveal-' + correctAnswer()"
-      class="mb-3 font-body text-base font-bold text-plum"
-      i18n="quiz|Correct answer label in answer reveal card@@quiz.correctAnswerLabel"
-    >
-      Correct answer: <strong>{{ correctAnswer() }}</strong>
-    </p>
+    <div class="mb-3 flex items-center gap-1.5">
+      @if (category() === 'q1') {
+        <span
+          aria-hidden="true"
+          class="material-symbols-rounded text-[16px] leading-none text-grape-700"
+          i18n="quiz|Material Symbols ligature — must not be translated@@quiz.iconPsychology"
+          style="font-variation-settings: 'FILL' 1"
+          >psychology</span
+        >
+        <p
+          [id]="'quiz-reveal-header-' + category()"
+          class="font-body text-[12px] font-extrabold text-plum-soft"
+        >
+          <span
+            class="text-grape-700"
+            i18n="quiz|Knowledge category chip label@@quiz.categoryChipKnowledge"
+            >KNOWLEDGE</span
+          ><span i18n="quiz|Correct answer suffix in reveal card header@@quiz.revealCorrectPart">
+            — correct: <strong>{{ correctAnswer() }}</strong></span
+          >
+        </p>
+      } @else {
+        <span
+          aria-hidden="true"
+          class="material-symbols-rounded text-[16px] leading-none text-teal-700"
+          i18n="quiz|Material Symbols ligature — must not be translated@@quiz.iconPublic"
+          style="font-variation-settings: 'FILL' 1"
+          >public</span
+        >
+        <p
+          [id]="'quiz-reveal-header-' + category()"
+          class="font-body text-[12px] font-extrabold text-plum-soft"
+        >
+          <span
+            class="text-teal-700"
+            i18n="quiz|Geography category chip label@@quiz.categoryChipGeography"
+            >GEOGRAPHY</span
+          ><span i18n="quiz|Correct answer suffix in reveal card header@@quiz.revealCorrectPart">
+            — correct: <strong>{{ correctAnswer() }}</strong></span
+          >
+        </p>
+      }
+    </div>
     <ul class="m-0 flex list-none flex-col gap-2 p-0">
       @for (entry of entries(); track entry.displayName) {
         @let correct = entry.answer === correctAnswer();
