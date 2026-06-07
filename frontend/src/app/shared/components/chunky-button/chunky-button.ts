@@ -4,30 +4,33 @@ export type ChunkyButtonColor = 'grape' | 'marigold' | 'teal' | 'coral';
 export type ChunkyButtonVariant = 'solid' | 'outline';
 
 const SOLID_CLASSES: Record<ChunkyButtonColor, string> = {
-  grape: 'bg-grape shadow-chunk-grape active:shadow-chunk-grape-pressed text-white',
-  marigold: 'bg-marigold shadow-chunk-marigold active:shadow-chunk-marigold-pressed text-plum',
-  teal: 'bg-teal shadow-chunk-teal active:shadow-chunk-teal-pressed text-white',
-  coral: 'bg-coral shadow-chunk-coral active:shadow-chunk-coral-pressed text-white',
+  grape:
+    'bg-grape shadow-chunk-grape active:shadow-chunk-grape-pressed text-white focus-visible:ring-grape',
+  marigold:
+    'bg-marigold shadow-chunk-marigold active:shadow-chunk-marigold-pressed text-plum focus-visible:ring-marigold',
+  teal: 'bg-teal shadow-chunk-teal active:shadow-chunk-teal-pressed text-white focus-visible:ring-teal',
+  coral:
+    'bg-coral shadow-chunk-coral active:shadow-chunk-coral-pressed text-white focus-visible:ring-coral',
 };
 
 const OUTLINE_CLASSES: Record<ChunkyButtonColor, string> = {
-  grape: 'border-grape text-grape',
-  marigold: 'border-marigold text-marigold',
-  teal: 'border-teal text-teal',
-  coral: 'border-coral text-coral',
+  grape: 'border-grape text-grape focus-visible:ring-grape',
+  marigold: 'border-marigold text-marigold focus-visible:ring-marigold',
+  teal: 'border-teal text-teal focus-visible:ring-teal',
+  coral: 'border-coral text-coral focus-visible:ring-coral',
 };
 
 const SOLID_ENABLED =
-  'duration-fast w-full cursor-pointer rounded-full border-0 px-6 py-[15px] font-display text-[17px] font-semibold transition-[transform,box-shadow] ease-smooth tap-transparent active:translate-y-[5px]';
+  'duration-fast w-full cursor-pointer rounded-full border-0 px-6 py-[15px] font-display text-[17px] font-semibold transition-[transform,box-shadow] ease-smooth tap-transparent active:translate-y-[5px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 
 const SOLID_DISABLED =
-  'duration-fast w-full cursor-not-allowed rounded-full border-0 px-6 py-[15px] font-display text-[17px] font-semibold opacity-50';
+  'duration-fast w-full cursor-not-allowed rounded-full border-0 px-6 py-[15px] font-display text-[17px] font-semibold opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 
 const OUTLINE_ENABLED =
-  'w-full cursor-pointer rounded-full border-2 bg-transparent px-5 py-[11px] font-display text-[14px] font-semibold tap-transparent';
+  'w-full cursor-pointer rounded-full border-2 bg-transparent px-5 py-[11px] font-display text-[14px] font-semibold tap-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 
 const OUTLINE_DISABLED =
-  'w-full cursor-not-allowed rounded-full border-2 bg-transparent px-5 py-[11px] font-display text-[14px] font-semibold opacity-50';
+  'w-full cursor-not-allowed rounded-full border-2 bg-transparent px-5 py-[11px] font-display text-[14px] font-semibold opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 
 @Component({
   selector: 'app-chunky-button',
