@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  input,
   output,
   signal,
 } from '@angular/core';
@@ -23,6 +24,7 @@ import { CountryList } from '../country-list';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CountryAutocomplete {
+  readonly correctCountryMode = input(false);
   readonly countrySelected = output<string>();
 
   private readonly countryList = inject(CountryList);

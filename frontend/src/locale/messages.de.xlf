@@ -154,9 +154,13 @@
         <source>Close voting</source>
         <target>Abstimmung schließen</target>
       </trans-unit>
-      <trans-unit id="quiz.countryLabel" datatype="html">
-        <source>Country</source>
-        <target>Land</target>
+      <trans-unit id="quiz.countryYourAnswerLabel" datatype="html">
+        <source>Your answer</source>
+        <target>Deine Antwort</target>
+      </trans-unit>
+      <trans-unit id="quiz.countryCorrectLabel" datatype="html">
+        <source>Correct country</source>
+        <target>Richtige Antwort</target>
       </trans-unit>
       <trans-unit id="quiz.hostCountryLabel" datatype="html">
         <source>Country</source>

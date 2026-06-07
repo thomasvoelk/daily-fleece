@@ -1,5 +1,14 @@
 <mat-form-field class="w-full">
-  <mat-label i18n="quiz|Label for the country picker@@quiz.countryLabel">Country</mat-label>
+  @if (correctCountryMode()) {
+    <mat-label i18n="quiz|Label for the host correct-country input@@quiz.countryCorrectLabel"
+      >Correct country</mat-label
+    >
+  } @else {
+    <mat-label
+      i18n="quiz|Label for the player's own country answer input@@quiz.countryYourAnswerLabel"
+      >Your answer</mat-label
+    >
+  }
   <input
     type="text"
     matInput

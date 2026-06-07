@@ -343,13 +343,22 @@
         <note priority="1" from="description">Alt text for the enlarged Q2 photo in the lightbox</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
-      <trans-unit id="quiz.countryLabel" datatype="html">
-        <source>Country</source>
+      <trans-unit id="quiz.countryYourAnswerLabel" datatype="html">
+        <source>Your answer</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/quiz/quiz.html</context>
-          <context context-type="linenumber">97,101</context>
+          <context context-type="sourcefile">src/app/quiz/country-autocomplete/country-autocomplete.html</context>
+          <context context-type="linenumber">4</context>
         </context-group>
-        <note priority="1" from="description">Label for the Q2 country picker</note>
+        <note priority="1" from="description">Label for the player's own country answer input</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.countryCorrectLabel" datatype="html">
+        <source>Correct country</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/country-autocomplete/country-autocomplete.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <note priority="1" from="description">Label for the host correct-country input</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
       <trans-unit id="quiz.q2AnswerCount" datatype="html">

@@ -68,7 +68,10 @@
   }
 
   @if (q2Status() === 'Open') {
-    <app-country-autocomplete (countrySelected)="selectedCountry.set($event)" />
+    <app-country-autocomplete
+      [correctCountryMode]="true"
+      (countrySelected)="selectedCountry.set($event)"
+    />
     <app-chunky-button
       color="coral"
       [disabled]="!selectedCountry()"

@@ -322,7 +322,7 @@ describe('Quiz – host controls', () => {
     });
 
     const hostControls = screen.getByRole('region', { name: /host controls/i });
-    within(hostControls).getByRole('combobox', { name: /country/i });
+    within(hostControls).getByRole('combobox', { name: /correct country/i });
     screen.getByRole('button', { name: /close voting/i });
   });
 
@@ -365,7 +365,7 @@ describe('Quiz – host controls', () => {
     });
 
     const hostControls = screen.getByRole('region', { name: /host controls/i });
-    const input = within(hostControls).getByRole('combobox', { name: /country/i });
+    const input = within(hostControls).getByRole('combobox', { name: /correct country/i });
     await user.click(input);
     const options = screen.getAllByRole('option');
     await user.click(options[0]);
@@ -383,7 +383,7 @@ describe('Quiz – host controls', () => {
     });
 
     const hostControls = screen.getByRole('region', { name: /host controls/i });
-    const input = within(hostControls).getByRole('combobox', { name: /country/i });
+    const input = within(hostControls).getByRole('combobox', { name: /correct country/i });
     await user.click(input);
     await user.type(input, 'deutsch');
 
@@ -615,13 +615,13 @@ describe('Quiz – Q2 country input', () => {
   it('shows country combobox when q2Status is Open', async () => {
     await renderQuiz({ q2Status: signal('Open' as const) });
 
-    screen.getByRole('combobox', { name: /country/i });
+    screen.getByRole('combobox', { name: /your answer/i });
   });
 
   it('hides country combobox when q2Status is not Open', async () => {
     await renderQuiz();
 
-    expect(screen.queryByRole('combobox', { name: /country/i })).toBeNull();
+    expect(screen.queryByRole('combobox', { name: /your answer/i })).toBeNull();
   });
 
   it('selecting a country option calls submitQ2Answer with the ISO code', async () => {
@@ -629,7 +629,7 @@ describe('Quiz – Q2 country input', () => {
     const submitQ2Answer = vi.fn();
     await renderQuiz({ q2Status: signal('Open' as const), submitQ2Answer });
 
-    const input = screen.getByRole('combobox', { name: /country/i });
+    const input = screen.getByRole('combobox', { name: /your answer/i });
     await user.click(input);
     await user.type(input, 'deutsch');
     const option = screen.getAllByRole('option')[0];
@@ -642,7 +642,7 @@ describe('Quiz – Q2 country input', () => {
     const user = userEvent.setup();
     await renderQuiz({ q2Status: signal('Open' as const) });
 
-    const input = screen.getByRole('combobox', { name: /country/i });
+    const input = screen.getByRole('combobox', { name: /your answer/i });
     await user.click(input);
     await user.type(input, 'deutsch');
 
