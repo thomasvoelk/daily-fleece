@@ -72,18 +72,18 @@ export async function completeQuizWithPlayer(
 
   await playerPage.getByRole('button', { name: 'Neu laden' }).click();
 
-  const playerCountryInput = playerPage.getByRole('combobox', { name: 'Land' });
+  const playerCountryInput = playerPage.getByRole('combobox', { name: 'Deine Antwort' });
   await playerCountryInput.click();
   await playerCountryInput.fill('Deutsch');
   await playerPage.getByRole('option', { name: 'Deutschland' }).click();
 
   const hostControls = page.getByRole('region', { name: 'Host-Steuerung' });
-  const hostCountryInput = hostControls.getByRole('combobox', { name: 'Land' });
+  const hostCountryInput = hostControls.getByRole('combobox', { name: 'Richtige Antwort' });
   await hostCountryInput.click();
   await hostCountryInput.fill('Deutsch');
   await page.getByRole('option', { name: 'Deutschland' }).click();
   await hostControls.getByRole('button', { name: 'Abstimmung schließen' }).click();
-  await expect(page.getByText(/Richtige Antwort:.*Deutschland/)).toBeVisible();
+  await expect(page.getByText(/richtig:.*Deutschland/)).toBeVisible();
 
   return { playerPage, playerContext };
 }
