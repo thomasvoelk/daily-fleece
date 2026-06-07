@@ -1,8 +1,31 @@
 <section
-  class="mx-4 mt-3 flex flex-col gap-3 rounded-2xl bg-cream-deep p-4"
+  class="mt-3 flex flex-col gap-3 border-y border-wool-line bg-cream-deep px-4 py-3"
   aria-label="Host controls"
   i18n-aria-label="quiz|Accessible label for the host controls section@@quiz.hostControlsAriaLabel"
 >
+  <div class="flex items-center justify-between">
+    <span
+      class="inline-flex items-center gap-1 rounded-full bg-marigold-200 px-2.5 py-1 font-pixel text-[8px] tracking-wider text-marigold-700"
+    >
+      <span
+        aria-hidden="true"
+        class="material-symbols-rounded text-[14px] leading-none"
+        i18n="quiz|Material Symbols ligature — must not be translated@@quiz.iconSettingsRemote"
+        style="font-variation-settings: 'FILL' 1"
+        >settings_remote</span
+      >
+      <span i18n="quiz|HOST badge label in the host controls section@@quiz.hostBadgeLabel"
+        >HOST</span
+      >
+    </span>
+    <span
+      class="font-pixel text-[10px] tracking-wider text-plum-soft"
+      i18n="
+        quiz|Helper text prompting the host to pick the correct answer@@quiz.hostPickCorrectAnswer"
+      >Pick correct answer</span
+    >
+  </div>
+
   @if (q1Status() === 'Open') {
     <fieldset class="flex flex-col gap-2 border-0" role="radiogroup">
       <legend

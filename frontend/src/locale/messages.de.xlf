@@ -138,6 +138,18 @@
         <source>Host controls</source>
         <target>Host-Steuerung</target>
       </trans-unit>
+      <trans-unit id="quiz.iconSettingsRemote" datatype="html">
+        <source>settings_remote</source>
+        <target>settings_remote</target>
+      </trans-unit>
+      <trans-unit id="quiz.hostBadgeLabel" datatype="html">
+        <source>HOST</source>
+        <target>HOST</target>
+      </trans-unit>
+      <trans-unit id="quiz.hostPickCorrectAnswer" datatype="html">
+        <source>Pick correct answer</source>
+        <target>Richtige Antwort auswählen</target>
+      </trans-unit>
       <trans-unit id="quiz.closeVotingButton" datatype="html">
         <source>Close voting</source>
         <target>Abstimmung schließen</target>

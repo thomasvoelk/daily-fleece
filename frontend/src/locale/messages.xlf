@@ -397,6 +397,33 @@
         <note priority="1" from="description">Accessible label for the host controls section</note>
         <note priority="1" from="meaning">quiz</note>
       </trans-unit>
+      <trans-unit id="quiz.iconSettingsRemote" datatype="html">
+        <source>settings_remote</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz-host-reveal/quiz-host-reveal.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <note priority="1" from="description">Material Symbols ligature — must not be translated</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.hostBadgeLabel" datatype="html">
+        <source>HOST</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz-host-reveal/quiz-host-reveal.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <note priority="1" from="description">HOST badge label in the host controls section</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
+      <trans-unit id="quiz.hostPickCorrectAnswer" datatype="html">
+        <source>Pick correct answer</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/quiz/quiz-host-reveal/quiz-host-reveal.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <note priority="1" from="description">Helper text prompting the host to pick the correct answer</note>
+        <note priority="1" from="meaning">quiz</note>
+      </trans-unit>
       <trans-unit id="quiz.closeVotingButton" datatype="html">
         <source> Close voting </source>
         <context-group purpose="location">
