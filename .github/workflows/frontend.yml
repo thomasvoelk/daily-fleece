@@ -2,22 +2,23 @@ name: Frontend CI
 
 on:
   push:
+    branches-ignore:
+      - 'renovate/**'
     paths:
       - 'frontend/**'
       - 'api/**'
+
   pull_request:
     paths:
       - 'frontend/**'
       - 'api/**'
-  workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v5
 
