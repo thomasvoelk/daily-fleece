@@ -7,8 +7,12 @@
   "packageRules": [
     {
       "description": "Apply js-app preset to frontend directory",
-      "matchPaths": ["frontend/**"],
-      "extends": [":js-app"]
+      "matchFileNames": [
+        "frontend/**"
+      ],
+      "extends": [
+        "config:js-app"
+      ]
     }
   ]
 }
