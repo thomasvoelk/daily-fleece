@@ -6,6 +6,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { Api, getLeaderboard, LeaderboardResponse } from '../backend-client';
 import { EntryContext } from '../entry';
 
@@ -45,7 +46,7 @@ export class Leaderboard implements OnInit {
   }
 
   private async load(): Promise<void> {
-    const response = await this.api.invoke(getLeaderboard);
+    const response = await firstValueFrom(this.api.invoke(getLeaderboard));
     this.data.set(response);
   }
 }

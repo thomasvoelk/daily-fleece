@@ -1,5 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { Api, getTodaySession, startSession, SessionResponse } from '../backend-client';
 import { EntryContext } from '../entry';
@@ -36,7 +37,7 @@ export const LobbyStore = signalStore(
 
       async goToQuiz(): Promise<void> {
         patchState(store, { error: null });
-        const session = await api.invoke(getTodaySession);
+        const session = await firstValueFrom(api.invoke(getTodaySession));
         patchState(store, { session });
         if (session.phase === 'Active') {
           await router.navigate(['/quiz']);
@@ -51,10 +52,12 @@ export const LobbyStore = signalStore(
         const session = store.session();
         const playerId = entryStore.playerId();
         if (!session || !playerId) return;
-        await api.invoke(startSession, {
-          sessionId: session.sessionId,
-          body: { hostId: playerId },
-        });
+        await firstValueFrom(
+          api.invoke(startSession, {
+            sessionId: session.sessionId,
+            body: { hostId: playerId },
+          }),
+        );
         await router.navigate(['/quiz']);
       },
     };

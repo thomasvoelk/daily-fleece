@@ -1,4 +1,5 @@
 import { computed, inject } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { Api, getTodaySession, getSessionResults, SessionResultsResponse } from '../backend-client';
 import { EntryContext } from '../entry';
@@ -43,8 +44,10 @@ export const ResultsStore = signalStore(
     const api = inject(Api);
     return {
       async load(): Promise<void> {
-        const session = await api.invoke(getTodaySession);
-        const data = await api.invoke(getSessionResults, { sessionId: session.sessionId });
+        const session = await firstValueFrom(api.invoke(getTodaySession));
+        const data = await firstValueFrom(
+          api.invoke(getSessionResults, { sessionId: session.sessionId }),
+        );
         patchState(store, { data });
       },
     };

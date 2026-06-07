@@ -1,5 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import {
   Api,
@@ -71,7 +72,7 @@ export const QuizStore = signalStore(
     const entryStore = inject(EntryContext);
 
     async function fetchAndStore(): Promise<void> {
-      const session = await api.invoke(getTodaySession);
+      const session = await firstValueFrom(api.invoke(getTodaySession));
       patchState(store, { session, error: null });
     }
 
@@ -81,7 +82,7 @@ export const QuizStore = signalStore(
       },
 
       async loadSession(): Promise<void> {
-        const session = await api.invoke(getTodaySession);
+        const session = await firstValueFrom(api.invoke(getTodaySession));
         patchState(store, { session, error: null });
         if (session.phase === 'Ended') {
           await router.navigate(['/results']);
@@ -91,7 +92,7 @@ export const QuizStore = signalStore(
       },
 
       async refresh(): Promise<void> {
-        const session = await api.invoke(getTodaySession);
+        const session = await firstValueFrom(api.invoke(getTodaySession));
         patchState(store, { session, error: null });
         if (session.phase === 'Ended') {
           await router.navigate(['/results']);
@@ -103,11 +104,13 @@ export const QuizStore = signalStore(
         const playerId = entryStore.playerId();
         if (!session || !playerId) return;
         patchState(store, { ownQ1Answer: answer });
-        await api.invoke(submitAnswer, {
-          sessionId: session.sessionId,
-          question: 'q1',
-          body: { playerId, answer },
-        });
+        await firstValueFrom(
+          api.invoke(submitAnswer, {
+            sessionId: session.sessionId,
+            question: 'q1',
+            body: { playerId, answer },
+          }),
+        );
         await fetchAndStore();
       },
 
@@ -116,11 +119,13 @@ export const QuizStore = signalStore(
         const playerId = entryStore.playerId();
         if (!session || !playerId) return;
         patchState(store, { ownQ2Answer: answer });
-        await api.invoke(submitAnswer, {
-          sessionId: session.sessionId,
-          question: 'q2',
-          body: { playerId, answer },
-        });
+        await firstValueFrom(
+          api.invoke(submitAnswer, {
+            sessionId: session.sessionId,
+            question: 'q2',
+            body: { playerId, answer },
+          }),
+        );
         await fetchAndStore();
       },
 
@@ -128,11 +133,13 @@ export const QuizStore = signalStore(
         const session = store.session();
         const playerId = entryStore.playerId();
         if (!session || !playerId) return;
-        const updated = await api.invoke(setCorrectAnswer, {
-          sessionId: session.sessionId,
-          question: 'q1',
-          body: { hostId: playerId, correctAnswer },
-        });
+        const updated = await firstValueFrom(
+          api.invoke(setCorrectAnswer, {
+            sessionId: session.sessionId,
+            question: 'q1',
+            body: { hostId: playerId, correctAnswer },
+          }),
+        );
         patchState(store, { session: updated, error: null });
       },
 
@@ -140,11 +147,13 @@ export const QuizStore = signalStore(
         const session = store.session();
         const playerId = entryStore.playerId();
         if (!session || !playerId) return;
-        const updated = await api.invoke(setCorrectAnswer, {
-          sessionId: session.sessionId,
-          question: 'q2',
-          body: { hostId: playerId, correctAnswer },
-        });
+        const updated = await firstValueFrom(
+          api.invoke(setCorrectAnswer, {
+            sessionId: session.sessionId,
+            question: 'q2',
+            body: { hostId: playerId, correctAnswer },
+          }),
+        );
         patchState(store, { session: updated, error: null });
       },
     };

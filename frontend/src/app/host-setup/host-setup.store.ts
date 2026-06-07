@@ -1,5 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { Api, createSession } from '../backend-client';
 import { EntryContext } from '../entry';
@@ -51,14 +52,16 @@ export const HostSetupStore = signalStore(
         if (!q1 || !q2) return; // canSubmit() already guarantees this; needed for type narrowing
         patchState(store, { phase: 'loading', errorMessage: null });
         try {
-          await api.invoke(createSession, {
-            body: {
-              hostId: playerId,
-              hostDisplayName: displayName,
-              q1,
-              q2,
-            },
-          });
+          await firstValueFrom(
+            api.invoke(createSession, {
+              body: {
+                hostId: playerId,
+                hostDisplayName: displayName,
+                q1,
+                q2,
+              },
+            }),
+          );
           patchState(store, { phase: 'idle' });
           await router.navigate(['/lobby']);
         } catch {
