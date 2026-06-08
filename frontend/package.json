@@ -8,7 +8,9 @@
     "watch": "NODE_OPTIONS=\"--throw-deprecation --require ./scripts/deprecation-filter.cjs\" ng build --watch --configuration development",
     "test": "NODE_OPTIONS=\"--throw-deprecation --require ./scripts/deprecation-filter.cjs\" ng test",
     "lint": "eslint src/ --max-warnings=0",
-    "generate:api": "ng-openapi-gen"
+    "generate:api": "ng-openapi-gen",
+    "prebuild": "ng-openapi-gen",
+    "prestart": "ng-openapi-gen"
   },
   "private": true,
   "overrides": {

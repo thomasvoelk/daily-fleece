@@ -33,10 +33,6 @@ jobs:
         run: npm ci
         working-directory: frontend
 
-      - name: Generate API client
-        run: npm run generate:api
-        working-directory: frontend
-
       - name: Build
         run: npm run build
         working-directory: frontend
