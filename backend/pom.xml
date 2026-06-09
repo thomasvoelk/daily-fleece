@@ -328,6 +328,8 @@
 					<includeTests>true</includeTests>
 					<failOnViolation>true</failOnViolation>
 					<printFailingErrors>true</printFailingErrors>
+					<linkXRef>false</linkXRef>
+					<skipEmptyReport>true</skipEmptyReport>
 					<excludeRoots>
 						<excludeRoot>${project.build.directory}</excludeRoot>
 					</excludeRoots>
@@ -341,6 +343,9 @@
 						</goals>
 						<configuration>
 							<minimumTokens>50</minimumTokens>
+							<ignoreAnnotations>true</ignoreAnnotations>
+							<ignoreIdentifiers>true</ignoreIdentifiers>
+							<ignoreLiterals>true</ignoreLiterals>
 							<includes>
 								<include>src/main/java/**/*.java</include>
 							</includes>
