@@ -328,6 +328,9 @@
 					<includeTests>true</includeTests>
 					<failOnViolation>true</failOnViolation>
 					<printFailingErrors>true</printFailingErrors>
+					<excludeRoots>
+						<excludeRoot>${project.build.directory}</excludeRoot>
+					</excludeRoots>
 				</configuration>
 				<executions>
 					<execution>
