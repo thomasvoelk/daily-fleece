@@ -7,7 +7,7 @@ test.beforeEach(async () => {
 
 for (const order of ['player-first', 'host-first'] as const) {
   test.describe(order, () => {
-    test('Q2 geography voting — player submits country, host closes voting, both see reveal', async ({
+    test('Q2 geography voting — player submits country, host closes voting, results show answers', async ({
       page,
       browser,
     }) => {
@@ -48,9 +48,14 @@ for (const order of ['player-first', 'host-first'] as const) {
       // ── host closes Q2 voting ────────────────────────────────────────────────
       await hostControls.getByRole('button', { name: 'Abstimmung schließen' }).click();
 
-      // ── host sees reveal with correct country and player answers ─────────────
-      await expect(page.getByText(/richtig:.*Deutschland/)).toBeVisible();
-      await expect(page.getByText('Bob Spieler')).toBeVisible();
+      // ── host auto-navigates to /results ─────────────────────────────────────
+      await expect(page).toHaveURL(/\/results/);
+
+      // ── results table shows correct Q2 answer in column header ───────────────
+      await expect(page.getByRole('columnheader', { name: /Deutschland/ })).toBeVisible();
+
+      // ── Bob Spieler's row is in the results table ────────────────────────────
+      await expect(page.getByRole('row', { name: 'Bob Spieler' })).toBeVisible();
 
       await playerContext.close();
     });

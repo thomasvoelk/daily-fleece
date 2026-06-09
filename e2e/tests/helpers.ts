@@ -83,7 +83,8 @@ export async function completeQuizWithPlayer(
   await hostCountryInput.fill('Deutsch');
   await page.getByRole('option', { name: 'Deutschland' }).click();
   await hostControls.getByRole('button', { name: 'Abstimmung schließen' }).click();
-  await expect(page.getByText(/richtig:.*Deutschland/)).toBeVisible();
+  // host auto-navigates to /results after setQ2CorrectAnswer (QuizAnswerReveal removed in df-c9x.1)
+  await expect(page).toHaveURL(/\/results/);
 
   return { playerPage, playerContext };
 }
