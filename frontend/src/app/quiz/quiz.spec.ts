@@ -163,46 +163,6 @@ describe('Quiz – refresh button', () => {
 
     expect(refresh).toHaveBeenCalled();
   });
-
-  it('shows "Proceed to results" when both answers are revealed', async () => {
-    await renderQuiz({
-      q1Status: signal('Closed' as const),
-      q2Status: signal('Closed' as const),
-      session: signal(
-        makeSession({
-          voting: {
-            q1: { status: 'Closed', correctAnswer: 'A' },
-            q2: { status: 'Closed', correctAnswer: 'DE' },
-          },
-        }),
-      ),
-    });
-
-    screen.getByRole('button', { name: /proceed to results/i });
-    expect(screen.queryByRole('button', { name: /refresh/i })).toBeNull();
-  });
-
-  it('calls refresh when "Proceed to results" is clicked', async () => {
-    const user = userEvent.setup();
-    const refresh = vi.fn();
-    await renderQuiz({
-      refresh,
-      q1Status: signal('Closed' as const),
-      q2Status: signal('Closed' as const),
-      session: signal(
-        makeSession({
-          voting: {
-            q1: { status: 'Closed', correctAnswer: 'A' },
-            q2: { status: 'Closed', correctAnswer: 'DE' },
-          },
-        }),
-      ),
-    });
-
-    await user.click(screen.getByRole('button', { name: /proceed to results/i }));
-
-    expect(refresh).toHaveBeenCalled();
-  });
 });
 
 // ─── answer count ────────────────────────────────────────────────────────────
@@ -247,57 +207,6 @@ describe('Quiz – Q2 answer count', () => {
 
     screen.getByText(/1\/5 answered/i);
     expect(screen.queryByText(/3\/5 answered/i)).toBeNull();
-  });
-});
-
-// ─── Q2 reveal ───────────────────────────────────────────────────────────────
-
-describe('Quiz – Q2 reveal', () => {
-  it('shows correct country name and player answers when Q2 is Closed', async () => {
-    await renderQuiz({
-      q2Status: signal('Closed' as const),
-      session: signal(
-        makeSession({
-          voting: {
-            q1: { status: 'Closed', correctAnswer: 'A' },
-            q2: {
-              status: 'Closed',
-              correctAnswer: 'DE',
-              answers: {
-                p1: { answer: 'DE', displayName: 'Alice' },
-                p2: { answer: 'FR', displayName: 'Bob' },
-              },
-            },
-          },
-        }),
-      ),
-    });
-
-    expect(screen.getAllByText(/deutschland/i).length).toBeGreaterThan(0);
-    screen.getByText('Alice');
-    screen.getByText('Bob');
-  });
-
-  it('does not show Q2 reveal when Q2 is still Open', async () => {
-    await renderQuiz({ q2Status: signal('Open' as const) });
-
-    expect(screen.queryByText(/deutschland/i)).toBeNull();
-  });
-
-  it('does not show Q2 reveal while Q1 voting is in progress', async () => {
-    await renderQuiz({
-      q2Status: signal('Closed' as const),
-      session: signal(
-        makeSession({
-          voting: {
-            q1: { status: 'Open' },
-            q2: { status: 'Closed' },
-          },
-        }),
-      ),
-    });
-
-    expect(screen.queryByRole('region', { name: /geography/i })).toBeNull();
   });
 });
 
@@ -415,63 +324,6 @@ describe('Quiz – host controls', () => {
   });
 });
 
-// ─── reveal state ────────────────────────────────────────────────────────────
-
-describe('Quiz – reveal state', () => {
-  it('shows correct answer and player answers when both questions are Closed', async () => {
-    await renderQuiz({
-      q1Status: signal('Closed' as const),
-      q2Status: signal('Closed' as const),
-      session: signal(
-        makeSession({
-          voting: {
-            q1: {
-              status: 'Closed',
-              correctAnswer: 'A',
-              answers: {
-                p1: { answer: 'A', displayName: 'Alice' },
-                p2: { answer: 'C', displayName: 'Bob' },
-              },
-            },
-            q2: { status: 'Closed', correctAnswer: 'DE' },
-          },
-        }),
-      ),
-    });
-
-    const q1Reveal = screen.getByRole('region', { name: /knowledge/i });
-    within(q1Reveal).getByText('Alice');
-    within(q1Reveal).getByText('Bob');
-  });
-
-  it('does not show Q1 reveal while Q2 voting is Open', async () => {
-    await renderQuiz({
-      q1Status: signal('Closed' as const),
-      q2Status: signal('Open' as const),
-      session: signal(
-        makeSession({
-          voting: {
-            q1: {
-              status: 'Closed',
-              correctAnswer: 'A',
-              answers: { p1: { answer: 'A', displayName: 'Alice' } },
-            },
-            q2: { status: 'Open' },
-          },
-        }),
-      ),
-    });
-
-    expect(screen.queryByText(/correct answer/i)).toBeNull();
-  });
-
-  it('does not show reveal section when Q1 is still Open', async () => {
-    await renderQuiz();
-
-    expect(screen.queryByText(/richtige antwort/i)).toBeNull();
-  });
-});
-
 // ─── Q1 photo lightbox ───────────────────────────────────────────────────────
 
 describe('Quiz – Q1 photo lightbox', () => {
@@ -530,53 +382,6 @@ describe('Quiz – Q1 photo lightbox', () => {
     await user.keyboard('[Escape]');
 
     expect(screen.queryByRole('img', { name: 'Question 1 enlarged' })).toBeNull();
-  });
-});
-
-// ─── reveal header ───────────────────────────────────────────────────────────
-
-describe('Quiz – reveal header', () => {
-  const bothRevealedOverrides = {
-    q1Status: signal('Closed' as const),
-    q2Status: signal('Closed' as const),
-    session: signal(
-      makeSession({
-        voting: {
-          q1: { status: 'Closed', correctAnswer: 'A' },
-          q2: { status: 'Closed', correctAnswer: 'DE' },
-        },
-      }),
-    ),
-  };
-
-  it('shows "Results are in!" heading when both questions are revealed', async () => {
-    await renderQuiz(bothRevealedOverrides);
-
-    screen.getByRole('heading', { name: /that's a wrap/i });
-  });
-
-  it('hides the photo when both questions are revealed', async () => {
-    await renderQuiz({
-      ...bothRevealedOverrides,
-      session: signal(
-        makeSession({
-          sessionId: 'abc',
-          voting: {
-            q1: { status: 'Closed', correctAnswer: 'A' },
-            q2: { status: 'Closed', correctAnswer: 'DE' },
-          },
-        }),
-      ),
-    });
-
-    expect(screen.queryByRole('img', { name: /question 1/i })).toBeNull();
-    expect(screen.queryByRole('img', { name: /question 2/i })).toBeNull();
-  });
-
-  it('does not show the reveal header during voting', async () => {
-    await renderQuiz();
-
-    expect(screen.queryByRole('heading', { name: /that's a wrap/i })).toBeNull();
   });
 });
 

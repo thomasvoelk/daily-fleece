@@ -434,10 +434,10 @@ describe('QuizStore – loadSession', () => {
   });
 });
 
-// ─── setQ2CorrectAnswer → quiz page stays active ─────────────────────────────
+// ─── setQ2CorrectAnswer → navigates to /results ───────────────────────────────
 
-describe('QuizStore – setQ2CorrectAnswer keeps quiz page active', () => {
-  it('keeps the quiz page active so the Q2 reveal card can render', async () => {
+describe('QuizStore – setQ2CorrectAnswer navigates to results', () => {
+  it('navigates to /results after the host sets the Q2 correct answer', async () => {
     localStorage.setItem(
       'lobby-player',
       JSON.stringify({ playerId: 'host-1', companyId: 'acme', displayName: 'Host' }),
@@ -471,6 +471,6 @@ describe('QuizStore – setQ2CorrectAnswer keeps quiz page active', () => {
     );
     await closePromise;
 
-    expect(navigateSpy).not.toHaveBeenCalled();
+    expect(navigateSpy).toHaveBeenCalledWith(['/results']);
   });
 });

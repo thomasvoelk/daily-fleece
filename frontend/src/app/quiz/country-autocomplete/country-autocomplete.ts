@@ -15,7 +15,7 @@ import {
   MatAutocompleteTrigger,
   MatOption,
 } from '@angular/material/autocomplete';
-import { CountryList } from '../country-list';
+import { CountryList } from '../../shared';
 
 @Component({
   selector: 'app-country-autocomplete',

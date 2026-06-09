@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ChunkyButton } from '../shared';
+import { ChunkyButton, CountryList } from '../shared';
 import { EntryContext } from '../entry';
 import { ResultsStore } from './results.store';
 
@@ -15,6 +15,11 @@ export class Results implements OnInit {
   protected readonly store = inject(ResultsStore);
   protected readonly entry = inject(EntryContext);
   private readonly router = inject(Router);
+  private readonly countryList = inject(CountryList);
+
+  protected countryName(code: string | null): string {
+    return code ? this.countryList.nameOf(code) : '';
+  }
 
   protected readonly confetti = Array.from({ length: 22 }, (_, i) => {
     const cols = ['#FFB422', '#14B8A6', '#FF5A5F', '#34C759', '#FFFBF4', '#7C3AF0'];

@@ -155,6 +155,7 @@ export const QuizStore = signalStore(
           }),
         );
         patchState(store, { session: updated, error: null });
+        await router.navigate(['/results']);
       },
     };
   }),

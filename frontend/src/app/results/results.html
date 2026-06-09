@@ -150,7 +150,7 @@
       </div>
     </div>
 
-    <!-- Right: scrollable results list + button -->
+    <!-- Right: scrollable results table + button -->
     <div class="flex flex-col bg-cream md:flex-1 md:overflow-y-auto">
       <section class="flex flex-1 flex-col gap-3 px-4 pt-6 pb-4">
         <h2
@@ -159,43 +159,95 @@
         >
           Heutige Ergebnisse
         </h2>
-        <ul role="list" class="m-0 flex list-none flex-col gap-2 p-0">
-          @for (row of store.sortedResults(); track row.playerId; let i = $index) {
-            <li
-              class="flex items-center gap-3 rounded-xl px-3.5 py-3"
-              [class.shadow-1]="row.playerId !== entry.playerId()"
-              [class.bg-paper]="row.playerId !== entry.playerId()"
-              [class.bg-grape-200]="row.playerId === entry.playerId()"
-              [class.shadow-ring-grape]="row.playerId === entry.playerId()"
-              [attr.aria-current]="row.playerId === entry.playerId() ? 'true' : null"
-              [attr.aria-label]="row.displayName"
-            >
-              <div class="w-7 shrink-0 text-center font-pixel text-[10px] text-plum-faint">
-                #{{ i + 1 }}
-              </div>
-              <div class="flex-1 font-body text-[15px] font-extrabold text-plum">
-                {{ row.displayName }}
-              </div>
-              <div
-                class="w-6 text-center font-body text-sm font-extrabold"
-                [class.text-coral-700]="!row.q1Correct"
-                [class.text-green-700]="row.q1Correct"
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b-2 border-wool-line">
+              <th scope="col" class="w-8 py-2 pr-2 pl-0 text-center"></th>
+              <th scope="col" class="p-2 text-left"></th>
+              <th scope="col" class="p-2 text-left">
+                <span
+                  class="block font-pixel text-[6px] tracking-[.06em] text-grape-700"
+                  i18n="quiz|Knowledge category chip label@@quiz.categoryChipKnowledge"
+                  >WISSEN</span
+                >
+                @if (store.q1CorrectAnswer(); as a) {
+                  <span
+                    class="font-body text-[11px] font-extrabold whitespace-nowrap text-grape-700"
+                    >✓ {{ a }}</span
+                  >
+                }
+              </th>
+              <th scope="col" class="p-2 text-left">
+                <span
+                  class="block font-pixel text-[6px] tracking-[.06em] text-teal-700"
+                  i18n="quiz|Geography category chip label@@quiz.categoryChipGeography"
+                  >GEO</span
+                >
+                @if (store.q2CorrectAnswer(); as code) {
+                  <span class="font-body text-[11px] font-extrabold whitespace-nowrap text-teal-700"
+                    >✓ {{ countryName(code) }}</span
+                  >
+                }
+              </th>
+              <th
+                scope="col"
+                class="py-2 pr-0 pl-2 text-right font-pixel text-[7px] whitespace-nowrap text-marigold-700"
+                i18n="results|points column header@@results.colPts"
               >
-                {{ row.q1Correct ? '✓' : '✗' }}
-              </div>
-              <div
-                class="w-6 text-center font-body text-sm font-extrabold"
-                [class.text-coral-700]="!row.q2Correct"
-                [class.text-green-700]="row.q2Correct"
+                PTS
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of store.enrichedResults(); track row.playerId; let i = $index) {
+              <tr
+                class="border-b border-wool-line"
+                [class.bg-grape-200]="row.playerId === entry.playerId()"
+                [attr.aria-current]="row.playerId === entry.playerId() ? 'true' : null"
+                [attr.aria-label]="row.displayName"
               >
-                {{ row.q2Correct ? '✓' : '✗' }}
-              </div>
-              <div class="shrink-0 font-pixel text-[11px] text-marigold-700">
-                {{ row.totalPoints }}
-              </div>
-            </li>
-          }
-        </ul>
+                <td class="py-2.5 pr-2 pl-0 text-center font-pixel text-[10px] text-plum-faint">
+                  #{{ i + 1 }}
+                </td>
+                <td
+                  class="w-full max-w-0 overflow-hidden px-2 py-2.5 font-body text-[15px] font-extrabold whitespace-nowrap"
+                  [class.text-grape-700]="row.playerId === entry.playerId()"
+                  [class.text-plum]="row.playerId !== entry.playerId()"
+                  style="text-overflow: ellipsis"
+                >
+                  {{ row.displayName }}
+                </td>
+                <td class="px-2 py-2.5">
+                  @if (row.q1Answer) {
+                    <span
+                      class="rounded-[8px] px-1.5 py-1 font-body text-[12px] font-bold"
+                      [class.bg-green-200]="row.q1Correct"
+                      [class.text-green-700]="row.q1Correct"
+                      [class.bg-coral-200]="!row.q1Correct"
+                      [class.text-coral-700]="!row.q1Correct"
+                      >{{ row.q1Answer }}</span
+                    >
+                  }
+                </td>
+                <td class="px-2 py-2.5 whitespace-nowrap">
+                  @if (row.q2Answer) {
+                    <span
+                      class="rounded-[8px] px-1.5 py-1 font-body text-[11px] font-bold"
+                      [class.bg-green-200]="row.q2Correct"
+                      [class.text-green-700]="row.q2Correct"
+                      [class.bg-coral-200]="!row.q2Correct"
+                      [class.text-coral-700]="!row.q2Correct"
+                      >{{ countryName(row.q2Answer) }}</span
+                    >
+                  }
+                </td>
+                <td class="py-2.5 pr-0 pl-2 text-right font-pixel text-[11px] text-marigold-700">
+                  {{ row.totalPoints }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </section>
 
       <div class="px-4 pt-2 pb-8 md:border-t md:border-wool-line">

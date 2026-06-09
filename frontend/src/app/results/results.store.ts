@@ -1,16 +1,33 @@
 import { computed, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
-import { Api, getTodaySession, getSessionResults, SessionResultsResponse } from '../backend-client';
+import {
+  Api,
+  getTodaySession,
+  getSessionResults,
+  SessionResponse,
+  SessionResultsResponse,
+} from '../backend-client';
 import { EntryContext } from '../entry';
 
+export interface EnrichedResult {
+  playerId: string;
+  displayName: string;
+  q1Answer: string | null;
+  q2Answer: string | null;
+  q1Correct: boolean;
+  q2Correct: boolean;
+  totalPoints: number;
+}
+
 interface ResultsState {
+  session: SessionResponse | null;
   data: SessionResultsResponse | null;
 }
 
 export const ResultsStore = signalStore(
   { providedIn: 'root' },
-  withState<ResultsState>({ data: null }),
+  withState<ResultsState>({ session: null, data: null }),
   withComputed((store) => {
     const entry = inject(EntryContext);
     return {
@@ -24,6 +41,8 @@ export const ResultsStore = signalStore(
         if (!d) return [];
         return [...d.results].sort((a, b) => b.totalPoints - a.totalPoints);
       }),
+      q1CorrectAnswer: computed(() => store.session()?.voting.q1.correctAnswer ?? null),
+      q2CorrectAnswer: computed(() => store.session()?.voting.q2.correctAnswer ?? null),
     };
   }),
   withComputed((store) => ({
@@ -39,6 +58,19 @@ export const ResultsStore = signalStore(
       const sorted = [...d.results].sort((a, b) => b.totalPoints - a.totalPoints);
       return sorted.findIndex((r) => r.playerId === me.playerId) + 1;
     }),
+    enrichedResults: computed((): EnrichedResult[] => {
+      const session = store.session();
+      const sorted = store.sortedResults();
+      return sorted.map((r) => ({
+        playerId: r.playerId,
+        displayName: r.displayName,
+        q1Answer: session?.voting.q1.answers?.[r.playerId]?.answer ?? null,
+        q2Answer: session?.voting.q2.answers?.[r.playerId]?.answer ?? null,
+        q1Correct: r.q1Correct,
+        q2Correct: r.q2Correct,
+        totalPoints: r.totalPoints,
+      }));
+    }),
   })),
   withMethods((store) => {
     const api = inject(Api);
@@ -48,7 +80,7 @@ export const ResultsStore = signalStore(
         const data = await firstValueFrom(
           api.invoke(getSessionResults, { sessionId: session.sessionId }),
         );
-        patchState(store, { data });
+        patchState(store, { session, data });
       },
     };
   }),

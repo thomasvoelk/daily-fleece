@@ -263,6 +263,10 @@
         <source> RANG </source>
         <target> RANG </target>
       </trans-unit>
+      <trans-unit id="results.colPts" datatype="html">
+        <source>PTS</source>
+        <target>PTS</target>
+      </trans-unit>
       <trans-unit id="results.headlineDone" datatype="html">
         <source> Session vorbei! 🦙 </source>
         <target> Session vorbei! 🦙 </target>
