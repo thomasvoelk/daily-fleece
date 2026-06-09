@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daily Fleece — Standup Display</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; background: #0d0a18; }
+
+  /* ── outer stage: letterbox at 16:9 ── */
+  .stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #0d0a18;
+  }
+  .canvas {
+    width: 1280px; height: 720px;
+    transform-origin: top left;
+    position: relative; overflow: hidden;
+  }
+
+  /* ── arcade night bg ── */
+  .canvas {
+    background: var(--plum);
+  }
+  .canvas::before {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  /* soft purple glow blobs */
+  .blob {
+    position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none;
+  }
+  .blob1 { width: 500px; height: 500px; top: -120px; left: -80px; background: rgba(124,58,240,.35); }
+  .blob2 { width: 400px; height: 400px; bottom: -80px; right: -60px; background: rgba(20,184,166,.25); }
+  .blob3 { width: 300px; height: 300px; top: 40%; right: 22%; background: rgba(255,180,34,.12); }
+
+  /* confetti dots */
+  .confetti-field { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .cdot { position: absolute; border-radius: 2px; opacity: .75; }
+
+  /* ── layout ── */
+  .layout {
+    position: relative; z-index: 2;
+    height: 100%; display: grid;
+    grid-template-columns: 340px 1fr;
+    grid-template-rows: 80px 1fr 64px;
+    gap: 0;
+  }
+
+  /* ── header ── */
+  .header {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; padding: 0 36px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .logo-wrap { display: flex; align-items: center; gap: 13px; }
+  .logo-wrap img { width: 44px; height: 44px; border-radius: 12px; }
+  .logo-wrap .wd { display: flex; flex-direction: column; line-height: 1; }
+  .logo-wrap .d { font-family: var(--font-pixel); font-size: 9px; color: var(--marigold); letter-spacing: .06em; }
+  .logo-wrap .f { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #fff; margin-top: 4px; }
+  .header-center { flex: 1; text-align: center; }
+  .session-lbl {
+    font-family: var(--font-pixel); font-size: 10px; color: rgba(255,255,255,.45);
+    letter-spacing: .1em; text-transform: uppercase;
+  }
+  .session-date { font-family: var(--font-display); font-weight: 600; font-size: 18px; color: rgba(255,255,255,.8); margin-top: 3px; }
+  .live-chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--coral); color: #fff; border-radius: 999px;
+    font-family: var(--font-pixel); font-size: 10px; padding: 9px 16px;
+  }
+  .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: blink 1.2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* ── sidebar ── */
+  .sidebar {
+    grid-row: 2; border-right: 1px solid rgba(255,255,255,.08);
+    padding: 28px 24px; display: flex; flex-direction: column; gap: 18px;
+    overflow: hidden;
+  }
+  .sidebar-title {
+    font-family: var(--font-pixel); font-size: 9px; color: rgba(255,255,255,.4);
+    letter-spacing: .12em; margin-bottom: 4px;
+  }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card {
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.10);
+    border-radius: var(--r-md); padding: 14px; display: flex; flex-direction: column; gap: 5px;
+  }
+  .stat-icon { font-family: 'Material Symbols Rounded'; font-style:normal; font-weight:normal; font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24; font-size: 20px; color: rgba(255,255,255,.5); -webkit-font-smoothing:antialiased; }
+  .stat-val { font-family: var(--font-pixel); font-size: 18px; color: #fff; }
+  .stat-lbl { font-family: var(--font-body); font-size: 11px; font-weight: 700; color: rgba(255,255,255,.45); }
+  .stat-card.gold .stat-icon, .stat-card.gold .stat-val { color: var(--marigold); }
+  .stat-card.teal .stat-icon, .stat-card.teal .stat-val { color: var(--teal); }
+
+  /* categories in sidebar */
+  .cat-row { display: flex; align-items: center; gap: 11px; padding: 12px 14px; border-radius: var(--r-md); background: rgba(255,255,255,.06); }
+  .cat-icon { width: 36px; height: 36px; border-radius: 10px; display:flex; align-items:center; justify-content:center; font-family: 'Material Symbols Rounded'; font-style:normal; font-weight:normal; font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24; font-size: 20px; flex-shrink: 0; -webkit-font-smoothing:antialiased; }
+  .cat-icon.k { background: var(--grape-200); color: var(--grape-700); }
+  .cat-icon.g { background: var(--teal-200);  color: var(--teal-700); }
+  .cat-nm { font-family: var(--font-body); font-weight: 800; font-size: 14px; color: #fff; }
+  .cat-sub { font-family: var(--font-body); font-size: 11px; font-weight: 600; color: rgba(255,255,255,.45); margin-top: 1px; }
+
+  /* ── main leaderboard ── */
+  .main { grid-row: 2; padding: 24px 36px 24px 32px; overflow: hidden; display: flex; flex-direction: column; gap: 0; }
+  .main-header { display: flex; align-items: center; margin-bottom: 18px; gap: 16px; }
+  .main-title { font-family: var(--font-display); font-weight: 700; font-size: 30px; color: #fff; }
+
+  /* leaderboard rows */
+  .board { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .brow {
+    display: flex; align-items: center; gap: 18px;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.10);
+    border-radius: var(--r-lg); padding: 14px 20px;
+    transition: background .3s;
+  }
+  .brow:hover { background: rgba(255,255,255,.11); }
+  .brow.gold {
+    background: linear-gradient(90deg, rgba(255,180,34,.18), rgba(255,180,34,.06));
+    border-color: rgba(255,180,34,.4);
+    box-shadow: 0 0 32px rgba(255,180,34,.08);
+  }
+  .brow.you { border-color: rgba(124,58,240,.6); background: rgba(124,58,240,.15); }
+  .b-rank { font-family: var(--font-pixel); font-size: 16px; width: 44px; text-align: center; color: rgba(255,255,255,.35); }
+  .brow.gold .b-rank { color: var(--marigold); }
+  .b-av { width: 52px; height: 52px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-family: var(--font-display); font-weight: 700; font-size: 22px; flex-shrink:0; }
+  .b-name { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #fff; display:flex; align-items:center; gap: 8px; }
+  .b-sub { font-family: var(--font-body); font-size: 12px; font-weight: 700; color: rgba(255,255,255,.4); margin-top: 2px; }
+  .b-bar-wrap { flex: 1; margin: 0 8px; }
+  .b-bar-bg { height: 6px; background: rgba(255,255,255,.08); border-radius: 999px; overflow:hidden; }
+  .b-bar { height: 100%; border-radius: 999px; }
+  .b-pts { font-family: var(--font-pixel); font-size: 18px; color: var(--marigold); white-space:nowrap; }
+  .brow.you .b-pts { color: #c5b0ff; }
+  .b-streak {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--font-pixel); font-size: 10px; padding: 6px 10px; border-radius: 999px;
+    background: rgba(255,90,95,.18); color: var(--coral);
+  }
+  .ms { font-family: 'Material Symbols Rounded'; font-style:normal; font-weight:normal; font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24; font-size: 18px; line-height: 1; -webkit-font-smoothing:antialiased; }
+
+  /* ── footer ── */
+  .footer {
+    grid-column: 1 / -1;
+    border-top: 1px solid rgba(255,255,255,.08);
+    display: flex; align-items: center; padding: 0 36px; gap: 28px;
+  }
+  .footer-stat { display: flex; align-items: center; gap: 8px; }
+  .footer-stat .ms { font-size: 16px; color: rgba(255,255,255,.35); }
+  .footer-stat span { font-family: var(--font-body); font-weight: 800; font-size: 13px; color: rgba(255,255,255,.55); }
+  .footer-stat strong { color: #fff; }
+  .footer-spacer { flex: 1; }
+  .next-q {
+    font-family: var(--font-pixel); font-size: 9px; color: rgba(255,255,255,.3); letter-spacing: .1em;
+  }
+  .tab-indicator {
+    display: flex; gap: 6px; align-items: center;
+  }
+  .tab-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.2); }
+  .tab-dot.on { background: var(--grape); width: 22px; border-radius: 999px; }
+
+  /* toggle tabs */
+  .view-tabs {
+    display: flex; gap: 4px; background: rgba(255,255,255,.08); border-radius: 999px; padding: 4px;
+  }
+  .vtab {
+    border: none; background: transparent; cursor: pointer; padding: 7px 18px;
+    border-radius: 999px; font-family: var(--font-body); font-weight: 800; font-size: 13px; color: rgba(255,255,255,.5);
+    transition: background .2s, color .2s;
+  }
+  .vtab.on { background: var(--grape); color: #fff; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="canvas" id="canvas">
+    <!-- glow blobs -->
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+    <div class="confetti-field" id="confetti"></div>
+
+    <div class="layout">
+      <!-- header -->
+      <header class="header">
+        <div class="logo-wrap">
+          <img src="../../assets/alpaca-mark.svg" alt="Daily Fleece">
+          <div class="wd"><span class="d">DAILY</span><span class="f">Fleece</span></div>
+        </div>
+        <div class="header-center">
+          <div class="session-lbl">standup session</div>
+          <div class="session-date" id="session-date">Thursday, June 5 · Team FLEECE</div>
+        </div>
+        <div class="live-chip"><div class="live-dot"></div>LIVE</div>
+      </header>
+
+      <!-- sidebar -->
+      <aside class="sidebar">
+        <div>
+          <div class="sidebar-title">SESSION STATS</div>
+          <div class="stat-grid">
+            <div class="stat-card gold">
+              <span class="stat-icon">group</span>
+              <div class="stat-val" id="played-count">7</div>
+              <div class="stat-lbl">Played today</div>
+            </div>
+            <div class="stat-card">
+              <span class="stat-icon">schedule</span>
+              <div class="stat-val">9:32</div>
+              <div class="stat-lbl">Current time</div>
+            </div>
+            <div class="stat-card teal">
+              <span class="stat-icon">leaderboard</span>
+              <div class="stat-val">2,480</div>
+              <div class="stat-lbl">Top score</div>
+            </div>
+            <div class="stat-card">
+              <span class="stat-icon">local_fire_department</span>
+              <div class="stat-val" style="color:var(--coral)">x7</div>
+              <div class="stat-lbl">Best streak</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="sidebar-title">TODAY'S QUESTIONS</div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:4px">
+            <div class="cat-row">
+              <div class="cat-icon k">psychology</div>
+              <div><div class="cat-nm">Knowledge</div><div class="cat-sub">What's the largest mammal?</div></div>
+            </div>
+            <div class="cat-row">
+              <div class="cat-icon g">public</div>
+              <div><div class="cat-nm">Geography</div><div class="cat-sub">Longest river in the world?</div></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- main board -->
+      <main class="main">
+        <div class="main-header">
+          <div class="main-title">Leaderboard</div>
+          <div style="flex:1"></div>
+          <div class="view-tabs">
+            <button class="vtab on" onclick="setScope('today',this)">Today</button>
+            <button class="vtab" onclick="setScope('week',this)">This week</button>
+            <button class="vtab" onclick="setScope('all',this)">All time</button>
+          </div>
+        </div>
+        <div class="board" id="board"></div>
+      </main>
+
+      <!-- footer -->
+      <footer class="footer">
+        <div class="footer-stat">
+          <span class="ms">group</span>
+          <span><strong>7</strong> / 9 teammates played</span>
+        </div>
+        <div class="footer-stat">
+          <span class="ms">local_fire_department</span>
+          <span>Longest streak: <strong>Priya x7</strong></span>
+        </div>
+        <div class="footer-stat">
+          <span class="ms">emoji_events</span>
+          <span>Yesterday's winner: <strong>Marco</strong></span>
+        </div>
+        <div class="footer-spacer"></div>
+        <div class="tab-indicator">
+          <div class="tab-dot on"></div>
+          <div class="tab-dot"></div>
+          <div class="tab-dot"></div>
+        </div>
+        <div class="next-q">AUTO-REFRESH 30s</div>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<script>
+const PLAYERS = [
+  { n:"Priya", i:"P", tone:["#E4D6FC","#7C3AF0"], pts:2480, streak:7, gold:true },
+  { n:"Marco", i:"M", tone:["#C7F1EB","#14B8A6"], pts:2210, streak:3 },
+  { n:"Sam",   i:"S", tone:["#FFE9BE","#D98A00"], pts:1990, streak:5, you:true },
+  { n:"Jess",  i:"J", tone:["#FFD7D8","#D13338"], pts:1840, streak:1 },
+  { n:"Diego", i:"D", tone:["#E4D6FC","#5E26C0"], pts:1620, streak:2 },
+  { n:"Aiko",  i:"A", tone:["#C7F1EB","#0C8678"], pts:1500, streak:4 },
+  { n:"Lena",  i:"L", tone:["#FFE9BE","#D98A00"], pts:1350, streak:0 },
+];
+
+const MAX_PTS = PLAYERS[0].pts;
+const BAR_COLS = ["#FFB422","#A882F4","#A882F4","#8A7FA6","#8A7FA6","#8A7FA6","#8A7FA6"];
+
+function renderBoard() {
+  const el = document.getElementById("board");
+  el.innerHTML = PLAYERS.map((p, i) => `
+    <div class="brow${p.gold?" gold":""}${p.you?" you":""}">
+      <span class="b-rank">${i+1}</span>
+      <div class="b-av" style="background:${p.tone[0]};color:${p.tone[1]};width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Fredoka',sans-serif;font-weight:700;font-size:22px;flex-shrink:0">${p.i}</div>
+      <div style="min-width:0">
+        <div class="b-name">${p.n}${p.gold?`<span class="ms" style="color:var(--marigold);font-size:20px">crown</span>`:""}${p.you?`<span style="font-family:var(--font-pixel);font-size:8px;color:#c5b0ff;margin-left:2px">YOU</span>`:""}</div>
+        <div class="b-sub">x${p.streak} day streak${p.streak===0?" · join the pack!":""}</div>
+      </div>
+      <div class="b-bar-wrap">
+        <div class="b-bar-bg"><div class="b-bar" style="width:${Math.round(p.pts/MAX_PTS*100)}%;background:${BAR_COLS[i]}"></div></div>
+      </div>
+      ${p.streak>0?`<div class="b-streak"><span class="ms" style="font-size:14px;color:var(--coral)">local_fire_department</span>x${p.streak}</div>`:""}
+      <div class="b-pts">${p.pts.toLocaleString()}</div>
+    </div>
+  `).join("");
+}
+
+function setScope(scope, btn) {
+  document.querySelectorAll(".vtab").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+}
+
+// confetti
+(function() {
+  const field = document.getElementById("confetti");
+  const cols = ["#FFB422","#14B8A6","#FF5A5F","#34C759","#FFFBF4","#E4D6FC"];
+  for (let i=0; i<40; i++) {
+    const d = document.createElement("div");
+    d.className = "cdot";
+    d.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;background:${cols[i%cols.length]};transform:rotate(${Math.random()*60}deg);opacity:${.4+Math.random()*.35}`;
+    field.appendChild(d);
+  }
+})();
+
+// scale canvas to viewport
+function scale() {
+  const c = document.getElementById("canvas");
+  const scaleX = window.innerWidth / 1280;
+  const scaleY = window.innerHeight / 720;
+  const s = Math.min(scaleX, scaleY);
+  const ox = (window.innerWidth  - 1280 * s) / 2;
+  const oy = (window.innerHeight - 720  * s) / 2;
+  c.style.transform = `translate(${ox}px,${oy}px) scale(${s})`;
+}
+window.addEventListener("resize", scale);
+scale();
+renderBoard();
+
+// live clock
+function tick() {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,"0");
+  const mm = String(now.getMinutes()).padStart(2,"0");
+  document.querySelector(".stat-card:nth-child(2) .stat-val").textContent = hh+":"+mm;
+}
+tick(); setInterval(tick, 15000);
+
+// date
+const d = new Date();
+document.getElementById("session-date").textContent =
+  d.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}) + " · Team FLEECE";
+</script>
+</body>
+</html>

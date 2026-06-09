@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; background: var(--cream); }
+  .wrap { padding: 24px; display: flex; gap: 36px; align-items: center; }
+  .lockup { display: flex; align-items: center; gap: 14px; }
+  .word { display: flex; flex-direction: column; line-height: 1; }
+  .daily { font-family: var(--font-pixel); font-size: 11px; color: var(--grape); letter-spacing: .04em; }
+  .fleece { font-family: var(--font-display); font-weight: 700; font-size: 34px; color: var(--plum); letter-spacing: -.01em; margin-top: 4px; }
+  .onpurple { background: var(--grape); padding: 14px 20px; border-radius: var(--r-lg); }
+  .onpurple .fleece { color: #fff; }
+  .onpurple .daily { color: var(--marigold); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="lockup">
+    <img src="../assets/alpaca-mark.svg" width="64" height="64" alt="">
+    <div class="word"><span class="daily">DAILY</span><span class="fleece">Fleece</span></div>
+  </div>
+  <div class="lockup onpurple">
+    <img src="../assets/alpaca-mark.svg" width="56" height="56" alt="" style="border-radius:14px">
+    <div class="word"><span class="daily">DAILY</span><span class="fleece">Fleece</span></div>
+  </div>
+</div>
+</body>
+</html>

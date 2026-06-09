@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-body); }
+  .wrap { padding: 22px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .scale { display: flex; align-items: center; gap: 12px; }
+  .label { width: 88px; font-weight: 800; font-size: 13px; color: var(--plum); }
+  .ramp { display: flex; flex: 1; gap: 8px; }
+  .step { flex: 1; height: 44px; border-radius: 10px; display: flex; align-items: flex-end; padding: 6px; box-sizing: border-box; }
+  .t { font-family: var(--font-pixel); font-size: 7px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="scale"><div class="label">Grape</div><div class="ramp">
+    <div class="step" style="background:#E4D6FC"><span class="t" style="color:#5E26C0">200</span></div>
+    <div class="step" style="background:#7C3AF0"><span class="t" style="color:#fff">500</span></div>
+    <div class="step" style="background:#5E26C0"><span class="t" style="color:#fff">700</span></div>
+  </div></div>
+  <div class="scale"><div class="label">Teal</div><div class="ramp">
+    <div class="step" style="background:#C7F1EB"><span class="t" style="color:#0C8678">200</span></div>
+    <div class="step" style="background:#14B8A6"><span class="t" style="color:#fff">500</span></div>
+    <div class="step" style="background:#0C8678"><span class="t" style="color:#fff">700</span></div>
+  </div></div>
+  <div class="scale"><div class="label">Marigold</div><div class="ramp">
+    <div class="step" style="background:#FFE9BE"><span class="t" style="color:#D98A00">200</span></div>
+    <div class="step" style="background:#FFB422"><span class="t" style="color:#241B3A">500</span></div>
+    <div class="step" style="background:#D98A00"><span class="t" style="color:#fff">700</span></div>
+  </div></div>
+  <div class="scale"><div class="label">Coral</div><div class="ramp">
+    <div class="step" style="background:#FFD7D8"><span class="t" style="color:#D13338">200</span></div>
+    <div class="step" style="background:#FF5A5F"><span class="t" style="color:#fff">500</span></div>
+    <div class="step" style="background:#D13338"><span class="t" style="color:#fff">700</span></div>
+  </div></div>
+  <div class="scale"><div class="label">Green</div><div class="ramp">
+    <div class="step" style="background:#CDF3D6"><span class="t" style="color:#1E9E40">200</span></div>
+    <div class="step" style="background:#34C759"><span class="t" style="color:#fff">500</span></div>
+    <div class="step" style="background:#1E9E40"><span class="t" style="color:#fff">700</span></div>
+  </div></div>
+</div>
+</body>
+</html>

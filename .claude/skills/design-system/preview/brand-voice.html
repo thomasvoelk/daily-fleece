@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; background: var(--cream); }
+  .wrap { padding: 22px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .pair { display: flex; gap: 12px; }
+  .col { flex: 1; padding: 12px 14px; border-radius: var(--r-md); }
+  .do { background: var(--green-200); }
+  .dont { background: var(--coral-200); }
+  .tag { font-family: var(--font-pixel); font-size: 8px; margin-bottom: 8px; display:block; }
+  .do .tag { color: var(--green-700); }
+  .dont .tag { color: var(--coral-700); }
+  .q { font-family: var(--font-body); font-weight: 800; font-size: 14px; color: var(--plum); line-height: 1.45; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="pair">
+    <div class="col do"><span class="tag">DO · WARM &amp; CHEEKY</span><div class="q">"Nice one! That's a wrap on today's quiz 🦙"</div></div>
+    <div class="col dont"><span class="tag">DON'T · STIFF</span><div class="q">"Quiz session completed successfully. Proceed."</div></div>
+  </div>
+  <div class="pair">
+    <div class="col do"><span class="tag">DO · SHORT &amp; PUNCHY</span><div class="q">"Two questions. Ten seconds each. Go!"</div></div>
+    <div class="col dont"><span class="tag">DON'T · WORDY</span><div class="q">"Please answer the following two questions within the allotted time."</div></div>
+  </div>
+</div>
+</body>
+</html>

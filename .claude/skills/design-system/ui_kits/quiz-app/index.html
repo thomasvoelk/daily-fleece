@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Fleece — Quiz App</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Press+Start+2P&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+<style>
+/* ── DESIGN TOKENS ── */
+:root {
+  --grape:#7C3AF0; --grape-700:#5E26C0; --grape-200:#E4D6FC;
+  --teal:#14B8A6;  --teal-700:#0C8678;  --teal-200:#C7F1EB;
+  --marigold:#FFB422; --marigold-700:#D98A00; --marigold-200:#FFE9BE;
+  --coral:#FF5A5F; --coral-700:#D13338; --coral-200:#FFD7D8;
+  --green:#34C759; --green-700:#1E9E40; --green-200:#CDF3D6;
+  --sky:#3FA7F0;
+  --cream:#FFF3E0; --cream-deep:#F6E7CE; --paper:#FFFBF4;
+  --plum:#241B3A;  --plum-soft:#4A3E66; --plum-faint:#8A7FA6;
+  --wool-line:#EADBC2;
+  --fg-1:var(--plum); --fg-2:var(--plum-soft); --fg-3:var(--plum-faint);
+  --font-display:'Fredoka','Trebuchet MS',sans-serif;
+  --font-body:'Nunito',system-ui,sans-serif;
+  --font-pixel:'Press Start 2P','Courier New',monospace;
+  --fs-h1:28px; --lh-h1:1.1; --fs-h2:22px; --lh-h2:1.15;
+  --fs-h3:18px; --lh-h3:1.2; --fs-body:16px; --lh-body:1.5;
+  --fs-small:14px; --lh-small:1.45; --fs-caption:12px; --lh-caption:1.3;
+  --r-sm:10px; --r-md:16px; --r-lg:24px; --r-xl:32px; --r-pill:999px;
+  --shadow-1:0 1px 3px rgba(36,27,58,.10),0 1px 2px rgba(36,27,58,.06);
+  --shadow-2:0 4px 12px rgba(36,27,58,.12);
+  --shadow-3:0 12px 28px rgba(36,27,58,.16);
+  --chunk-grape:0 5px 0 var(--grape-700);
+  --chunk-marigold:0 5px 0 var(--marigold-700);
+  --chunk-teal:0 5px 0 var(--teal-700);
+  --chunk-coral:0 5px 0 var(--coral-700);
+  --ease-bounce:cubic-bezier(.34,1.56,.64,1);
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --dur-fast:120ms; --dur-base:220ms; --dur-slow:420ms;
+}
+.t-h1{font-family:var(--font-display);font-weight:600;font-size:var(--fs-h1);line-height:var(--lh-h1);color:var(--fg-1)}
+.t-h2{font-family:var(--font-display);font-weight:600;font-size:var(--fs-h2);line-height:var(--lh-h2);color:var(--fg-1)}
+.t-h3{font-family:var(--font-display);font-weight:500;font-size:var(--fs-h3);line-height:var(--lh-h3);color:var(--fg-1)}
+.t-body{font-family:var(--font-body);font-weight:400;font-size:var(--fs-body);line-height:var(--lh-body);color:var(--fg-1)}
+.t-body-strong{font-family:var(--font-body);font-weight:700;font-size:var(--fs-body);line-height:var(--lh-body);color:var(--fg-1)}
+.t-small{font-family:var(--font-body);font-weight:600;font-size:var(--fs-small);line-height:var(--lh-small);color:var(--fg-2)}
+.t-caption{font-family:var(--font-body);font-weight:800;font-size:var(--fs-caption);line-height:var(--lh-caption);letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3)}
+
+/* ── KIT STYLES ── */
+.qa-root{font-family:var(--font-body);color:var(--fg-1);height:100%;display:flex;flex-direction:column;background:var(--cream);position:relative}
+.qa-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.qa-scroll::-webkit-scrollbar{width:0}
+.qa-topbar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--cream);position:sticky;top:0;z-index:5}
+.qa-topbar.frost{background:rgba(255,243,224,.85);backdrop-filter:blur(8px)}
+.qa-brand{display:flex;align-items:center;gap:9px}
+.qa-brand .wd{display:flex;flex-direction:column;line-height:1}
+.qa-brand .d{font-family:var(--font-pixel);font-size:7px;color:var(--grape);letter-spacing:.04em}
+.qa-brand .f{font-family:var(--font-display);font-weight:700;font-size:19px;color:var(--plum);margin-top:3px}
+.qa-spacer{flex:1}
+.qa-streak{display:inline-flex;align-items:center;gap:4px;background:var(--marigold-200);color:var(--marigold-700);font-family:var(--font-pixel);font-size:10px;padding:7px 10px;border-radius:999px}
+.qa-iconbtn{width:40px;height:40px;border-radius:50%;border:none;background:transparent;display:flex;align-items:center;justify-content:center;color:var(--plum);cursor:pointer}
+.qa-iconbtn:active{background:var(--cream-deep)}
+.ms{font-family:'Material Symbols Rounded';line-height:1;font-weight:normal;font-style:normal;font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24;-webkit-font-smoothing:antialiased;font-feature-settings:'liga' 1;display:inline-block}
+.ms.o{font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24}
+.chunk{font-family:var(--font-display);font-weight:600;font-size:17px;border:none;border-radius:var(--r-pill);padding:15px 26px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out);user-select:none;-webkit-tap-highlight-color:transparent}
+.chunk.full{width:100%}
+.chunk.lg{font-size:19px;padding:18px 28px}
+.chunk:active{transform:translateY(5px)}
+.chunk--grape{background:var(--grape);color:#fff;box-shadow:var(--chunk-grape)}
+.chunk--grape:active{box-shadow:0 0 0 var(--grape-700)}
+.chunk--marigold{background:var(--marigold);color:var(--plum);box-shadow:var(--chunk-marigold)}
+.chunk--marigold:active{box-shadow:0 0 0 var(--marigold-700)}
+.chunk--teal{background:var(--teal);color:#fff;box-shadow:var(--chunk-teal)}
+.chunk--teal:active{box-shadow:0 0 0 var(--teal-700)}
+.chunk--coral{background:var(--coral);color:#fff;box-shadow:var(--chunk-coral)}
+.chunk--coral:active{box-shadow:0 0 0 var(--coral-700)}
+.chunk--ghost{background:var(--paper);color:var(--grape);box-shadow:inset 0 0 0 2px var(--grape)}
+.chunk--lightghost{background:rgba(255,255,255,.16);color:#fff;box-shadow:inset 0 0 0 2px rgba(255,255,255,.4)}
+.chunk:disabled{opacity:.5;cursor:default}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-body);font-weight:800;font-size:13px;padding:7px 13px;border-radius:999px;letter-spacing:.02em}
+.chip .ms{font-size:17px}
+.chip--knowledge{background:var(--grape-200);color:var(--grape-700)}
+.chip--geography{background:var(--teal-200);color:var(--teal-700)}
+.chip--points{background:var(--marigold-200);color:var(--marigold-700)}
+.card{background:var(--paper);border-radius:var(--r-lg);box-shadow:var(--shadow-1)}
+.ans{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:16px;background:var(--paper);border:2px solid var(--wool-line);border-radius:var(--r-md);cursor:pointer;box-shadow:var(--shadow-1);font-family:var(--font-body);font-weight:700;font-size:16px;color:var(--plum);transition:transform var(--dur-fast) var(--ease-out),border-color var(--dur-base),background var(--dur-base);-webkit-tap-highlight-color:transparent}
+.ans:not(:disabled):active{transform:translateY(3px)}
+.ans .key{width:30px;height:30px;flex-shrink:0;border-radius:8px;background:var(--cream-deep);display:flex;align-items:center;justify-content:center;font-family:var(--font-pixel);font-size:11px;color:var(--plum-soft)}
+.ans .end{margin-left:auto;display:flex}
+.ans .end .ms{font-size:24px}
+.ans--selected{border-color:var(--grape);box-shadow:0 0 0 3px var(--grape-200)}
+.ans--selected .key{background:var(--grape);color:#fff}
+.ans--correct{border-color:var(--green);background:var(--green-200)}
+.ans--correct .key{background:var(--green);color:#fff}
+.ans--correct .end .ms{color:var(--green-700)}
+.ans--wrong{border-color:var(--coral);background:var(--coral-200)}
+.ans--wrong .key{background:var(--coral);color:#fff}
+.ans--wrong .end .ms{color:var(--coral-700)}
+.ans--dim{opacity:.55}
+.ans:disabled{cursor:default}
+.timer{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-pixel);font-size:12px;color:var(--plum);background:var(--paper);border:2px solid var(--wool-line);padding:7px 12px;border-radius:999px}
+.timer .ms{font-size:16px;color:var(--plum-soft)}
+.timer.warn{color:var(--coral-700);border-color:var(--coral);background:var(--coral-200)}
+.timer.warn .ms{color:var(--coral-700)}
+.dots{display:flex;gap:7px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--wool-line);display:block}
+.dots i.on{background:var(--grape)}
+.dots i.done{background:var(--green)}
+.qa-bottomnav{display:flex;background:var(--paper);border-top:1px solid var(--wool-line);padding:6px 8px 8px}
+.qa-navitem{flex:1;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;font-family:var(--font-body);font-weight:800;font-size:11px;color:var(--plum-faint);-webkit-tap-highlight-color:transparent}
+.qa-navitem .pill{width:56px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;transition:background var(--dur-base)}
+.qa-navitem .pill .ms{font-size:22px}
+.qa-navitem.active{color:var(--grape-700)}
+.qa-navitem.active .pill{background:var(--grape-200)}
+.lrow{display:flex;align-items:center;gap:13px;background:var(--paper);border-radius:var(--r-md);padding:12px 14px;box-shadow:var(--shadow-1)}
+.lrow .rk{font-family:var(--font-pixel);font-size:12px;width:26px;color:var(--plum-faint);text-align:center}
+.lrow .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:16px;flex-shrink:0}
+.lrow .nm{font-family:var(--font-body);font-weight:800;font-size:15px;color:var(--plum);display:flex;align-items:center;gap:5px}
+.lrow .sub{font-size:11px;color:var(--plum-faint);font-weight:700}
+.lrow .pts{margin-left:auto;font-family:var(--font-pixel);font-size:13px;color:var(--marigold-700)}
+.lrow--gold{box-shadow:var(--shadow-2);border:2px solid var(--marigold)}
+.lrow--gold .rk{color:var(--marigold-700)}
+.lrow--you{box-shadow:0 0 0 2px var(--grape) inset,var(--shadow-1);background:var(--grape-200)}
+.seg{display:flex;background:var(--cream-deep);border-radius:999px;padding:4px}
+.seg button{flex:1;border:none;background:transparent;cursor:pointer;padding:8px 0;border-radius:999px;font-family:var(--font-body);font-weight:800;font-size:13px;color:var(--plum-soft)}
+.seg button.on{background:var(--paper);color:var(--grape-700);box-shadow:var(--shadow-1)}
+.toast{position:absolute;left:16px;right:16px;bottom:16px;z-index:20;background:var(--plum);color:#fff;border-radius:var(--r-md);padding:13px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-3);font-family:var(--font-body);font-weight:700;font-size:14px;animation:toastin var(--dur-base) var(--ease-bounce)}
+@keyframes toastin{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+.arcade{background:var(--plum);color:#fff;height:100%;position:relative;overflow:hidden}
+.arcade .confetti{position:absolute;border-radius:2px;opacity:.9}
+.arcade .ttl{font-family:var(--font-display);font-weight:700;font-size:30px;color:#fff;text-align:center}
+.arcade .big-score{font-family:var(--font-pixel);font-size:44px;color:var(--marigold);text-align:center;line-height:1}
+.arcade .sub{color:#cdbff0;font-family:var(--font-body);font-weight:700}
+.pop{transform:none;opacity:1}
+.rise{transform:none;opacity:1}
+@media (prefers-reduced-motion:no-preference){
+  .pop{animation:popIn var(--dur-slow) var(--ease-bounce) both}
+  .rise{animation:riseIn var(--dur-base) var(--ease-out) both}
+  @keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:none;opacity:1}}
+  @keyframes riseIn{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+}
+
+/* ── PAGE SHELL ── */
+html,body{margin:0;height:100%}
+body{
+  background:radial-gradient(circle at 18% 12%,rgba(124,58,240,.10),transparent 42%),
+    radial-gradient(circle at 84% 78%,rgba(20,184,166,.10),transparent 42%),
+    var(--cream-deep);
+  display:flex;align-items:center;justify-content:center;min-height:100%;
+  font-family:var(--font-body);padding:24px;box-sizing:border-box;
+}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(var(--wool-line) 1.4px,transparent 1.4px);
+  background-size:22px 22px}
+#root{position:relative}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- ① Android device frame -->
+<script type="text/babel">
+const MD_C = {
+  surface:'#f4fbf8',surfaceVariant:'#dae5e1',inverseOnSurface:'#ecf2ef',
+  secondaryContainer:'#cde8e1',primaryFixedDim:'#83d5c6',onSurface:'#171d1b',
+  onSurfaceVar:'#49454f',onPrimaryContainer:'#00201c',primary:'#006a60',
+  frameBorder:'rgba(116,119,117,0.5)',
+};
+function AndroidStatusBar({dark=false}){
+  const c=dark?'#fff':MD_C.onSurface;
+  return(<div style={{height:40,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 16px',position:'relative',fontFamily:'Roboto,system-ui,sans-serif'}}>
+    <span style={{fontSize:14,fontWeight:400,letterSpacing:0.25,color:c}}>9:30</span>
+    <div style={{position:'absolute',left:'50%',top:8,transform:'translateX(-50%)',width:24,height:24,borderRadius:100,background:'#2e2e2e'}}/>
+    <svg width="16" height="16" viewBox="0 0 16 16"><rect x="3.75" y="2" width="8.5" height="13" rx="1.5" fill={c}/></svg>
+  </div>);
+}
+function AndroidNavBar({dark=false}){
+  return(<div style={{height:24,display:'flex',alignItems:'center',justifyContent:'center'}}>
+    <div style={{width:108,height:4,borderRadius:2,background:dark?'#fff':MD_C.onSurface,opacity:.4}}/>
+  </div>);
+}
+function AndroidDevice({children,width=400,height=840,dark=false}){
+  return(<div style={{width,height,borderRadius:18,overflow:'hidden',background:dark?'#1d1b20':MD_C.surface,border:`8px solid ${MD_C.frameBorder}`,boxShadow:'0 30px 80px rgba(0,0,0,0.25)',display:'flex',flexDirection:'column',boxSizing:'border-box'}}>
+    <AndroidStatusBar dark={dark}/>
+    <div style={{flex:1,overflow:'auto',display:'flex',flexDirection:'column'}}>{children}</div>
+    <AndroidNavBar dark={dark}/>
+  </div>);
+}
+Object.assign(window,{AndroidDevice});
+</script>
+
+<!-- ② Shared components -->
+<script type="text/babel">
+function Icon({name,filled=true,size=24,color,style}){
+  return <span className={"ms"+(filled?"":" o")} style={{fontSize:size,color,...style}}>{name}</span>;
+}
+function Mark({size=34,radius=9}){
+  return(
+    <svg viewBox="0 0 200 200" width={size} height={size} style={{borderRadius:radius,display:'block',flexShrink:0}} xmlns="http://www.w3.org/2000/svg">
+      <defs><clipPath id="mr"><rect width="200" height="200" rx="44"/></clipPath></defs>
+      <g clipPath="url(#mr)">
+        <rect width="200" height="200" fill="#7C3AF0"/>
+        <circle cx="28" cy="34" r="5" fill="#FFB422"/><circle cx="170" cy="28" r="6" fill="#14B8A6"/>
+        <circle cx="176" cy="150" r="5" fill="#FF5A5F"/><circle cx="24" cy="158" r="6" fill="#34C759"/>
+        <rect x="82" y="150" width="36" height="40" rx="14" fill="#FFF3E0"/>
+        <path d="M72 64 Q60 22 84 42 L88 70 Z" fill="#FFFBF4"/><path d="M128 64 Q140 22 116 42 L112 70 Z" fill="#FFFBF4"/>
+        <path d="M76 58 Q70 36 82 48 L84 64 Z" fill="#E4D6FC"/><path d="M124 58 Q130 36 118 48 L116 64 Z" fill="#E4D6FC"/>
+        <rect x="62" y="56" width="76" height="86" rx="34" fill="#FFFBF4"/>
+        <circle cx="84" cy="62" r="15" fill="#FFFBF4"/><circle cx="100" cy="56" r="16" fill="#FFFBF4"/><circle cx="116" cy="62" r="15" fill="#FFFBF4"/>
+        <rect x="78" y="104" width="44" height="40" rx="20" fill="#FFE9BE"/>
+        <circle cx="84" cy="96" r="7" fill="#241B3A"/><circle cx="116" cy="96" r="7" fill="#241B3A"/>
+        <circle cx="86" cy="94" r="2.4" fill="#FFFBF4"/><circle cx="118" cy="94" r="2.4" fill="#FFFBF4"/>
+        <circle cx="92" cy="118" r="3" fill="#241B3A"/><circle cx="108" cy="118" r="3" fill="#241B3A"/>
+        <path d="M92 128 Q100 134 108 128" stroke="#241B3A" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+        <circle cx="72" cy="114" r="6" fill="#FF5A5F" opacity=".35"/><circle cx="128" cy="114" r="6" fill="#FF5A5F" opacity=".35"/>
+      </g>
+    </svg>
+  );
+}
+function ChunkBtn({color="grape",size,full,children,onClick,disabled,icon,style}){
+  const cls=["chunk","chunk--"+color];
+  if(full)cls.push("full");
+  if(size==="lg")cls.push("lg");
+  return <button className={cls.join(" ")} onClick={onClick} disabled={disabled} style={style}>{icon&&<Icon name={icon} size={20}/>}{children}</button>;
+}
+function CategoryChip({kind}){
+  const map={knowledge:{icon:"psychology",label:"Knowledge"},geography:{icon:"public",label:"Geography"}};
+  const c=map[kind];
+  return <span className={"chip chip--"+kind}><Icon name={c.icon} size={17}/>{c.label}</span>;
+}
+function PointsChip({children}){return <span className="chip chip--points"><Icon name="stars" size={17}/>{children}</span>;}
+function Dots({total,index,doneList=[]}){
+  return(<div className="dots">{Array.from({length:total}).map((_,i)=><i key={i} className={doneList.includes(i)?"done":(i===index?"on":"")}/>)}</div>);
+}
+function Avatar({initial,tone="grape",size=40}){
+  const tones={grape:["var(--grape-200)","var(--grape-700)"],teal:["var(--teal-200)","var(--teal-700)"],marigold:["var(--marigold-200)","var(--marigold-700)"],coral:["var(--coral-200)","var(--coral-700)"]};
+  const [bg,fg]=tones[tone]||tones.grape;
+  return <div className="av" style={{width:size,height:size,background:bg,color:fg,fontSize:size*.4}}>{initial}</div>;
+}
+function Timer({seconds}){
+  const warn=seconds<=4;
+  const txt="0:"+String(Math.max(0,seconds)).padStart(2,"0");
+  return <span className={"timer"+(warn?" warn":"")}><Icon name="timer" size={16} filled={false}/>{txt}</span>;
+}
+Object.assign(window,{Icon,Mark,ChunkBtn,CategoryChip,PointsChip,Dots,Avatar,Timer});
+</script>
+
+<!-- ③ Screens -->
+<script type="text/babel">
+const {useState,useEffect,useRef}=React;
+const PLAYERS=[
+  {name:"Priya",     initial:"P",tone:"marigold",pts:2480,streak:7},
+  {name:"Marco",     initial:"M",tone:"grape",   pts:2210,streak:3},
+  {name:"Sam (you)", initial:"S",tone:"teal",    pts:1990,streak:5,you:true},
+  {name:"Jess",      initial:"J",tone:"coral",   pts:1840,streak:1},
+  {name:"Diego",     initial:"D",tone:"grape",   pts:1620,streak:2},
+  {name:"Aiko",      initial:"A",tone:"teal",    pts:1500,streak:4},
+  {name:"Lena",      initial:"L",tone:"marigold",pts:1350,streak:0},
+];
+const QUESTIONS=[
+  {cat:"knowledge",q:"What's the largest mammal on Earth?",options:["African elephant","Blue whale","Giraffe","Hippopotamus"],correct:1,points:90},
+  {cat:"geography",q:"Which is the longest river in the world?",options:["The Amazon","The Yangtze","The Nile","The Mississippi"],correct:2,points:90},
+];
+function TopBar({right,frost}){
+  return(<div className={"qa-topbar"+(frost?" frost":"")}>
+    <div className="qa-brand"><Mark size={34}/><div className="wd"><span className="d">DAILY</span><span className="f">Fleece</span></div></div>
+    <div className="qa-spacer"/>{right}
+  </div>);
+}
+function BottomNav({active,onNav}){
+  const items=[{id:"home",icon:"cottage",label:"Today"},{id:"board",icon:"leaderboard",label:"Board"},{id:"you",icon:"person",label:"You"}];
+  return(<div className="qa-bottomnav">{items.map(it=>(
+    <button key={it.id} className={"qa-navitem"+(active===it.id?" active":"")} onClick={()=>onNav(it.id)}>
+      <span className="pill"><Icon name={it.icon} filled={active===it.id} size={22}/></span>{it.label}
+    </button>))}</div>);
+}
+function LRow({p,rank}){
+  const cls=["lrow"];
+  if(rank===1)cls.push("lrow--gold");
+  if(p.you)cls.push("lrow--you");
+  return(<div className={cls.join(" ")}>
+    <span className="rk">{rank}</span>
+    <Avatar initial={p.initial} tone={p.tone}/>
+    <div><div className="nm">{p.name}{rank===1&&<Icon name="crown" size={16} color="var(--marigold)"/>}</div><div className="sub">{p.streak>0?`x${p.streak} streak`:"no streak yet"}</div></div>
+    <span className="pts">{p.pts.toLocaleString()}</span>
+  </div>);
+}
+function HomeScreen({onPlay,onNav,played}){
+  const sorted=[...PLAYERS].sort((a,b)=>b.pts-a.pts);
+  const you=sorted.find(p=>p.you);
+  const yourRank=sorted.indexOf(you)+1;
+  return(<div className="qa-root">
+    <TopBar right={<span className="qa-streak"><Icon name="local_fire_department" size={15}/>x5</span>}/>
+    <div className="qa-scroll" style={{padding:"4px 16px 20px"}}>
+      <div style={{margin:"6px 2px 16px"}}>
+        <div className="t-small" style={{color:"var(--plum-faint)"}}>Tuesday · standup time ☕</div>
+        <div className="t-h1" style={{marginTop:2}}>Morning, Sam!</div>
+      </div>
+      <div className="pop" style={{background:"var(--grape)",borderRadius:"var(--r-xl)",padding:20,position:"relative",overflow:"hidden",boxShadow:"var(--shadow-2)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:14}}>
+          <Mark size={66} radius={18}/>
+          <div>
+            <div style={{fontFamily:"var(--font-display)",fontWeight:700,fontSize:22,color:"#fff",lineHeight:1.1}}>Today's quiz<br/>is ready</div>
+            <div style={{color:"#E4D6FC",fontWeight:700,fontSize:13,marginTop:6,display:"flex",gap:8}}>
+              <span><Icon name="psychology" size={14} style={{verticalAlign:-2}}/> Knowledge</span>
+              <span><Icon name="public" size={14} style={{verticalAlign:-2}}/> Geography</span>
+            </div>
+          </div>
+        </div>
+        <div style={{marginTop:18}}>
+          {played
+            ?<ChunkBtn color="lightghost" full size="lg" icon="check_circle" disabled>All done today!</ChunkBtn>
+            :<ChunkBtn color="marigold" full size="lg" icon="play_arrow" onClick={onPlay}>Play today</ChunkBtn>}
+        </div>
+      </div>
+      <div className="card rise" style={{marginTop:16,padding:16,display:"flex",alignItems:"center",gap:14}}>
+        <div style={{textAlign:"center"}}>
+          <div className="t-caption">Your rank</div>
+          <div style={{fontFamily:"var(--font-pixel)",fontSize:22,color:"var(--grape-700)",marginTop:4}}>#{yourRank}</div>
+        </div>
+        <div style={{width:1,alignSelf:"stretch",background:"var(--wool-line)"}}/>
+        <div style={{flex:1}}>
+          <div className="t-body-strong">{you.pts.toLocaleString()} pts</div>
+          <div className="t-small" style={{color:"var(--plum-faint)"}}>x5 day streak · keep it warm 🔥</div>
+        </div>
+      </div>
+      <div style={{display:"flex",alignItems:"center",margin:"22px 2px 10px"}}>
+        <div className="t-h3">Top of the flock</div>
+        <div className="qa-spacer"/>
+        <button onClick={()=>onNav("board")} style={{border:"none",background:"transparent",color:"var(--grape-700)",fontWeight:800,fontSize:13,fontFamily:"var(--font-body)",cursor:"pointer"}}>See all</button>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:9}}>
+        {sorted.slice(0,3).map((p,i)=><LRow key={p.name} p={p} rank={i+1}/>)}
+      </div>
+    </div>
+    <BottomNav active="home" onNav={onNav}/>
+  </div>);
+}
+function QuizFlow({onComplete,onQuit}){
+  const [qIndex,setQIndex]=useState(0);
+  const [phase,setPhase]=useState("answering");
+  const [selected,setSelected]=useState(null);
+  const [seconds,setSeconds]=useState(10);
+  const [earned,setEarned]=useState(0);
+  const q=QUESTIONS[qIndex];
+  useEffect(()=>{
+    if(phase!=="answering")return;
+    if(seconds<=0){reveal(null);return;}
+    const t=setTimeout(()=>setSeconds(s=>s-1),1000);
+    return()=>clearTimeout(t);
+  },[seconds,phase]);
+  function reveal(choice){
+    setSelected(choice);setPhase("revealed");
+    if(choice===q.correct)setEarned(e=>e+Math.round(q.points+seconds*3));
+  }
+  function next(){
+    if(qIndex+1<QUESTIONS.length){setQIndex(i=>i+1);setPhase("answering");setSelected(null);setSeconds(10);}
+    else onComplete(earned);
+  }
+  const gotIt=phase==="revealed"&&selected===q.correct;
+  const lastBonus=gotIt?Math.round(q.points+seconds*3):0;
+  return(<div className="qa-root">
+    <div className="qa-topbar">
+      <button className="qa-iconbtn" onClick={onQuit}><Icon name="close" size={24}/></button>
+      <div className="qa-spacer"/>
+      <Dots total={QUESTIONS.length} index={qIndex} doneList={Array.from({length:qIndex},(_,i)=>i)}/>
+      <div className="qa-spacer"/>
+      <Timer seconds={phase==="answering"?seconds:(gotIt?seconds:0)}/>
+    </div>
+    <div className="qa-scroll" style={{padding:"8px 18px 20px",display:"flex",flexDirection:"column"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginTop:4}}>
+        <CategoryChip kind={q.cat}/>
+        <span style={{fontFamily:"var(--font-pixel)",fontSize:8,color:"var(--plum-faint)"}}>Q{qIndex+1}/{QUESTIONS.length}</span>
+      </div>
+      <div className="t-h1" style={{fontSize:27,margin:"20px 2px 24px"}}>{q.q}</div>
+      <div style={{display:"flex",flexDirection:"column",gap:12}} key={qIndex}>
+        {q.options.map((opt,i)=>{
+          const cls=["ans","rise"];
+          if(phase==="answering"){if(selected===i)cls.push("ans--selected");}
+          else{if(i===q.correct)cls.push("ans--correct");else if(i===selected)cls.push("ans--wrong");else cls.push("ans--dim");}
+          return(<button key={i} className={cls.join(" ")} style={{animationDelay:(i*50)+"ms"}} disabled={phase==="revealed"} onClick={()=>reveal(i)}>
+            <span className="key">{"ABCD"[i]}</span>{opt}
+            <span className="end">
+              {phase==="revealed"&&i===q.correct&&<Icon name="check_circle" size={24}/>}
+              {phase==="revealed"&&i===selected&&i!==q.correct&&<Icon name="cancel" size={24}/>}
+            </span>
+          </button>);
+        })}
+      </div>
+    </div>
+    {phase==="revealed"&&(
+      <div style={{padding:16,background:"var(--paper)",borderTop:"1px solid var(--wool-line)",display:"flex",alignItems:"center",gap:12}}>
+        <div style={{flex:1}}>
+          <div className="t-body-strong" style={{color:gotIt?"var(--green-700)":"var(--coral-700)"}}>{gotIt?"Nailed it! 🦙":(selected===null?"Time's up!":"Not quite!")}</div>
+          <div className="t-small" style={{color:"var(--plum-faint)"}}>{gotIt?`+${lastBonus} pts · speed bonus`:"Answer: "+q.options[q.correct]}</div>
+        </div>
+        <ChunkBtn color={gotIt?"teal":"grape"} icon="arrow_forward" onClick={next}>{qIndex+1<QUESTIONS.length?"Next":"Finish"}</ChunkBtn>
+      </div>
+    )}
+  </div>);
+}
+function ResultsScreen({earned,onBoard,onHome}){
+  const confetti=useRef(Array.from({length:26},(_,i)=>{
+    const cols=["#FFB422","#14B8A6","#FF5A5F","#34C759","#FFFBF4"];
+    return{left:Math.random()*100,top:Math.random()*56,s:6+Math.random()*8,c:cols[i%cols.length],r:Math.random()*60};
+  })).current;
+  return(<div className="arcade">
+    {confetti.map((c,i)=><div key={i} className="confetti" style={{left:c.left+"%",top:c.top+"%",width:c.s,height:c.s,background:c.c,transform:`rotate(${c.r}deg)`}}/>)}
+    <div style={{position:"relative",height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:28,textAlign:"center"}}>
+      <div className="pop"><Mark size={104} radius={28}/></div>
+      <div className="ttl pop" style={{marginTop:22}}>Nice flockin'<br/>work!</div>
+      <div className="sub" style={{marginTop:6}}>You answered both. Same time tomorrow?</div>
+      <div className="rise" style={{marginTop:26,display:"flex",gap:26}}>
+        <div><div style={{fontFamily:"var(--font-pixel)",fontSize:7,color:"#8A7FA6"}}>EARNED</div><div className="big-score" style={{fontSize:38}}>+{earned}</div></div>
+        <div><div style={{fontFamily:"var(--font-pixel)",fontSize:7,color:"#8A7FA6"}}>STREAK</div><div className="big-score" style={{fontSize:38,color:"#FF8A4D"}}>x6</div></div>
+      </div>
+      <div className="rise" style={{marginTop:22,background:"rgba(255,255,255,.1)",borderRadius:999,padding:"10px 18px",fontFamily:"var(--font-display)",fontWeight:600,color:"#fff"}}>
+        You climbed to <span style={{color:"var(--marigold)"}}>{"#2"}</span> today 👑
+      </div>
+      <div style={{position:"absolute",left:24,right:24,bottom:28,display:"flex",flexDirection:"column",gap:11}}>
+        <ChunkBtn color="marigold" full size="lg" icon="leaderboard" onClick={onBoard}>See leaderboard</ChunkBtn>
+        <ChunkBtn color="lightghost" full icon="ios_share" onClick={onHome}>Share to team</ChunkBtn>
+      </div>
+    </div>
+  </div>);
+}
+function LeaderboardScreen({onNav}){
+  const [scope,setScope]=useState("today");
+  const sorted=[...PLAYERS].sort((a,b)=>b.pts-a.pts);
+  return(<div className="qa-root">
+    <TopBar right={<button className="qa-iconbtn"><Icon name="ios_share" filled={false}/></button>}/>
+    <div className="qa-scroll" style={{padding:"2px 16px 20px"}}>
+      <div className="t-h1" style={{margin:"4px 2px 14px"}}>Leaderboard</div>
+      <div className="seg" style={{marginBottom:16}}>
+        <button className={scope==="today"?"on":""} onClick={()=>setScope("today")}>Today</button>
+        <button className={scope==="week"?"on":""} onClick={()=>setScope("week")}>This week</button>
+        <button className={scope==="all"?"on":""} onClick={()=>setScope("all")}>All time</button>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:9}}>
+        {sorted.map((p,i)=><LRow key={p.name} p={p} rank={i+1}/>)}
+      </div>
+    </div>
+    <BottomNav active="board" onNav={onNav}/>
+  </div>);
+}
+function ProfileScreen({onNav}){
+  const [ping,setPing]=useState(true);
+  const stats=[
+    {icon:"stars",label:"Total points",value:"1,990",tone:"marigold"},
+    {icon:"local_fire_department",label:"Best streak",value:"12 days",tone:"coral"},
+    {icon:"event_available",label:"Days played",value:"38",tone:"teal"},
+    {icon:"ads_click",label:"Accuracy",value:"81%",tone:"grape"},
+  ];
+  return(<div className="qa-root">
+    <TopBar right={<button className="qa-iconbtn"><Icon name="settings" filled={false}/></button>}/>
+    <div className="qa-scroll" style={{padding:"2px 16px 20px"}}>
+      <div style={{display:"flex",flexDirection:"column",alignItems:"center",margin:"10px 0 22px"}}>
+        <Avatar initial="S" tone="teal" size={84}/>
+        <div className="t-h1" style={{marginTop:12}}>Sam Okafor</div>
+        <div className="t-small" style={{color:"var(--plum-faint)"}}>Team FLEECE · joined Mar 2026</div>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:11}}>
+        {stats.map(s=>(
+          <div key={s.label} className="card" style={{padding:15}}>
+            <Icon name={s.icon} size={22} color={`var(--${s.tone}-700)`}/>
+            <div style={{fontFamily:"var(--font-pixel)",fontSize:16,color:"var(--plum)",margin:"10px 0 4px"}}>{s.value}</div>
+            <div className="t-small" style={{color:"var(--plum-faint)"}}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+      <div className="card" style={{marginTop:16,overflow:"hidden"}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,padding:15}}>
+          <Icon name="notifications" size={22} color="var(--plum-soft)"/>
+          <div style={{flex:1}}><div className="t-body-strong">Daily standup ping</div><div className="t-small" style={{color:"var(--plum-faint)"}}>9:30 AM reminder</div></div>
+          <button onClick={()=>setPing(p=>!p)} style={{border:"none",cursor:"pointer",padding:0,width:52,height:30,borderRadius:999,background:ping?"var(--grape)":"var(--wool-line)",position:"relative",transition:"background .2s"}}>
+            <span style={{position:"absolute",top:3,left:ping?25:3,width:24,height:24,borderRadius:"50%",background:"#fff",boxShadow:"var(--shadow-1)",transition:"left .2s var(--ease-bounce)"}}/>
+          </button>
+        </div>
+        <div style={{height:1,background:"var(--wool-line)"}}/>
+        <div style={{display:"flex",alignItems:"center",gap:12,padding:15}}>
+          <Icon name="tag" size={22} color="var(--plum-soft)"/>
+          <div style={{flex:1}}><div className="t-body-strong">Team code</div><div className="t-small" style={{color:"var(--plum-faint)"}}>FLEECE</div></div>
+          <Icon name="chevron_right" size={22} color="var(--plum-faint)"/>
+        </div>
+      </div>
+    </div>
+    <BottomNav active="you" onNav={onNav}/>
+  </div>);
+}
+Object.assign(window,{PLAYERS,QUESTIONS,TopBar,BottomNav,HomeScreen,LRow,QuizFlow,ResultsScreen,LeaderboardScreen,ProfileScreen});
+</script>
+
+<!-- ④ App root -->
+<script type="text/babel">
+const {useState:useS,useEffect:useE}=React;
+const LS="df_quiz_demo_v1";
+function App(){
+  const saved=(()=>{try{return JSON.parse(localStorage.getItem(LS))||{};}catch(e){return{};}})();
+  const [screen,setScreen]=useS(saved.screen||"home");
+  const [played,setPlayed]=useS(!!saved.played);
+  const [earned,setEarned]=useS(saved.earned||0);
+  useE(()=>{
+    const persist=["home","board","you"].includes(screen)?screen:"home";
+    localStorage.setItem(LS,JSON.stringify({screen:persist,played,earned}));
+  },[screen,played,earned]);
+  const nav=id=>setScreen(id);
+  let view;
+  if(screen==="quiz") view=<QuizFlow onComplete={e=>{setEarned(e);setPlayed(true);setScreen("results");}} onQuit={()=>setScreen("home")}/>;
+  else if(screen==="results") view=<ResultsScreen earned={earned} onBoard={()=>setScreen("board")} onHome={()=>setScreen("home")}/>;
+  else if(screen==="board") view=<LeaderboardScreen onNav={nav}/>;
+  else if(screen==="you") view=<ProfileScreen onNav={nav}/>;
+  else view=<HomeScreen onPlay={()=>setScreen("quiz")} onNav={nav} played={played}/>;
+  return <div data-screen-label={screen}><AndroidDevice width={400} height={840}>{view}</AndroidDevice></div>;
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

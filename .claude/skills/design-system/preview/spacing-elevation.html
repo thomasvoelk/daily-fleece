@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; background: var(--paper); }
+  .wrap { padding: 30px 24px; display: flex; gap: 26px; align-items: center; flex-wrap: wrap; }
+  .item { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .box { width: 96px; height: 60px; background: var(--paper); border-radius: var(--r-md); display: flex; align-items: center; justify-content: center; }
+  .soft { border: 1px solid var(--wool-line); }
+  .lbl { font-family: var(--font-pixel); font-size: 7.5px; color: var(--plum-soft); }
+  .e1 { box-shadow: var(--shadow-1); }
+  .e2 { box-shadow: var(--shadow-2); }
+  .e3 { box-shadow: var(--shadow-3); }
+  .chunk { background: var(--grape); color:#fff; font-family:var(--font-display); font-weight:600; box-shadow: var(--chunk-grape); }
+  .chunkm { background: var(--marigold); color:var(--plum); font-family:var(--font-display); font-weight:600; box-shadow: var(--chunk-marigold); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="item"><div class="box soft e1"></div><div class="lbl">shadow-1</div></div>
+  <div class="item"><div class="box soft e2"></div><div class="lbl">shadow-2</div></div>
+  <div class="item"><div class="box soft e3"></div><div class="lbl">shadow-3</div></div>
+  <div class="item"><div class="box chunk">Tap</div><div class="lbl">chunk-grape</div></div>
+  <div class="item"><div class="box chunkm">Tap</div><div class="lbl">chunk-marigold</div></div>
+</div>
+</body>
+</html>
