@@ -109,12 +109,7 @@ class LeaderboardApiTest {
         endSession(HOST_ID, new PlayerName("Host"), "B", "DE");
         endSession(HOST_ID, new PlayerName("Host"), "B", "DE");
 
-        ResponseEntity<Map<String, Object>> response =
-                http.get().uri("/leaderboard").retrieve().toEntity(responseType());
-
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> entries = Objects.requireNonNull((List<Map<String, Object>>)
-                Objects.requireNonNull(response.getBody()).get("entries"));
+        List<Map<String, Object>> entries = getLeaderboardEntries();
         assertThat(entries).hasSize(1);
         assertThat(entries.get(0)).containsEntry("totalPoints", 4).containsEntry("sessionsParticipated", 2);
     }
@@ -125,12 +120,7 @@ class LeaderboardApiTest {
     void player_with_zero_points_appears_on_leaderboard() {
         endSession(HOST_ID, new PlayerName("Host"), "A", "FR"); // wrong answers → 0 pts
 
-        ResponseEntity<Map<String, Object>> response =
-                http.get().uri("/leaderboard").retrieve().toEntity(responseType());
-
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> entries = Objects.requireNonNull((List<Map<String, Object>>)
-                Objects.requireNonNull(response.getBody()).get("entries"));
+        List<Map<String, Object>> entries = getLeaderboardEntries();
         assertThat(entries).hasSize(1);
         assertThat(entries.get(0)).containsEntry("totalPoints", 0).containsEntry("sessionsParticipated", 1);
     }
@@ -154,6 +144,14 @@ class LeaderboardApiTest {
     }
 
     // ---------------------------------------------------------------------------
+
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> getLeaderboardEntries() {
+        ResponseEntity<Map<String, Object>> response =
+                http.get().uri("/leaderboard").retrieve().toEntity(responseType());
+        return Objects.requireNonNull((List<Map<String, Object>>)
+                Objects.requireNonNull(response.getBody()).get("entries"));
+    }
 
     /**
      * Ends a session via HTTP so SetCorrectAnswerUseCase publishes SessionEndedDomainEvent.

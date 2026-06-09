@@ -37,6 +37,7 @@
 		<spotless.version>3.6.0</spotless.version>
 		<checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
 		<spotbugs.plugin.version>4.9.8.4</spotbugs.plugin.version>
+		<pmd.plugin.version>3.26.0</pmd.plugin.version>
 		<spotbugs.annotations.version>4.10.1</spotbugs.annotations.version>
 		<findsecbugs.version>1.14.0</findsecbugs.version>
 		<palantir-java-format.version>2.91.0</palantir-java-format.version>
@@ -314,6 +315,26 @@
 						<phase>verify</phase>
 						<goals>
 							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>${pmd.plugin.version}</version>
+				<configuration>
+					<minimumTokens>100</minimumTokens>
+					<includeTests>true</includeTests>
+					<failOnViolation>true</failOnViolation>
+					<printFailingErrors>true</printFailingErrors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>cpd-check</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>cpd-check</goal>
 						</goals>
 					</execution>
 				</executions>

@@ -7,7 +7,6 @@ import de.dailyfleece.backend.quiz.domain.QuestionKey;
 import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import de.dailyfleece.backend.shared.PlayerName;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -72,6 +71,7 @@ class SessionApiTest {
     EventConfig.EventStore eventStore;
 
     RestClient http;
+    CreateSessionRequest createSession;
 
     @BeforeEach
     void setup() {
@@ -84,6 +84,7 @@ class SessionApiTest {
                 .baseUrl("http://localhost:" + port + "/api/v1")
                 .defaultStatusHandler(status -> true, (req, res) -> {})
                 .build();
+        createSession = new CreateSessionRequest(http, HOST_ID, "Host");
     }
 
     @Test
@@ -518,27 +519,7 @@ class SessionApiTest {
     }
 
     private ResponseEntity<Map<String, Object>> postSession() {
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("hostId", HOST_ID.toString());
-        body.add("hostDisplayName", "Host");
-        body.add("q1", new ByteArrayResource("q1-bytes".getBytes(StandardCharsets.UTF_8)) {
-            @Override
-            public String getFilename() {
-                return "q1.jpg";
-            }
-        });
-        body.add("q2", new ByteArrayResource("q2-bytes".getBytes(StandardCharsets.UTF_8)) {
-            @Override
-            public String getFilename() {
-                return "q2.jpg";
-            }
-        });
-        return http.post()
-                .uri("/sessions")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(body)
-                .retrieve()
-                .toEntity(responseType());
+        return createSession.post();
     }
 
     @SuppressWarnings("unchecked")

@@ -2,7 +2,6 @@ package de.dailyfleece.backend;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,13 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -36,6 +31,7 @@ class CreateSessionApiTest {
     MongoTemplate mongoTemplate;
 
     RestClient http;
+    CreateSessionRequest createSession;
 
     @BeforeEach
     void setup() {
@@ -46,6 +42,7 @@ class CreateSessionApiTest {
                 .baseUrl("http://localhost:" + port + "/api/v1")
                 .defaultStatusHandler(status -> true, (req, res) -> {})
                 .build();
+        createSession = new CreateSessionRequest(http, HOST_ID, "Thomas");
     }
 
     @Test
@@ -72,31 +69,6 @@ class CreateSessionApiTest {
     }
 
     private ResponseEntity<Map<String, Object>> postSession() {
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("hostId", HOST_ID.toString());
-        body.add("hostDisplayName", "Thomas");
-        body.add("q1", new ByteArrayResource("q1-bytes".getBytes(StandardCharsets.UTF_8)) {
-            @Override
-            public String getFilename() {
-                return "q1.jpg";
-            }
-        });
-        body.add("q2", new ByteArrayResource("q2-bytes".getBytes(StandardCharsets.UTF_8)) {
-            @Override
-            public String getFilename() {
-                return "q2.jpg";
-            }
-        });
-        return http.post()
-                .uri("/sessions")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(body)
-                .retrieve()
-                .toEntity(responseType());
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Class<Map<String, Object>> responseType() {
-        return (Class<Map<String, Object>>) (Class<?>) Map.class;
+        return createSession.post();
     }
 }
