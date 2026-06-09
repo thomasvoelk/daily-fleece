@@ -142,3 +142,34 @@ describe('Leaderboard – entries rendered', () => {
     screen.getByRole('row', { name: 'Bob' });
   });
 });
+
+// ─── champion fireworks ──────────────────────────────────────────────────────
+
+describe('Leaderboard – champion fireworks', () => {
+  async function renderWith(entries: LeaderboardResponse['entries']) {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p2', companyId: 'acme', displayName: 'Me' }),
+    );
+    const { container } = await render(Leaderboard, { providers: PROVIDERS });
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne('/api/v1/leaderboard').flush(makeLeaderboard({ entries }));
+    return container;
+  }
+
+  it('renders fireworks whenever the board has a champion', async () => {
+    const container = await renderWith([
+      { playerId: 'p1', displayName: 'Alice', sessionsParticipated: 5, totalPoints: 10 },
+      { playerId: 'p2', displayName: 'Bob', sessionsParticipated: 3, totalPoints: 6 },
+    ]);
+    await screen.findByRole('row', { name: 'Alice' });
+
+    expect(container.querySelector('[data-fireworks]')).not.toBeNull();
+  });
+
+  it('does not render fireworks for an empty board', async () => {
+    const container = await renderWith([]);
+
+    expect(container.querySelector('[data-fireworks]')).toBeNull();
+  });
+});

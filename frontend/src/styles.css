@@ -77,6 +77,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Celebratory fireworks burst — particles fly out toward --fx / --fy. */
+@utility animate-firework {
+  animation: fireworkBurst 1200ms var(--ease-smooth) 3 both;
+}
+
 @keyframes popIn {
   from { transform: scale(0.8); opacity: 0; }
   to   { transform: none; opacity: 1; }
@@ -85,6 +90,12 @@
 @keyframes riseIn {
   from { transform: translateY(12px); opacity: 0; }
   to   { transform: none; opacity: 1; }
+}
+
+@keyframes fireworkBurst {
+  0%   { transform: translate(0, 0) scale(0.4); opacity: 0; }
+  15%  { opacity: 1; }
+  100% { transform: translate(var(--fx, 0), var(--fy, 0)) scale(1); opacity: 0; }
 }
 
 /* Global heading font — in @layer base so Tailwind utilities (e.g. text-white) can override. */
