@@ -350,16 +350,9 @@ class SessionApiTest {
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "A");
         sessionRepository.save(session);
 
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/" + session.sessionId() + "/questions/q1/correct")
-                .body(Map.of("hostId", HOST_ID.toString(), "correctAnswer", "B"))
-                .retrieve()
-                .toEntity(responseType());
+        Map<String, Object> voting =
+                postCorrectAnswerAndGetVoting("/sessions/" + session.sessionId() + "/questions/q1/correct", "B");
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        @SuppressWarnings("unchecked")
-        Map<String, Object> voting = Objects.requireNonNull(
-                (Map<String, Object>) Objects.requireNonNull(response.getBody()).get("voting"));
         @SuppressWarnings("unchecked")
         Map<String, Object> q1 = Objects.requireNonNull((Map<String, Object>) voting.get("q1"));
         @SuppressWarnings("unchecked")
@@ -782,6 +775,67 @@ class SessionApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
+    @Test
+    void setCorrectAnswerByKey_returns_404_when_no_session_for_date() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/questions/q1/correct")
+                .body(Map.of("hostId", HOST_ID.toString(), "correctAnswer", "B"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void setCorrectAnswerByKey_returns_200_with_q1_closed() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        Map<String, Object> voting =
+                postCorrectAnswerAndGetVoting("/sessions/default/" + today + "/questions/q1/correct", "B");
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> q1 = Objects.requireNonNull((Map<String, Object>) voting.get("q1"));
+        assertThat(q1).containsEntry("status", "Closed").containsEntry("correctAnswer", "B");
+    }
+
+    @Test
+    void submitAnswerByKey_returns_404_when_no_session_for_date() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.put()
+                .uri("/sessions/default/" + today + "/questions/q1/answers")
+                .body(Map.of("playerId", HOST_ID.toString(), "answer", "A"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void submitAnswerByKey_returns_200_for_open_voting() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Void> response = http.put()
+                .uri("/sessions/default/" + today + "/questions/q1/answers")
+                .body(Map.of("playerId", HOST_ID.toString(), "answer", "A"))
+                .retrieve()
+                .toBodilessEntity();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
     private ResponseEntity<Map<String, Object>> endSessionAndGetResultsByKey(Session session) {
         session.start();
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
@@ -824,6 +878,19 @@ class SessionApiTest {
                 .body(body)
                 .retrieve()
                 .toEntity((Class<Map<String, Object>>) (Class<?>) Map.class);
+    }
+
+    private Map<String, Object> postCorrectAnswerAndGetVoting(String uri, String correctAnswer) {
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri(uri)
+                .body(Map.of("hostId", HOST_ID.toString(), "correctAnswer", correctAnswer))
+                .retrieve()
+                .toEntity(responseType());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> voting = Objects.requireNonNull(
+                (Map<String, Object>) Objects.requireNonNull(response.getBody()).get("voting"));
+        return voting;
     }
 
     @SuppressWarnings("unchecked")
