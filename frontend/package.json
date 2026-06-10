@@ -60,7 +60,7 @@
     "eslint-plugin-tailwindcss": "4.0.0-alpha.5",
     "jsdom": "28.1.0",
     "ng-openapi-gen": "1.0.5",
-    "postcss": "8.5.3",
+    "postcss": "8.5.15",
     "prettier": "3.8.4",
     "typescript": "6.0.3",
     "typescript-eslint": "8.61.0",
