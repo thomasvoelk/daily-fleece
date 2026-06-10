@@ -571,6 +571,31 @@ class SessionApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
+    @Test
+    void getSessionByKey_returns_200_with_session() {
+        sessionRepository.save(Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host")));
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response =
+                http.get().uri("/sessions/default/" + today).retrieve().toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).containsKey("sessionId");
+        assertThat(response.getBody()).containsEntry("phase", "Lobby");
+    }
+
+    @Test
+    void getSessionByKey_returns_404_when_no_session_for_date() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response =
+                http.get().uri("/sessions/default/" + today).retrieve().toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
     private ResponseEntity<Map<String, Object>> postSession() {
         return createSession.post();
     }

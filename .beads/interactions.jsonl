@@ -205,3 +205,4 @@
 {"id":"int-c7fdb60689efd5206a8ca693f941fb7e","kind":"field_change","created_at":"2026-06-10T17:18:40.03524Z","actor":"thomas","issue_id":"df-d94.1","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-298271a6c7822ddbc2469a85576aa55e","kind":"field_change","created_at":"2026-06-10T17:47:35.46716Z","actor":"thomas","issue_id":"df-d94.2","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-8ebdae4d87e88bcff6a8502ad4d269ef","kind":"field_change","created_at":"2026-06-10T17:49:14.146628Z","actor":"thomas","issue_id":"df-d94.3","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
+{"id":"int-8430aed00876e6abe9b69d861f7e3d53","kind":"field_change","created_at":"2026-06-10T17:53:11.609937Z","actor":"thomas","issue_id":"df-d94.4","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}

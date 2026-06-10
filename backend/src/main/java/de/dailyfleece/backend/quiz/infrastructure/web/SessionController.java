@@ -100,6 +100,15 @@ class SessionController implements SessionsApi {
     }
 
     @Override
+    public ResponseEntity<SessionResponse> getSessionByKey(String projectId, LocalDate date) {
+        return loadSessionUseCase
+                .load(date)
+                .map(mapper::toResponse)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new NoSessionForDate(date));
+    }
+
+    @Override
     public ResponseEntity<SessionResponse> joinSession(String sessionId, JoinSessionRequest request) {
         UUID sessionUuid = UUID.fromString(sessionId);
         UUID playerId = UUID.fromString(request.getPlayerId());
