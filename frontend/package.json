@@ -14,7 +14,15 @@
   },
   "private": true,
   "overrides": {
-    "eslint": "10.4.1"
+    "eslint": "10.4.1",
+    "@angular-architects/ngrx-toolkit": {
+      "@angular/common": "$@angular/common",
+      "@angular/core": "$@angular/core"
+    },
+    "@ngrx/signals": {
+      "@angular/common": "$@angular/common",
+      "@angular/core": "$@angular/core"
+    }
   },
   "packageManager": "npm@11.16.0",
   "dependencies": {
@@ -34,7 +42,7 @@
     "tslib": "2.8.1"
   },
   "devDependencies": {
-    "@angular/build": "^22.0.0",
+    "@angular/build": "22.0.0",
     "@angular/cli": "22.0.0",
     "@angular/compiler-cli": "22.0.0",
     "@angular/localize": "22.0.0",
@@ -52,7 +60,7 @@
     "eslint-plugin-tailwindcss": "4.0.0-alpha.5",
     "jsdom": "28.1.0",
     "ng-openapi-gen": "1.0.5",
-    "postcss": "^8.5.3",
+    "postcss": "8.5.3",
     "prettier": "3.8.4",
     "typescript": "6.0.3",
     "typescript-eslint": "8.61.0",
