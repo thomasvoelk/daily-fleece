@@ -13,7 +13,9 @@ import de.dailyfleece.backend.quiz.application.NoSessionForDate;
 import de.dailyfleece.backend.quiz.application.StartSessionUseCase;
 import de.dailyfleece.backend.quiz.domain.Photo;
 import de.dailyfleece.backend.quiz.domain.PhotoType;
+import de.dailyfleece.backend.quiz.domain.ProjectId;
 import de.dailyfleece.backend.quiz.domain.Session;
+import de.dailyfleece.backend.quiz.domain.SessionKey;
 import de.dailyfleece.backend.shared.PlayerName;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -60,13 +62,13 @@ class SessionController implements SessionsApi {
     public ResponseEntity<SessionResponse> createSession(
             String hostId, String hostDisplayName, MultipartFile q1, MultipartFile q2) {
         try {
-            LocalDate today = LocalDate.now(ZoneId.systemDefault());
+            SessionKey key = new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault()));
             UUID hostUuid = UUID.fromString(hostId);
             PlayerName name = new PlayerName(hostDisplayName);
             PhotoType q1Type = PhotoTypeRegistry.toEnum(q1.getContentType());
             PhotoType q2Type = PhotoTypeRegistry.toEnum(q2.getContentType());
             Session session = createSessionUseCase.create(
-                    today, hostUuid, name, q1.getInputStream(), q1Type, q2.getInputStream(), q2Type);
+                    key, hostUuid, name, q1.getInputStream(), q1Type, q2.getInputStream(), q2Type);
             return ResponseEntity.status(201).body(mapper.toResponse(session));
         } catch (IOException e) {
             throw new IllegalStateException("Failed to read uploaded photo", e);

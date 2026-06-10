@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import de.dailyfleece.backend.TestcontainersConfiguration;
 import de.dailyfleece.backend.quiz.api.SessionEndedDomainEvent;
+import de.dailyfleece.backend.quiz.domain.ProjectId;
 import de.dailyfleece.backend.quiz.domain.QuestionKey;
 import de.dailyfleece.backend.quiz.domain.Session;
+import de.dailyfleece.backend.quiz.domain.SessionKey;
 import de.dailyfleece.backend.quiz.domain.SessionPhase;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import de.dailyfleece.backend.shared.PlayerName;
@@ -88,7 +90,10 @@ class SetCorrectAnswerUseCaseTest {
 
     @Test
     void set_q1_does_not_publish_SessionEndedDomainEvent() {
-        Session session = Session.create(LocalDate.parse("2098-01-01"), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.parse("2098-01-01")),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         sessionRepository.save(session);
 
@@ -105,7 +110,10 @@ class SetCorrectAnswerUseCaseTest {
 
     @Test
     void set_throws_when_caller_is_not_the_host() {
-        Session session = Session.create(LocalDate.parse("2098-01-02"), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.parse("2098-01-02")),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         sessionRepository.save(session);
 
@@ -114,7 +122,10 @@ class SetCorrectAnswerUseCaseTest {
     }
 
     private Session sessionReadyForQ2() {
-        Session session = Session.create(LocalDate.parse("2098-01-01"), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.parse("2098-01-01")),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         session.setCorrectAnswer(QuestionKey.Q1, "A");
         sessionRepository.save(session);

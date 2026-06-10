@@ -5,7 +5,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import de.dailyfleece.backend.TestcontainersConfiguration;
 import de.dailyfleece.backend.quiz.domain.LobbyClosed;
+import de.dailyfleece.backend.quiz.domain.ProjectId;
 import de.dailyfleece.backend.quiz.domain.Session;
+import de.dailyfleece.backend.quiz.domain.SessionKey;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import de.dailyfleece.backend.shared.PlayerName;
 import java.time.LocalDate;
@@ -30,7 +32,10 @@ class JoinSessionUseCaseTest {
 
     @Test
     void join_adds_player_to_lobby_session() {
-        Session session = Session.create(LocalDate.parse("2098-01-01"), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.parse("2098-01-01")),
+                HOST_ID,
+                new PlayerName("Host"));
         sessionRepository.save(session);
 
         useCase.join(session.sessionId(), PLAYER_1, new PlayerName("Thomas"));
@@ -48,7 +53,10 @@ class JoinSessionUseCaseTest {
 
     @Test
     void join_propagates_domain_exception_when_session_not_in_lobby() {
-        Session session = Session.create(LocalDate.parse("2098-01-03"), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.parse("2098-01-03")),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         sessionRepository.save(session);
 

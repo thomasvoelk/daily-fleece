@@ -3,8 +3,10 @@ package de.dailyfleece.backend;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.dailyfleece.backend.quiz.api.SessionEndedDomainEvent;
+import de.dailyfleece.backend.quiz.domain.ProjectId;
 import de.dailyfleece.backend.quiz.domain.QuestionKey;
 import de.dailyfleece.backend.quiz.domain.Session;
+import de.dailyfleece.backend.quiz.domain.SessionKey;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import de.dailyfleece.backend.shared.PlayerName;
 import java.time.LocalDate;
@@ -97,7 +99,10 @@ class SessionApiTest {
 
     @Test
     void deleteTodaySession_returns_204_and_removes_session() {
-        sessionRepository.save(Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host")));
+        sessionRepository.save(Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host")));
 
         ResponseEntity<Void> response =
                 http.delete().uri("/sessions/today").retrieve().toBodilessEntity();
@@ -127,7 +132,10 @@ class SessionApiTest {
 
     @Test
     void getTodaySession_returns_200_with_session() {
-        sessionRepository.save(Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host")));
+        sessionRepository.save(Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host")));
 
         ResponseEntity<Map<String, Object>> response =
                 http.get().uri("/sessions/today").retrieve().toEntity(responseType());
@@ -147,7 +155,10 @@ class SessionApiTest {
         String playerId =
                 (String) Objects.requireNonNull(registerResponse.getBody()).get("playerId");
 
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         sessionRepository.save(session);
 
         ResponseEntity<Map<String, Object>> response = http.post()
@@ -199,7 +210,10 @@ class SessionApiTest {
 
     @Test
     void joinSession_active_session_returns_409() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         sessionRepository.save(session);
 
@@ -226,7 +240,10 @@ class SessionApiTest {
 
     @Test
     void startSession_returns_200_with_active_phase() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         sessionRepository.save(session);
 
         ResponseEntity<Map<String, Object>> response = http.post()
@@ -241,7 +258,10 @@ class SessionApiTest {
 
     @Test
     void startSession_returns_403_when_caller_is_not_the_host() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         sessionRepository.save(session);
 
         ResponseEntity<Map<String, Object>> response = http.post()
@@ -255,7 +275,10 @@ class SessionApiTest {
 
     @Test
     void startSession_returns_409_when_session_already_started() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         sessionRepository.save(session);
 
@@ -319,7 +342,10 @@ class SessionApiTest {
 
     @Test
     void setCorrectAnswer_returns_200_with_q1_closed_and_q2_open() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "A");
         sessionRepository.save(session);
@@ -349,7 +375,10 @@ class SessionApiTest {
 
     @Test
     void setCorrectAnswer_on_q2_returns_200_with_session_ended() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         session.setCorrectAnswer(QuestionKey.Q1, "A");
         sessionRepository.save(session);
@@ -366,7 +395,10 @@ class SessionApiTest {
 
     @Test
     void setCorrectAnswer_on_q2_publishes_SessionEndedDomainEvent() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
         session.setCorrectAnswer(QuestionKey.Q1, "B");
@@ -389,7 +421,10 @@ class SessionApiTest {
 
     @Test
     void setCorrectAnswer_returns_403_when_caller_is_not_host() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         sessionRepository.save(session);
 
@@ -404,7 +439,10 @@ class SessionApiTest {
 
     @Test
     void submitAnswer_returns_200_for_open_voting() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         sessionRepository.save(session);
 
@@ -419,7 +457,10 @@ class SessionApiTest {
 
     @Test
     void getTodaySession_answerCount_reflects_submitted_answers() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
         sessionRepository.save(session);
@@ -438,7 +479,10 @@ class SessionApiTest {
 
     @Test
     void submitAnswer_returns_409_when_voting_is_closed() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         session.setCorrectAnswer(QuestionKey.Q1, "A");
         sessionRepository.save(session);
@@ -454,7 +498,10 @@ class SessionApiTest {
 
     @Test
     void getSessionResults_returns_200_with_per_player_results_for_ended_session() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
         session.setCorrectAnswer(QuestionKey.Q1, "B");
@@ -481,7 +528,10 @@ class SessionApiTest {
 
     @Test
     void getSessionResults_returns_409_when_session_not_ended() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         sessionRepository.save(session);
 
@@ -505,7 +555,10 @@ class SessionApiTest {
 
     @Test
     void submitAnswer_returns_400_for_invalid_question_key() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         sessionRepository.save(session);
 

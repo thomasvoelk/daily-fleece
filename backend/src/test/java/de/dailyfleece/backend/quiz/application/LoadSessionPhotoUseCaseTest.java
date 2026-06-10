@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import de.dailyfleece.backend.TestcontainersConfiguration;
 import de.dailyfleece.backend.quiz.domain.Photo;
 import de.dailyfleece.backend.quiz.domain.PhotoType;
+import de.dailyfleece.backend.quiz.domain.ProjectId;
+import de.dailyfleece.backend.quiz.domain.SessionKey;
 import de.dailyfleece.backend.shared.PlayerName;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -35,7 +37,7 @@ class LoadSessionPhotoUseCaseTest {
     @Test
     void load_returns_q1_photo_bytes() throws IOException {
         var session = createSessionUseCase.create(
-                LocalDate.parse("2097-02-01"),
+                new SessionKey(new ProjectId("default"), LocalDate.parse("2097-02-01")),
                 HOST_ID,
                 HOST_NAME,
                 new ByteArrayInputStream(Q1_BYTES),
@@ -52,7 +54,7 @@ class LoadSessionPhotoUseCaseTest {
     @Test
     void load_returns_q2_photo_bytes() throws IOException {
         var session = createSessionUseCase.create(
-                LocalDate.parse("2097-02-02"),
+                new SessionKey(new ProjectId("default"), LocalDate.parse("2097-02-02")),
                 HOST_ID,
                 HOST_NAME,
                 new ByteArrayInputStream(Q1_BYTES),

@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import de.dailyfleece.backend.TestcontainersConfiguration;
 import de.dailyfleece.backend.quiz.domain.PlayerResult;
+import de.dailyfleece.backend.quiz.domain.ProjectId;
 import de.dailyfleece.backend.quiz.domain.QuestionKey;
 import de.dailyfleece.backend.quiz.domain.Session;
+import de.dailyfleece.backend.quiz.domain.SessionKey;
 import de.dailyfleece.backend.quiz.domain.SessionPhase;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import de.dailyfleece.backend.shared.PlayerName;
@@ -43,7 +45,10 @@ class GetSessionResultsUseCaseTest {
 
     @Test
     void get_returns_ended_session_for_results_computation() {
-        Session saved = Session.create(LocalDate.parse("2098-01-01"), HOST_ID, new PlayerName("Host"));
+        Session saved = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.parse("2098-01-01")),
+                HOST_ID,
+                new PlayerName("Host"));
         saved.join(PLAYER_1, new PlayerName("Anna"));
         saved.start();
         saved.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
@@ -68,7 +73,10 @@ class GetSessionResultsUseCaseTest {
 
     @Test
     void get_throws_when_session_not_ended() {
-        Session session = Session.create(LocalDate.parse("2098-01-02"), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.parse("2098-01-02")),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         sessionRepository.save(session);
 

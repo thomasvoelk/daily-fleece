@@ -2,8 +2,10 @@ package de.dailyfleece.backend;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.dailyfleece.backend.quiz.domain.ProjectId;
 import de.dailyfleece.backend.quiz.domain.QuestionKey;
 import de.dailyfleece.backend.quiz.domain.Session;
+import de.dailyfleece.backend.quiz.domain.SessionKey;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import de.dailyfleece.backend.shared.PlayerName;
 import java.time.LocalDate;
@@ -158,8 +160,12 @@ class LeaderboardApiTest {
      * Q1 and Q2 answers are optional (null → player earns 0 pts for that question).
      */
     private void endSession(UUID hostId, PlayerName hostName, String q1Answer, String q2Answer) {
-        Session session =
-                Session.create(LocalDate.now(ZoneId.systemDefault()).plusDays(sessionDateOffset++), hostId, hostName);
+        Session session = Session.create(
+                new SessionKey(
+                        new ProjectId("default"),
+                        LocalDate.now(ZoneId.systemDefault()).plusDays(sessionDateOffset++)),
+                hostId,
+                hostName);
         session.start();
         if (q1Answer != null) session.submitAnswer(QuestionKey.Q1, hostId, q1Answer);
         session.setCorrectAnswer(QuestionKey.Q1, "B");
@@ -175,7 +181,10 @@ class LeaderboardApiTest {
 
     /** Ends a session with host (2 pts) and a second player (0 pts). */
     private void endSessionWithTwoPlayers() {
-        Session session = Session.create(LocalDate.now(ZoneId.systemDefault()), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
         session.join(PLAYER_ID, new PlayerName("Anna"));
         session.start();
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");

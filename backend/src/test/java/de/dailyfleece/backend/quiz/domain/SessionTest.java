@@ -12,21 +12,31 @@ import org.junit.jupiter.api.Test;
 class SessionTest {
 
     private static final LocalDate DATE = LocalDate.parse("2026-05-29");
+    private static final SessionKey KEY = new SessionKey(new ProjectId("default"), DATE);
     private static final UUID HOST_ID = UUID.fromString("00000000-0000-0000-0000-000000000099");
     private static final PlayerName HOST_NAME = new PlayerName("Host");
+
+    @Test
+    void create_stores_session_key() {
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
+
+        assertThat(session.key()).isEqualTo(KEY);
+        assertThat(session.date()).isEqualTo(DATE);
+    }
+
     private static final UUID PLAYER_1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private static final UUID PLAYER_2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
 
     @Test
     void new_session_starts_in_lobby_phase() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
 
         assertThat(session.phase()).isEqualTo(SessionPhase.LOBBY);
     }
 
     @Test
     void create_adds_host_as_first_player() {
-        Session session = Session.create(DATE, HOST_ID, new PlayerName("Thomas"));
+        Session session = Session.create(KEY, HOST_ID, new PlayerName("Thomas"));
 
         assertThat(session.players()).hasSize(1);
         assertThat(session.players().get(0).playerId()).isEqualTo(HOST_ID);
@@ -35,7 +45,7 @@ class SessionTest {
 
     @Test
     void player_can_join_a_lobby_session() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
 
         session.join(PLAYER_1, new PlayerName("Thomas"));
 
@@ -46,7 +56,7 @@ class SessionTest {
 
     @Test
     void multiple_players_can_join_a_lobby_session() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
 
         session.join(PLAYER_1, new PlayerName("Thomas"));
         session.join(PLAYER_2, new PlayerName("Anna"));
@@ -56,7 +66,7 @@ class SessionTest {
 
     @Test
     void joining_an_active_session_throws() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
         session.start();
 
         assertThatThrownBy(() -> session.join(PLAYER_1, new PlayerName("Thomas")))
@@ -65,7 +75,7 @@ class SessionTest {
 
     @Test
     void joining_an_ended_session_throws() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
         session.start();
         session.end();
 
@@ -75,7 +85,7 @@ class SessionTest {
 
     @Test
     void starting_an_active_session_throws() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
         session.start();
 
         assertThatThrownBy(session::start).isInstanceOf(InvalidPhaseTransition.class);
@@ -83,7 +93,7 @@ class SessionTest {
 
     @Test
     void starting_an_ended_session_throws() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
         session.start();
         session.end();
 
@@ -92,7 +102,7 @@ class SessionTest {
 
     @Test
     void start_transitions_lobby_session_to_active() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
 
         session.start();
 
@@ -101,7 +111,7 @@ class SessionTest {
 
     @Test
     void start_opens_q1_voting() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
 
         session.start();
 
@@ -111,7 +121,7 @@ class SessionTest {
 
     @Test
     void player_can_submit_answer_for_open_q1_voting() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
         session.start();
 
         session.submitAnswer(QuestionKey.Q1, PLAYER_1, "A");
@@ -121,7 +131,7 @@ class SessionTest {
 
     @Test
     void player_can_change_answer_while_voting_is_open() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
         session.start();
         session.submitAnswer(QuestionKey.Q1, PLAYER_1, "A");
 
@@ -132,7 +142,7 @@ class SessionTest {
 
     @Test
     void submitting_answer_to_closed_voting_throws() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
         session.start();
         session.setCorrectAnswer(QuestionKey.Q1, "A");
 
@@ -142,7 +152,7 @@ class SessionTest {
 
     @Test
     void setCorrectAnswer_on_q1_closes_q1_and_opens_q2() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
         session.start();
 
         session.setCorrectAnswer(QuestionKey.Q1, "B");
@@ -156,7 +166,7 @@ class SessionTest {
 
     @Test
     void setCorrectAnswer_on_q2_closes_q2_and_ends_session() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
         session.start();
         session.setCorrectAnswer(QuestionKey.Q1, "A");
 
@@ -169,7 +179,7 @@ class SessionTest {
 
     @Test
     void results_player_who_answered_both_correctly_gets_2_points() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
         session.start();
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
         session.setCorrectAnswer(QuestionKey.Q1, "B");
@@ -188,7 +198,7 @@ class SessionTest {
 
     @Test
     void results_player_who_did_not_answer_gets_0_points() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
         session.join(PLAYER_1, new PlayerName("Anna"));
         session.start();
         session.setCorrectAnswer(QuestionKey.Q1, "B");
@@ -207,7 +217,7 @@ class SessionTest {
 
     @Test
     void results_player_with_correct_q1_and_wrong_q2_gets_1_point() {
-        Session session = Session.create(DATE, HOST_ID, HOST_NAME);
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
         session.start();
         session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
         session.setCorrectAnswer(QuestionKey.Q1, "B");

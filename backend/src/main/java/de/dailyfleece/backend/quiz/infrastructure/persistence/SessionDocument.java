@@ -1,7 +1,9 @@
 package de.dailyfleece.backend.quiz.infrastructure.persistence;
 
+import de.dailyfleece.backend.quiz.domain.ProjectId;
 import de.dailyfleece.backend.quiz.domain.QuestionVoting;
 import de.dailyfleece.backend.quiz.domain.Session;
+import de.dailyfleece.backend.quiz.domain.SessionKey;
 import de.dailyfleece.backend.quiz.domain.SessionPhase;
 import de.dailyfleece.backend.quiz.domain.SessionPlayer;
 import de.dailyfleece.backend.shared.PlayerName;
@@ -15,6 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "sessions")
 record SessionDocument(
         @Id String sessionId,
+        String projectId,
         LocalDate date,
         String phase,
         List<SessionPlayerDocument> players,
@@ -29,6 +32,7 @@ record SessionDocument(
                 .toList();
         return new SessionDocument(
                 session.sessionId().toString(),
+                session.key().projectId().value(),
                 session.date(),
                 session.phase().name(),
                 players,
@@ -45,7 +49,7 @@ record SessionDocument(
         QuestionVoting q2 = q2Voting != null ? q2Voting.toDomain() : null;
         return Session.reconstitute(
                 UUID.fromString(sessionId),
-                date,
+                new SessionKey(new ProjectId(projectId), date),
                 SessionPhase.valueOf(phase),
                 domainPlayers,
                 UUID.fromString(hostId),

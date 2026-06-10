@@ -17,7 +17,7 @@ import org.jspecify.annotations.Nullable;
 public final class Session {
 
     private final UUID sessionId;
-    private final LocalDate date;
+    private final SessionKey key;
 
     /**
      * Identity reference to the Player who created this Session. Stored as a UUID to avoid
@@ -35,29 +35,29 @@ public final class Session {
     @Nullable
     private QuestionVoting q2Voting;
 
-    private Session(UUID sessionId, LocalDate date, UUID hostId) {
+    private Session(UUID sessionId, SessionKey key, UUID hostId) {
         this.sessionId = sessionId;
-        this.date = date;
+        this.key = key;
         this.hostId = hostId;
         this.phase = SessionPhase.LOBBY;
         this.players = new ArrayList<>();
     }
 
-    public static Session create(LocalDate date, UUID hostId, PlayerName hostDisplayName) {
-        Session session = new Session(UUID.randomUUID(), date, hostId);
+    public static Session create(SessionKey key, UUID hostId, PlayerName hostDisplayName) {
+        Session session = new Session(UUID.randomUUID(), key, hostId);
         session.players.add(new SessionPlayer(hostId, hostDisplayName));
         return session;
     }
 
     public static Session reconstitute(
             UUID sessionId,
-            LocalDate date,
+            SessionKey key,
             SessionPhase phase,
             List<SessionPlayer> players,
             UUID hostId,
             @Nullable QuestionVoting q1Voting,
             @Nullable QuestionVoting q2Voting) {
-        Session session = new Session(sessionId, date, hostId);
+        Session session = new Session(sessionId, key, hostId);
         session.phase = phase;
         session.players.addAll(players);
         session.q1Voting = q1Voting;
@@ -110,8 +110,12 @@ public final class Session {
         return sessionId;
     }
 
+    public SessionKey key() {
+        return key;
+    }
+
     public LocalDate date() {
-        return date;
+        return key.date();
     }
 
     /**

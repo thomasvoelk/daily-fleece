@@ -1,6 +1,7 @@
 package de.dailyfleece.backend.quiz.infrastructure.persistence;
 
 import de.dailyfleece.backend.quiz.domain.Session;
+import de.dailyfleece.backend.quiz.domain.SessionKey;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -28,6 +29,16 @@ class MongoSessionRepository implements SessionRepository {
     @Override
     public Optional<Session> findById(UUID sessionId) {
         @Nullable SessionDocument doc = mongoTemplate.findById(sessionId.toString(), SessionDocument.class);
+        return Optional.ofNullable(doc).map(SessionDocument::toDomain);
+    }
+
+    @Override
+    public Optional<Session> findByKey(SessionKey key) {
+        Query query = Query.query(Criteria.where("projectId")
+                .is(key.projectId().value())
+                .and("date")
+                .is(key.date()));
+        @Nullable SessionDocument doc = mongoTemplate.findOne(query, SessionDocument.class);
         return Optional.ofNullable(doc).map(SessionDocument::toDomain);
     }
 

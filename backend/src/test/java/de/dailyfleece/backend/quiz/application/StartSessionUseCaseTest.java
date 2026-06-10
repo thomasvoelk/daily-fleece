@@ -5,7 +5,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import de.dailyfleece.backend.TestcontainersConfiguration;
 import de.dailyfleece.backend.quiz.domain.InvalidPhaseTransition;
+import de.dailyfleece.backend.quiz.domain.ProjectId;
 import de.dailyfleece.backend.quiz.domain.Session;
+import de.dailyfleece.backend.quiz.domain.SessionKey;
 import de.dailyfleece.backend.quiz.domain.SessionPhase;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import de.dailyfleece.backend.shared.PlayerName;
@@ -41,7 +43,10 @@ class StartSessionUseCaseTest {
 
     @Test
     void start_transitions_session_to_active_phase() {
-        Session session = Session.create(LocalDate.parse("2098-01-01"), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.parse("2098-01-01")),
+                HOST_ID,
+                new PlayerName("Host"));
         sessionRepository.save(session);
 
         Session result = useCase.start(session.sessionId(), HOST_ID);
@@ -58,7 +63,10 @@ class StartSessionUseCaseTest {
 
     @Test
     void start_throws_when_caller_is_not_the_host() {
-        Session session = Session.create(LocalDate.parse("2098-01-02"), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.parse("2098-01-02")),
+                HOST_ID,
+                new PlayerName("Host"));
         sessionRepository.save(session);
 
         assertThatThrownBy(() -> useCase.start(session.sessionId(), OTHER_PLAYER))
@@ -67,7 +75,10 @@ class StartSessionUseCaseTest {
 
     @Test
     void start_propagates_domain_exception_when_session_already_started() {
-        Session session = Session.create(LocalDate.parse("2098-01-03"), HOST_ID, new PlayerName("Host"));
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.parse("2098-01-03")),
+                HOST_ID,
+                new PlayerName("Host"));
         session.start();
         sessionRepository.save(session);
 
