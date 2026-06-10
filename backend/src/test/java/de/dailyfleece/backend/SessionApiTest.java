@@ -597,6 +597,49 @@ class SessionApiTest {
     }
 
     @Test
+    void createSessionByKey_returns_201_with_projectId_and_date() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+
+        ResponseEntity<Map<String, Object>> response = postSessionByKey();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).containsEntry("projectId", "default");
+        assertThat(response.getBody()).containsEntry("date", today);
+        assertThat(response.getBody()).containsEntry("phase", "Lobby");
+    }
+
+    @Test
+    void createSessionByKey_duplicate_returns_409() {
+        postSessionByKey();
+
+        ResponseEntity<Map<String, Object>> response = postSessionByKey();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void deleteSessionByKey_returns_204_and_removes_session() {
+        postSessionByKey();
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Void> response =
+                http.delete().uri("/sessions/default/" + today).retrieve().toBodilessEntity();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(sessionRepository.findByDate(LocalDate.now(ZoneId.systemDefault())))
+                .isEmpty();
+    }
+
+    @Test
+    void deleteSessionByKey_returns_204_when_no_session_exists() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Void> response =
+                http.delete().uri("/sessions/default/" + today).retrieve().toBodilessEntity();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
     void getSessionResultsByKey_returns_enriched_results_for_ended_session() {
         Session session = Session.create(
                 new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
@@ -687,6 +730,32 @@ class SessionApiTest {
 
     private ResponseEntity<Map<String, Object>> postSession() {
         return createSession.post();
+    }
+
+    @SuppressWarnings("unchecked")
+    private ResponseEntity<Map<String, Object>> postSessionByKey() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("hostId", HOST_ID.toString());
+        body.add("hostDisplayName", "Host");
+        body.add("q1", new ByteArrayResource("q1-bytes".getBytes(java.nio.charset.StandardCharsets.UTF_8)) {
+            @Override
+            public String getFilename() {
+                return "q1.jpg";
+            }
+        });
+        body.add("q2", new ByteArrayResource("q2-bytes".getBytes(java.nio.charset.StandardCharsets.UTF_8)) {
+            @Override
+            public String getFilename() {
+                return "q2.jpg";
+            }
+        });
+        return http.post()
+                .uri("/sessions/default/" + today)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(body)
+                .retrieve()
+                .toEntity((Class<Map<String, Object>>) (Class<?>) Map.class);
     }
 
     @SuppressWarnings("unchecked")

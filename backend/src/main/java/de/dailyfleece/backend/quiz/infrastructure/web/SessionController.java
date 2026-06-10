@@ -61,18 +61,8 @@ class SessionController implements SessionsApi {
     @Override
     public ResponseEntity<SessionResponse> createSession(
             String hostId, String hostDisplayName, MultipartFile q1, MultipartFile q2) {
-        try {
-            SessionKey key = new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault()));
-            UUID hostUuid = UUID.fromString(hostId);
-            PlayerName name = new PlayerName(hostDisplayName);
-            PhotoType q1Type = PhotoTypeRegistry.toEnum(q1.getContentType());
-            PhotoType q2Type = PhotoTypeRegistry.toEnum(q2.getContentType());
-            Session session = createSessionUseCase.create(
-                    key, hostUuid, name, q1.getInputStream(), q1Type, q2.getInputStream(), q2Type);
-            return ResponseEntity.status(201).body(mapper.toResponse(session));
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to read uploaded photo", e);
-        }
+        SessionKey key = new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault()));
+        return createSessionForKey(key, hostId, hostDisplayName, q1, q2);
     }
 
     @Override
@@ -100,6 +90,24 @@ class SessionController implements SessionsApi {
     }
 
     @Override
+    public ResponseEntity<SessionResponse> createSessionByKey(
+            String projectId,
+            LocalDate date,
+            String hostId,
+            String hostDisplayName,
+            MultipartFile q1,
+            MultipartFile q2) {
+        SessionKey key = new SessionKey(new ProjectId(projectId), date);
+        return createSessionForKey(key, hostId, hostDisplayName, q1, q2);
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteSessionByKey(String projectId, LocalDate date) {
+        deleteSessionUseCase.delete(date);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
     public ResponseEntity<SessionResponse> getSessionByKey(String projectId, LocalDate date) {
         return loadSessionUseCase
                 .load(date)
@@ -123,5 +131,20 @@ class SessionController implements SessionsApi {
         UUID hostId = UUID.fromString(request.getHostId());
         Session session = startSessionUseCase.start(sessionUuid, hostId);
         return ResponseEntity.ok(mapper.toResponse(session));
+    }
+
+    private ResponseEntity<SessionResponse> createSessionForKey(
+            SessionKey key, String hostId, String hostDisplayName, MultipartFile q1, MultipartFile q2) {
+        try {
+            UUID hostUuid = UUID.fromString(hostId);
+            PlayerName name = new PlayerName(hostDisplayName);
+            PhotoType q1Type = PhotoTypeRegistry.toEnum(q1.getContentType());
+            PhotoType q2Type = PhotoTypeRegistry.toEnum(q2.getContentType());
+            Session session = createSessionUseCase.create(
+                    key, hostUuid, name, q1.getInputStream(), q1Type, q2.getInputStream(), q2Type);
+            return ResponseEntity.status(201).body(mapper.toResponse(session));
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to read uploaded photo", e);
+        }
     }
 }
