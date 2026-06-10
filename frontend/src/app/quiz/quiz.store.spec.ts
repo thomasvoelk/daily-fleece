@@ -13,10 +13,18 @@ const drainMicrotasks = () =>
     queueMicrotask(r);
   });
 
-@Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
+@Component({
+  selector: 'app-lobby-stub',
+  template: '',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
 class LobbyStub {}
 
-@Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
+@Component({
+  selector: 'app-results-stub',
+  template: '',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
 class ResultsStub {}
 
 const PROVIDERS = [
