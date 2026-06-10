@@ -704,6 +704,74 @@ class SessionApiTest {
     }
 
     @Test
+    void joinSessionByKey_returns_200_with_updated_player_list() {
+        ResponseEntity<Map<String, Object>> registerResponse = http.post()
+                .uri("/players")
+                .body(Map.of("companyId", "anna.schmidt", "displayName", "Anna"))
+                .retrieve()
+                .toEntity(responseType());
+        String playerId =
+                (String) Objects.requireNonNull(registerResponse.getBody()).get("playerId");
+
+        sessionRepository.save(Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host")));
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/join")
+                .body(Map.of("playerId", playerId, "displayName", "Anna"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).containsKey("players");
+    }
+
+    @Test
+    void startSessionByKey_returns_200_with_active_phase() {
+        sessionRepository.save(Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host")));
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/start")
+                .body(Map.of("hostId", HOST_ID.toString()))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).containsEntry("phase", "Active");
+    }
+
+    @Test
+    void startSessionByKey_returns_404_when_no_session_for_date() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/start")
+                .body(Map.of("hostId", HOST_ID.toString()))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void joinSessionByKey_returns_404_when_no_session_for_date() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/join")
+                .body(Map.of("playerId", UUID.randomUUID().toString(), "displayName", "Anna"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     void getSessionResultsByKey_returns_404_when_no_session_for_date() {
         String today = LocalDate.now(ZoneId.systemDefault()).toString();
         ResponseEntity<Map<String, Object>> response = http.get()

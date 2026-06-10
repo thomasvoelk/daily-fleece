@@ -117,12 +117,31 @@ class SessionController implements SessionsApi {
     }
 
     @Override
+    public ResponseEntity<SessionResponse> joinSessionByKey(
+            String projectId, LocalDate date, JoinSessionRequest request) {
+        Session sessionForKey = loadSessionUseCase.load(date).orElseThrow(() -> new NoSessionForDate(date));
+        UUID playerId = UUID.fromString(request.getPlayerId());
+        PlayerName displayName = new PlayerName(request.getDisplayName());
+        Session updated = joinSessionUseCase.join(sessionForKey.sessionId(), playerId, displayName);
+        return ResponseEntity.ok(mapper.toResponse(updated));
+    }
+
+    @Override
     public ResponseEntity<SessionResponse> joinSession(String sessionId, JoinSessionRequest request) {
         UUID sessionUuid = UUID.fromString(sessionId);
         UUID playerId = UUID.fromString(request.getPlayerId());
         PlayerName displayName = new PlayerName(request.getDisplayName());
         Session session = joinSessionUseCase.join(sessionUuid, playerId, displayName);
         return ResponseEntity.ok(mapper.toResponse(session));
+    }
+
+    @Override
+    public ResponseEntity<SessionResponse> startSessionByKey(
+            String projectId, LocalDate date, HostActionRequest request) {
+        Session sessionForKey = loadSessionUseCase.load(date).orElseThrow(() -> new NoSessionForDate(date));
+        UUID hostId = UUID.fromString(request.getHostId());
+        Session updated = startSessionUseCase.start(sessionForKey.sessionId(), hostId);
+        return ResponseEntity.ok(mapper.toResponse(updated));
     }
 
     @Override
