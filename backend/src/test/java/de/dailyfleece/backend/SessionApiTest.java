@@ -596,6 +596,95 @@ class SessionApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
+    @Test
+    void getSessionResultsByKey_returns_enriched_results_for_ended_session() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        ResponseEntity<Map<String, Object>> response = endSessionAndGetResultsByKey(session);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).containsEntry("q1CorrectAnswer", "B");
+        assertThat(response.getBody()).containsEntry("q2CorrectAnswer", "DE");
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> results = Objects.requireNonNull((List<Map<String, Object>>)
+                Objects.requireNonNull(response.getBody()).get("results"));
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0))
+                .containsEntry("playerId", HOST_ID.toString())
+                .containsEntry("q1Correct", true)
+                .containsEntry("q2Correct", true)
+                .containsEntry("totalPoints", 2)
+                .containsEntry("q1Answer", "B")
+                .containsEntry("q2Answer", "DE");
+    }
+
+    @Test
+    void getSessionResultsByKey_returns_null_answers_for_player_who_did_not_submit() {
+        UUID guestId = UUID.fromString("00000000-0000-0000-0000-000000000088");
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.join(guestId, new PlayerName("Guest"));
+        ResponseEntity<Map<String, Object>> response = endSessionAndGetResultsByKey(session);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> results = Objects.requireNonNull((List<Map<String, Object>>)
+                Objects.requireNonNull(response.getBody()).get("results"));
+        Map<String, Object> guestResult = results.stream()
+                .filter(r -> guestId.toString().equals(r.get("playerId")))
+                .findFirst()
+                .orElseThrow();
+        assertThat(guestResult.get("q1Answer")).isNull();
+        assertThat(guestResult.get("q2Answer")).isNull();
+    }
+
+    @Test
+    void getSessionResultsByKey_returns_409_when_session_not_ended() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.get()
+                .uri("/sessions/default/" + today + "/results")
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void getSessionResultsByKey_returns_404_when_no_session_for_date() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.get()
+                .uri("/sessions/default/" + today + "/results")
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    private ResponseEntity<Map<String, Object>> endSessionAndGetResultsByKey(Session session) {
+        session.start();
+        session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.setCorrectAnswer(QuestionKey.Q1, "B");
+        session.submitAnswer(QuestionKey.Q2, HOST_ID, "DE");
+        session.setCorrectAnswer(QuestionKey.Q2, "DE");
+        sessionRepository.save(session);
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        return http.get()
+                .uri("/sessions/default/" + today + "/results")
+                .retrieve()
+                .toEntity(responseType());
+    }
+
     private ResponseEntity<Map<String, Object>> postSession() {
         return createSession.post();
     }

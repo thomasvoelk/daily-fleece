@@ -1,6 +1,7 @@
 package de.dailyfleece.backend.quiz.application;
 
 import de.dailyfleece.backend.quiz.domain.Session;
+import de.dailyfleece.backend.quiz.domain.SessionKey;
 import de.dailyfleece.backend.quiz.domain.SessionPhase;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -26,6 +27,18 @@ public class GetSessionResultsUseCase {
         Session session = sessionRepository.findById(sessionId).orElseThrow(() -> new SessionNotFound(sessionId));
         if (session.phase() != SessionPhase.ENDED) {
             throw new SessionNotEnded(sessionId, session.phase());
+        }
+        return session;
+    }
+
+    /**
+     * Loads the session by natural key and verifies it has ended. Throws {@link NoSessionForDate} if
+     * not found, or {@link SessionNotEnded} if the session has not yet ended.
+     */
+    public Session get(SessionKey key) {
+        Session session = sessionRepository.findByKey(key).orElseThrow(() -> new NoSessionForDate(key.date()));
+        if (session.phase() != SessionPhase.ENDED) {
+            throw new SessionNotEnded(session.sessionId(), session.phase());
         }
         return session;
     }
