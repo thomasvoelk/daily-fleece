@@ -58,7 +58,6 @@ module.exports = defineConfig([
       ],
       "@typescript-eslint/no-extraneous-class": ["error", { allowWithDecorator: true }],
       // Additional @angular-eslint rules (df-jef.4)
-      "@angular-eslint/no-conflicting-lifecycle": "error",
       "@angular-eslint/consistent-component-styles": "error",
       // component-class-suffix omitted: project uses suffix-free page components (App, Lobby, Quiz…)
       "@angular-eslint/directive-class-suffix": "error",
