@@ -33,6 +33,16 @@ function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse 
 // ─── goToQuiz ────────────────────────────────────────────────────────────────
 
 describe('LobbyStore – goToQuiz', () => {
+  it('does nothing when no session is in state', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(LobbyStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    await store.goToQuiz();
+
+    http.verify();
+  });
+
   it('navigates to /quiz when fetched session is Active', async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(LobbyStore);
@@ -43,7 +53,7 @@ describe('LobbyStore – goToQuiz', () => {
     store.initializeSession(makeSession({ phase: 'Lobby' }));
 
     const promise = store.goToQuiz();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ phase: 'Active' }));
+    http.expectOne('/api/v1/sessions/default/2026-05-31').flush(makeSession({ phase: 'Active' }));
     await promise;
 
     expect(navigateSpy).toHaveBeenCalledWith(['/quiz']);
@@ -59,7 +69,7 @@ describe('LobbyStore – goToQuiz', () => {
     store.initializeSession(makeSession({ phase: 'Lobby' }));
 
     const promise = store.goToQuiz();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ phase: 'Lobby' }));
+    http.expectOne('/api/v1/sessions/default/2026-05-31').flush(makeSession({ phase: 'Lobby' }));
     await promise;
 
     expect(store.error()).toMatch(/not started/i);
@@ -100,7 +110,7 @@ describe('LobbyStore – isHost', () => {
 // ─── startQuiz ───────────────────────────────────────────────────────────────
 
 describe('LobbyStore – startQuiz', () => {
-  it('calls POST /sessions/{id}/start with the current player as hostId', async () => {
+  it('does nothing when no session is in state', async () => {
     localStorage.setItem(
       'lobby-player',
       JSON.stringify({ playerId: 'host-1', companyId: 'acme', displayName: 'Alice' }),
@@ -109,13 +119,39 @@ describe('LobbyStore – startQuiz', () => {
     const store = TestBed.inject(LobbyStore);
     const http = TestBed.inject(HttpTestingController);
 
-    store.initializeSession(makeSession({ sessionId: 's42', hostId: 'host-1' }));
+    await store.startQuiz();
+
+    http.verify();
+  });
+
+  it('does nothing when no player identity is available', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(LobbyStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    store.initializeSession(makeSession());
+
+    await store.startQuiz();
+
+    http.verify();
+  });
+
+  it('calls POST /sessions/default/{date}/start with the current player as hostId', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'host-1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(LobbyStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    store.initializeSession(makeSession({ hostId: 'host-1' }));
 
     const promise = store.startQuiz();
-    const req = http.expectOne('/api/v1/sessions/s42/start');
+    const req = http.expectOne('/api/v1/sessions/default/2026-05-31/start');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toMatchObject({ hostId: 'host-1' });
-    req.flush(makeSession({ sessionId: 's42', phase: 'Active' }));
+    req.flush(makeSession({ phase: 'Active' }));
     await promise;
   });
 
@@ -130,10 +166,12 @@ describe('LobbyStore – startQuiz', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate');
 
-    store.initializeSession(makeSession({ sessionId: 's42', hostId: 'host-1' }));
+    store.initializeSession(makeSession({ hostId: 'host-1' }));
 
     const promise = store.startQuiz();
-    http.expectOne('/api/v1/sessions/s42/start').flush(makeSession({ phase: 'Active' }));
+    http
+      .expectOne('/api/v1/sessions/default/2026-05-31/start')
+      .flush(makeSession({ phase: 'Active' }));
     await promise;
 
     expect(navigateSpy).toHaveBeenCalledWith(['/quiz']);

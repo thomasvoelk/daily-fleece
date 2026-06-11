@@ -154,7 +154,7 @@ describe('Lobby – Go to Quiz button', () => {
 
     await user.click(screen.getByRole('button', { name: /go to quiz/i }));
     http
-      .expectOne('/api/v1/sessions/today')
+      .expectOne('/api/v1/sessions/default/2026-05-31')
       .flush(makeSession({ phase: 'Lobby', players: [{ playerId: 'p1', displayName: 'Alice' }] }));
 
     await screen.findByText(/not started/i);
