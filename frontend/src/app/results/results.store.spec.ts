@@ -2,22 +2,35 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { ResultsStore } from './results.store';
 import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
-import { SessionResponse, SessionResultsResponse } from '../backend-client';
+import { PlayerResult, SessionResultsResponse } from '../backend-client';
 
 mockLocalStorage();
 
-const drainMicrotasks = () =>
-  new Promise<void>((r) => {
-    queueMicrotask(r);
-  });
+const TODAY = new Date().toISOString().slice(0, 10);
+const RESULTS_URL = `/api/v1/sessions/default/${TODAY}/results`;
 
 const PROVIDERS = [...provideTestEnvironment(), ResultsStore];
 
 function makeResults(overrides: Partial<SessionResultsResponse> = {}): SessionResultsResponse {
   return {
     sessionId: 's1',
-    date: '2026-06-05',
+    date: TODAY,
+    q1CorrectAnswer: null,
+    q2CorrectAnswer: null,
     results: [],
+    ...overrides,
+  };
+}
+
+function makePlayer(overrides: Partial<PlayerResult> = {}): PlayerResult {
+  return {
+    playerId: 'p1',
+    displayName: 'Alice',
+    q1Correct: false,
+    q2Correct: false,
+    q1Answer: null,
+    q2Answer: null,
+    totalPoints: 0,
     ...overrides,
   };
 }
@@ -25,7 +38,7 @@ function makeResults(overrides: Partial<SessionResultsResponse> = {}): SessionRe
 // ─── load ─────────────────────────────────────────────────────────────────────
 
 describe('ResultsStore – load', () => {
-  it('fetches session then results and populates data', async () => {
+  it('makes exactly one HTTP call and populates data', async () => {
     localStorage.setItem(
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
@@ -35,25 +48,16 @@ describe('ResultsStore – load', () => {
     const http = TestBed.inject(HttpTestingController);
 
     const loadPromise = store.load();
-    http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
-    await drainMicrotasks();
-    http.expectOne('/api/v1/sessions/s1/results').flush(
+    http.expectOne(RESULTS_URL).flush(
       makeResults({
-        results: [
-          {
-            playerId: 'p1',
-            displayName: 'Alice',
-            q1Correct: true,
-            q2Correct: false,
-            totalPoints: 1,
-          },
-        ],
+        results: [makePlayer({ q1Correct: true, totalPoints: 1 })],
       }),
     );
     await loadPromise;
 
     expect(store.data()?.sessionId).toBe('s1');
     expect(store.data()?.results).toHaveLength(1);
+    http.verify();
   });
 });
 
@@ -70,25 +74,11 @@ describe('ResultsStore – myResult', () => {
     const http = TestBed.inject(HttpTestingController);
 
     const loadPromise = store.load();
-    http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
-    await drainMicrotasks();
-    http.expectOne('/api/v1/sessions/s1/results').flush(
+    http.expectOne(RESULTS_URL).flush(
       makeResults({
         results: [
-          {
-            playerId: 'p1',
-            displayName: 'Alice',
-            q1Correct: true,
-            q2Correct: true,
-            totalPoints: 2,
-          },
-          {
-            playerId: 'p2',
-            displayName: 'Bob',
-            q1Correct: false,
-            q2Correct: false,
-            totalPoints: 0,
-          },
+          makePlayer({ playerId: 'p1', q1Correct: true, q2Correct: true, totalPoints: 2 }),
+          makePlayer({ playerId: 'p2', displayName: 'Bob', totalPoints: 0 }),
         ],
       }),
     );
@@ -109,9 +99,7 @@ describe('ResultsStore – myResult', () => {
     const http = TestBed.inject(HttpTestingController);
 
     const loadPromise = store.load();
-    http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
-    await drainMicrotasks();
-    http.expectOne('/api/v1/sessions/s1/results').flush(makeResults());
+    http.expectOne(RESULTS_URL).flush(makeResults());
     await loadPromise;
 
     expect(store.myResult()).toBeNull();
@@ -131,19 +119,17 @@ describe('ResultsStore – sortedResults', () => {
     const http = TestBed.inject(HttpTestingController);
 
     const loadPromise = store.load();
-    http.expectOne('/api/v1/sessions/today').flush({ sessionId: 's1', phase: 'Ended' });
-    await drainMicrotasks();
-    http.expectOne('/api/v1/sessions/s1/results').flush(
+    http.expectOne(RESULTS_URL).flush(
       makeResults({
         results: [
-          {
-            playerId: 'p1',
-            displayName: 'Alice',
-            q1Correct: false,
-            q2Correct: false,
-            totalPoints: 0,
-          },
-          { playerId: 'p2', displayName: 'Bob', q1Correct: true, q2Correct: true, totalPoints: 2 },
+          makePlayer({ playerId: 'p1', displayName: 'Alice', totalPoints: 0 }),
+          makePlayer({
+            playerId: 'p2',
+            displayName: 'Bob',
+            q1Correct: true,
+            q2Correct: true,
+            totalPoints: 2,
+          }),
         ],
       }),
     );
@@ -155,26 +141,10 @@ describe('ResultsStore – sortedResults', () => {
   });
 });
 
-// ─── correct answers from session ─────────────────────────────────────────────
-
-function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse {
-  return {
-    sessionId: 's1',
-    date: '2026-06-05',
-    hostId: 'host-1',
-    phase: 'Ended',
-    projectId: 'default',
-    players: [],
-    voting: {
-      q1: { status: 'Closed', correctAnswer: 'B' },
-      q2: { status: 'Closed', correctAnswer: 'FR' },
-    },
-    ...overrides,
-  };
-}
+// ─── correct answers from enriched response ────────────────────────────────
 
 describe('ResultsStore – q1CorrectAnswer / q2CorrectAnswer', () => {
-  it('exposes the Q1 correct answer from the session', async () => {
+  it('exposes the Q1 correct answer from the results response', async () => {
     localStorage.setItem(
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
@@ -184,15 +154,13 @@ describe('ResultsStore – q1CorrectAnswer / q2CorrectAnswer', () => {
     const http = TestBed.inject(HttpTestingController);
 
     const loadPromise = store.load();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession());
-    await drainMicrotasks();
-    http.expectOne('/api/v1/sessions/s1/results').flush(makeResults());
+    http.expectOne(RESULTS_URL).flush(makeResults({ q1CorrectAnswer: 'B', q2CorrectAnswer: 'FR' }));
     await loadPromise;
 
     expect(store.q1CorrectAnswer()).toBe('B');
   });
 
-  it('exposes the Q2 correct answer (ISO code) from the session', async () => {
+  it('exposes the Q2 correct answer (ISO code) from the results response', async () => {
     localStorage.setItem(
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
@@ -202,9 +170,7 @@ describe('ResultsStore – q1CorrectAnswer / q2CorrectAnswer', () => {
     const http = TestBed.inject(HttpTestingController);
 
     const loadPromise = store.load();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession());
-    await drainMicrotasks();
-    http.expectOne('/api/v1/sessions/s1/results').flush(makeResults());
+    http.expectOne(RESULTS_URL).flush(makeResults({ q1CorrectAnswer: 'B', q2CorrectAnswer: 'FR' }));
     await loadPromise;
 
     expect(store.q2CorrectAnswer()).toBe('FR');
@@ -214,7 +180,7 @@ describe('ResultsStore – q1CorrectAnswer / q2CorrectAnswer', () => {
 // ─── enrichedResults ──────────────────────────────────────────────────────────
 
 describe('ResultsStore – enrichedResults', () => {
-  it('joins per-player answers from session voting with sorted results', async () => {
+  it('reads per-player answers directly from PlayerResult', async () => {
     localStorage.setItem(
       'lobby-player',
       JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
@@ -224,46 +190,29 @@ describe('ResultsStore – enrichedResults', () => {
     const http = TestBed.inject(HttpTestingController);
 
     const loadPromise = store.load();
-    http.expectOne('/api/v1/sessions/today').flush(
-      makeSession({
-        voting: {
-          q1: {
-            status: 'Closed',
-            correctAnswer: 'B',
-            answers: {
-              p1: { answer: 'B', displayName: 'Alice' },
-              p2: { answer: 'A', displayName: 'Bob' },
-            },
-          },
-          q2: {
-            status: 'Closed',
-            correctAnswer: 'FR',
-            answers: {
-              p1: { answer: 'FR', displayName: 'Alice' },
-              p2: { answer: 'DE', displayName: 'Bob' },
-            },
-          },
-        },
-      }),
-    );
-    await drainMicrotasks();
-    http.expectOne('/api/v1/sessions/s1/results').flush(
+    http.expectOne(RESULTS_URL).flush(
       makeResults({
+        q1CorrectAnswer: 'B',
+        q2CorrectAnswer: 'FR',
         results: [
-          {
+          makePlayer({
             playerId: 'p1',
             displayName: 'Alice',
             q1Correct: true,
             q2Correct: true,
+            q1Answer: 'B',
+            q2Answer: 'FR',
             totalPoints: 2,
-          },
-          {
+          }),
+          makePlayer({
             playerId: 'p2',
             displayName: 'Bob',
             q1Correct: false,
             q2Correct: false,
+            q1Answer: 'A',
+            q2Answer: 'DE',
             totalPoints: 0,
-          },
+          }),
         ],
       }),
     );
@@ -291,28 +240,9 @@ describe('ResultsStore – enrichedResults', () => {
     const http = TestBed.inject(HttpTestingController);
 
     const loadPromise = store.load();
-    http
-      .expectOne('/api/v1/sessions/today')
-      .flush(
-        makeSession({
-          voting: {
-            q1: { status: 'Closed', correctAnswer: 'B' },
-            q2: { status: 'Closed', correctAnswer: 'FR' },
-          },
-        }),
-      );
-    await drainMicrotasks();
-    http.expectOne('/api/v1/sessions/s1/results').flush(
+    http.expectOne(RESULTS_URL).flush(
       makeResults({
-        results: [
-          {
-            playerId: 'p1',
-            displayName: 'Alice',
-            q1Correct: false,
-            q2Correct: false,
-            totalPoints: 0,
-          },
-        ],
+        results: [makePlayer({ q1Answer: null, q2Answer: null })],
       }),
     );
     await loadPromise;

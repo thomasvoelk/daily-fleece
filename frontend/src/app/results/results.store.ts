@@ -1,13 +1,7 @@
 import { computed, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
-import {
-  Api,
-  getTodaySession,
-  getSessionResults,
-  SessionResponse,
-  SessionResultsResponse,
-} from '../backend-client';
+import { Api, getSessionResultsByKey, SessionResultsResponse } from '../backend-client';
 import { EntryContext } from '../entry';
 
 export interface EnrichedResult {
@@ -21,13 +15,12 @@ export interface EnrichedResult {
 }
 
 interface ResultsState {
-  session: SessionResponse | null;
   data: SessionResultsResponse | null;
 }
 
 export const ResultsStore = signalStore(
   { providedIn: 'root' },
-  withState<ResultsState>({ session: null, data: null }),
+  withState<ResultsState>({ data: null }),
   withComputed((store) => {
     const entry = inject(EntryContext);
     return {
@@ -41,8 +34,8 @@ export const ResultsStore = signalStore(
         if (!d) return [];
         return [...d.results].sort((a, b) => b.totalPoints - a.totalPoints);
       }),
-      q1CorrectAnswer: computed(() => store.session()?.voting.q1.correctAnswer ?? null),
-      q2CorrectAnswer: computed(() => store.session()?.voting.q2.correctAnswer ?? null),
+      q1CorrectAnswer: computed(() => store.data()?.q1CorrectAnswer ?? null),
+      q2CorrectAnswer: computed(() => store.data()?.q2CorrectAnswer ?? null),
     };
   }),
   withComputed((store) => ({
@@ -59,13 +52,11 @@ export const ResultsStore = signalStore(
       return sorted.findIndex((r) => r.playerId === me.playerId) + 1;
     }),
     enrichedResults: computed((): EnrichedResult[] => {
-      const session = store.session();
-      const sorted = store.sortedResults();
-      return sorted.map((r) => ({
+      return store.sortedResults().map((r) => ({
         playerId: r.playerId,
         displayName: r.displayName,
-        q1Answer: session?.voting.q1.answers?.[r.playerId]?.answer ?? null,
-        q2Answer: session?.voting.q2.answers?.[r.playerId]?.answer ?? null,
+        q1Answer: r.q1Answer ?? null,
+        q2Answer: r.q2Answer ?? null,
         q1Correct: r.q1Correct,
         q2Correct: r.q2Correct,
         totalPoints: r.totalPoints,
@@ -76,11 +67,11 @@ export const ResultsStore = signalStore(
     const api = inject(Api);
     return {
       async load(): Promise<void> {
-        const session = await firstValueFrom(api.invoke(getTodaySession));
+        const date = new Date().toISOString().slice(0, 10);
         const data = await firstValueFrom(
-          api.invoke(getSessionResults, { sessionId: session.sessionId }),
+          api.invoke(getSessionResultsByKey, { projectId: 'default', date }),
         );
-        patchState(store, { session, data });
+        patchState(store, { data });
       },
     };
   }),
