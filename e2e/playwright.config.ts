@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
+  globalSetup: './global-setup.ts',
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
