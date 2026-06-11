@@ -18,3 +18,12 @@ When a new domain concept appears, ask: does a raw primitive let callers pass th
 **MongoDB documents stay as strings.** Persistence adapters convert via `uuid.toString()` / `UUID.fromString()` and `.value()` / `new CompanyId(...)` in `fromDomain()` / `toDomain()`. IDs are stored as plain UUID strings (not BSON binary), so they remain human-readable in the shell.
 
 **`PlayerName` lives in the `shared` module** (`de.dailyfleece.backend.shared`). Both `quiz` and `player` declare `allowedDependencies` that include `"shared"`. Do not duplicate this type in either module.
+
+## Frontend commands
+
+Always run these from `frontend/`:
+
+| Task | Command | Why |
+|---|---|---|
+| Build | `npm run build` | Runs `ng-openapi-gen` (client regen) + `ng build` + `eslint` lint — `ng build` alone skips both |
+| Test | `npm run test:ci` | Enforces 90% coverage thresholds — `npm run test` skips them |
