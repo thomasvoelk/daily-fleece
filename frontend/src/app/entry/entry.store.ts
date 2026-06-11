@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { withStorageSync } from '@angular-architects/ngrx-toolkit';
-import { Api, registerPlayer, joinSession, getTodaySession } from '../backend-client';
+import { Api, registerPlayer, joinSessionByKey } from '../backend-client';
 
 interface EntryState {
   playerId: string | null;
@@ -58,10 +58,11 @@ export const EntryStore = signalStore(
           );
           patchState(store, { playerId: player.playerId, companyId, displayName });
 
-          const session = await firstValueFrom(api.invoke(getTodaySession));
+          const today = new Date().toISOString().slice(0, 10);
           await firstValueFrom(
-            api.invoke(joinSession, {
-              sessionId: session.sessionId,
+            api.invoke(joinSessionByKey, {
+              projectId: 'default',
+              date: today,
               body: { playerId: player.playerId, displayName },
             }),
           );
