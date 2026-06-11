@@ -73,6 +73,14 @@ class SessionController implements SessionsApi {
     }
 
     @Override
+    public ResponseEntity<Resource> getSessionPhotoByKey(String projectId, LocalDate date, String question) {
+        Session session = loadSessionUseCase.load(date).orElseThrow(() -> new NoSessionForDate(date));
+        Photo photo = loadSessionPhotoUseCase.load(session.sessionId(), question);
+        MediaType contentType = PhotoTypeRegistry.toMediaType(photo.photoType());
+        return ResponseEntity.ok().contentType(contentType).body(new InputStreamResource(photo.data()));
+    }
+
+    @Override
     public ResponseEntity<Void> deleteTodaySession() {
         LocalDate today = LocalDate.now(ZoneId.systemDefault());
         deleteSessionUseCase.delete(today);

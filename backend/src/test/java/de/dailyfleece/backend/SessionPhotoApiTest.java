@@ -88,7 +88,33 @@ class SessionPhotoApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
-    private String createSession() {
+    @Test
+    void getSessionPhotoByKey_q1_returns_image_bytes() {
+        String date = (String) createSessionResponse().get("date");
+
+        ResponseEntity<byte[]> response = http.get()
+                .uri("/sessions/default/" + date + "/photos/q1")
+                .retrieve()
+                .toEntity(byte[].class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(Q1_BYTES);
+        assertThat(Objects.requireNonNull(response.getHeaders().getContentType())
+                        .toString())
+                .startsWith("image/");
+    }
+
+    @Test
+    void getSessionPhotoByKey_unknown_date_returns_404() {
+        ResponseEntity<byte[]> response = http.get()
+                .uri("/sessions/default/1999-01-01/photos/q1")
+                .retrieve()
+                .toEntity(byte[].class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    private Map<String, Object> createSessionResponse() {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("hostId", HOST_ID.toString());
         body.add("hostDisplayName", "Thomas");
@@ -122,6 +148,10 @@ class SessionPhotoApiTest {
                 .retrieve()
                 .toEntity((Class<Map<String, Object>>) (Class<?>) Map.class)
                 .getBody());
-        return Objects.requireNonNull((String) responseBody.get("sessionId"));
+        return Objects.requireNonNull(responseBody);
+    }
+
+    private String createSession() {
+        return Objects.requireNonNull((String) createSessionResponse().get("sessionId"));
     }
 }

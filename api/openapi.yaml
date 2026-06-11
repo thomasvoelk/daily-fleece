@@ -40,14 +40,6 @@ info:
     The stable `playerId` is stored client-side (localStorage) for all subsequent
     calls and is designed to survive a future migration to company SSO.
 
-    ## Real-time events
-
-    Session state changes are pushed to clients via `GET /sessions/{id}/events`
-    (Server-Sent Events). The protocol choice (SSE vs WebSocket) is deferred
-    pending intranet proxy restrictions check — see issue df-lg7. The endpoint is
-    defined here with `text/event-stream` as a placeholder; event schemas are
-    documented in the `SessionEvent` component schema.
-
     ## One session per day
 
     Sessions are scoped to a project (one global project for now) and a calendar
@@ -74,8 +66,7 @@ tags:
     description: Answer submission and correct answer declaration
   - name: Results
     description: Session results and leaderboard
-  - name: Events
-    description: Real-time session event stream
+
 
 paths:
   # ---------------------------------------------------------------------------
@@ -215,8 +206,7 @@ paths:
       summary: Get session state
       description: |
         Returns the full session document. Used by clients after reconnect to
-        determine the current phase and render the correct screen before
-        subscribing to the event stream.
+        determine the current phase and render the correct screen.
       parameters:
         - $ref: "#/components/parameters/SessionId"
       responses:
@@ -412,9 +402,6 @@ paths:
       description: |
         Transitions the session from Lobby to Active phase and opens Q1 voting.
         Only the host may call this endpoint.
-
-        A `session-started` event is broadcast to all connected clients via the
-        event stream, prompting them to navigate to the Q1 answer screen.
       parameters:
         - $ref: "#/components/parameters/SessionId"
       requestBody:
@@ -543,14 +530,11 @@ paths:
         1. Closes voting (no further answers accepted)
         2. Records the correct answer
         3. Awards 1 point to each player who answered correctly
-        4. For Q1: opens Q2 voting and broadcasts `question-scored` event
-        5. For Q2: ends the session and broadcasts `session-ended` event
+        4. For Q1: opens Q2 voting
+        5. For Q2: ends the session
 
         **Q1** — `correctAnswer` must be one of `A`, `B`, `C`.
         **Q2** — `correctAnswer` must be an ISO 3166-1 alpha-2 country code (e.g. `DE`).
-
-        A `question-scored` event is broadcast immediately, revealing all player
-        answers and the correct answer to all connected clients simultaneously.
       parameters:
         - $ref: "#/components/parameters/SessionId"
         - $ref: "#/components/parameters/Question"
@@ -797,9 +781,6 @@ paths:
       description: |
         Transitions the session from Lobby to Active phase and opens Q1 voting.
         Only the host may call this endpoint.
-
-        A `session-started` event is broadcast to all connected clients via the
-        event stream.
       parameters:
         - $ref: "#/components/parameters/ProjectId"
         - $ref: "#/components/parameters/SessionDate"
@@ -922,8 +903,8 @@ paths:
         1. Closes voting (no further answers accepted)
         2. Records the correct answer
         3. Awards 1 point to each player who answered correctly
-        4. For Q1: opens Q2 voting and broadcasts `question-scored` event
-        5. For Q2: ends the session and broadcasts `session-ended` event
+        4. For Q1: opens Q2 voting
+        5. For Q2: ends the session
 
         **Q1** — `correctAnswer` must be one of `A`, `B`, `C`.
         **Q2** — `correctAnswer` must be an ISO 3166-1 alpha-2 country code (e.g. `DE`).
@@ -1021,37 +1002,6 @@ paths:
                 status: 404
                 detail: "No session found for project 'default' on 2026-06-10."
 
-  /sessions/{projectId}/{date}/events:
-    get:
-      operationId: getSessionEventsByKey
-      tags: [Events]
-      summary: Subscribe to session events by natural key
-      description: |
-        Server-Sent Events stream for real-time session state changes. Clients
-        subscribe after joining or reconnecting and use events to navigate screens
-        without polling.
-      parameters:
-        - $ref: "#/components/parameters/ProjectId"
-        - $ref: "#/components/parameters/SessionDate"
-      responses:
-        "200":
-          description: Event stream. Connection stays open until the session ends.
-          content:
-            text/event-stream:
-              schema:
-                $ref: "#/components/schemas/SessionEvent"
-        "404":
-          description: Session not found.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/session-not-found"
-                title: "Session Not Found"
-                status: 404
-                detail: "No session found for project 'default' on 2026-06-10."
-
   /leaderboard:
     get:
       operationId: getLeaderboard
@@ -1082,65 +1032,6 @@ paths:
                     displayName: "Thomas"
                     totalPoints: 12
                     sessionsParticipated: 8
-
-  # ---------------------------------------------------------------------------
-  # Events
-  # ---------------------------------------------------------------------------
-
-  /sessions/{sessionId}/events:
-    get:
-      operationId: getSessionEvents
-      tags: [Events]
-      summary: Subscribe to session events
-      description: |
-        Server-Sent Events stream for real-time session state changes. Clients
-        subscribe after joining or reconnecting and use events to navigate screens
-        without polling.
-
-        **Protocol note**: The transport (SSE vs WebSocket) is deferred pending
-        intranet proxy restrictions check — see issue df-lg7. This endpoint is
-        defined as SSE (`text/event-stream`) as the working assumption. If
-        WebSockets are chosen, this endpoint will be replaced by an AsyncAPI
-        spec entry and this definition removed.
-
-        ## Event types
-
-        | `event` field            | Triggered by                        | Relevant to        |
-        |--------------------------|-------------------------------------|--------------------|
-        | `player-joined`          | A player joins the lobby            | Host (lobby screen)|
-        | `session-started`        | Host starts the session             | All clients        |
-        | `answer-count-updated`   | A player submits or changes answer  | Host only          |
-        | `question-scored`        | Host sets correct answer            | All clients        |
-        | `session-ended`          | Host sets Q2 correct answer         | All clients        |
-
-        Each event `data` field is a JSON string. Clients should parse it to
-        access the payload and ignore unknown event types to remain
-        forward-compatible.
-
-        ## Reconnection
-
-        On reconnect, call `GET /sessions/{id}` first to recover full current
-        state, then re-subscribe here to receive subsequent changes.
-      parameters:
-        - $ref: "#/components/parameters/SessionId"
-      responses:
-        "200":
-          description: Event stream. Connection stays open until the session ends.
-          content:
-            text/event-stream:
-              schema:
-                $ref: "#/components/schemas/SessionEvent"
-        "404":
-          description: Session not found.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/session-not-found"
-                title: "Session Not Found"
-                status: 404
-                detail: "No session found with ID s-7c2d1e."
 
 # =============================================================================
 # Components
@@ -1503,160 +1394,6 @@ components:
           type: integer
           minimum: 0
           example: 8
-
-    # -------------------------------------------------------------------------
-    # Events
-    # -------------------------------------------------------------------------
-
-    SessionEvent:
-      description: |
-        A single Server-Sent Event. The `event` field identifies the type;
-        parse the `data` field as JSON to access the payload.
-
-        Clients should ignore unknown event types to remain forward-compatible.
-      type: object
-      required: [event, data]
-      discriminator:
-        propertyName: event
-        mapping:
-          player-joined: "#/components/schemas/PlayerJoinedEvent"
-          session-started: "#/components/schemas/SessionStartedEvent"
-          answer-count-updated: "#/components/schemas/AnswerCountUpdatedEvent"
-          question-scored: "#/components/schemas/QuestionScoredEvent"
-          session-ended: "#/components/schemas/SessionEndedEvent"
-      oneOf:
-        - $ref: "#/components/schemas/PlayerJoinedEvent"
-        - $ref: "#/components/schemas/SessionStartedEvent"
-        - $ref: "#/components/schemas/AnswerCountUpdatedEvent"
-        - $ref: "#/components/schemas/QuestionScoredEvent"
-        - $ref: "#/components/schemas/SessionEndedEvent"
-
-    PlayerJoinedEvent:
-      description: A player joined the lobby. Broadcast to all clients so the player list updates live.
-      type: object
-      required: [event, data]
-      properties:
-        event:
-          type: string
-        data:
-          type: object
-          required: [playerId, displayName]
-          properties:
-            playerId:
-              type: string
-              example: "p-8b1c3a"
-            displayName:
-              type: string
-              example: "Anna"
-      example:
-        event: "player-joined"
-        data:
-          playerId: "p-8b1c3a"
-          displayName: "Anna"
-
-    SessionStartedEvent:
-      description: Host started the session. All clients navigate to the Q1 answer screen.
-      type: object
-      required: [event, data]
-      properties:
-        event:
-          type: string
-        data:
-          type: object
-          description: Empty payload — clients act on the event type alone.
-      example:
-        event: "session-started"
-        data: {}
-
-    AnswerCountUpdatedEvent:
-      description: |
-        A player submitted or changed their answer. Sent to all clients but
-        only meaningful to the host, who displays a live "X/N answered" count.
-        Individual answers remain hidden until the correct answer is set.
-      type: object
-      required: [event, data]
-      properties:
-        event:
-          type: string
-        data:
-          type: object
-          required: [question, answered, total]
-          properties:
-            question:
-              type: string
-              enum: [q1, q2]
-              example: "q1"
-            answered:
-              type: integer
-              description: Number of players who have submitted an answer.
-              example: 4
-            total:
-              type: integer
-              description: Total number of players in the session.
-              example: 6
-      example:
-        event: "answer-count-updated"
-        data:
-          question: "q1"
-          answered: 4
-          total: 6
-
-    QuestionScoredEvent:
-      description: |
-        Host set the correct answer for a question. Voting is now closed.
-        All player answers and the correct answer are revealed simultaneously.
-        For Q1, clients render the Q2 answer screen. For Q2, a `session-ended`
-        event follows immediately after.
-      type: object
-      required: [event, data]
-      properties:
-        event:
-          type: string
-        data:
-          type: object
-          required: [question, correctAnswer, answers]
-          properties:
-            question:
-              type: string
-              enum: [q1, q2]
-              example: "q1"
-            correctAnswer:
-              type: string
-              description: A/B/C for Q1; ISO 3166-1 alpha-2 for Q2.
-              example: "B"
-            answers:
-              type: object
-              description: Map of playerId → PlayerAnswer. All answers now visible to all clients.
-              additionalProperties:
-                $ref: "#/components/schemas/PlayerAnswer"
-      example:
-        event: "question-scored"
-        data:
-          question: "q1"
-          correctAnswer: "B"
-          answers:
-            p-4f3a9b:
-              displayName: "Thomas"
-              answer: "B"
-            p-8b1c3a:
-              displayName: "Anna"
-              answer: "A"
-
-    SessionEndedEvent:
-      description: |
-        Q2 has been scored and the session is now Ended. All clients navigate
-        to the results screen. Call `GET /sessions/{id}/results` to fetch scores.
-      type: object
-      required: [event, data]
-      properties:
-        event:
-          type: string
-        data:
-          type: object
-          description: Empty payload — clients navigate to results on this event type alone.
-      example:
-        event: "session-ended"
-        data: {}
 
     # -------------------------------------------------------------------------
     # Errors — RFC 9457 Problem Details
