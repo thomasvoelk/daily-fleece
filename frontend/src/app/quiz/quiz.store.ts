@@ -4,9 +4,9 @@ import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import {
   Api,
-  getTodaySession,
-  submitAnswer,
-  setCorrectAnswer,
+  getSessionByKey,
+  submitAnswerByKey,
+  setCorrectAnswerByKey,
   SessionResponse,
 } from '../backend-client';
 import { EntryContext } from '../entry';
@@ -72,7 +72,11 @@ export const QuizStore = signalStore(
     const entryStore = inject(EntryContext);
 
     async function fetchAndStore(): Promise<void> {
-      const session = await firstValueFrom(api.invoke(getTodaySession));
+      const date = store.session()?.date;
+      if (!date) return;
+      const session = await firstValueFrom(
+        api.invoke(getSessionByKey, { projectId: 'default', date }),
+      );
       patchState(store, { session, error: null });
     }
 
@@ -82,7 +86,11 @@ export const QuizStore = signalStore(
       },
 
       async loadSession(): Promise<void> {
-        const session = await firstValueFrom(api.invoke(getTodaySession));
+        const date = store.session()?.date;
+        if (!date) return;
+        const session = await firstValueFrom(
+          api.invoke(getSessionByKey, { projectId: 'default', date }),
+        );
         patchState(store, { session, error: null });
         if (session.phase === 'Ended') {
           await router.navigate(['/results']);
@@ -92,7 +100,11 @@ export const QuizStore = signalStore(
       },
 
       async refresh(): Promise<void> {
-        const session = await firstValueFrom(api.invoke(getTodaySession));
+        const date = store.session()?.date;
+        if (!date) return;
+        const session = await firstValueFrom(
+          api.invoke(getSessionByKey, { projectId: 'default', date }),
+        );
         patchState(store, { session, error: null });
         if (session.phase === 'Ended') {
           await router.navigate(['/results']);
@@ -105,8 +117,9 @@ export const QuizStore = signalStore(
         if (!session || !playerId) return;
         patchState(store, { ownQ1Answer: answer });
         await firstValueFrom(
-          api.invoke(submitAnswer, {
-            sessionId: session.sessionId,
+          api.invoke(submitAnswerByKey, {
+            projectId: 'default',
+            date: session.date,
             question: 'q1',
             body: { playerId, answer },
           }),
@@ -120,8 +133,9 @@ export const QuizStore = signalStore(
         if (!session || !playerId) return;
         patchState(store, { ownQ2Answer: answer });
         await firstValueFrom(
-          api.invoke(submitAnswer, {
-            sessionId: session.sessionId,
+          api.invoke(submitAnswerByKey, {
+            projectId: 'default',
+            date: session.date,
             question: 'q2',
             body: { playerId, answer },
           }),
@@ -134,8 +148,9 @@ export const QuizStore = signalStore(
         const playerId = entryStore.playerId();
         if (!session || !playerId) return;
         const updated = await firstValueFrom(
-          api.invoke(setCorrectAnswer, {
-            sessionId: session.sessionId,
+          api.invoke(setCorrectAnswerByKey, {
+            projectId: 'default',
+            date: session.date,
             question: 'q1',
             body: { hostId: playerId, correctAnswer },
           }),
@@ -148,8 +163,9 @@ export const QuizStore = signalStore(
         const playerId = entryStore.playerId();
         if (!session || !playerId) return;
         const updated = await firstValueFrom(
-          api.invoke(setCorrectAnswer, {
-            sessionId: session.sessionId,
+          api.invoke(setCorrectAnswerByKey, {
+            projectId: 'default',
+            date: session.date,
             question: 'q2',
             body: { hostId: playerId, correctAnswer },
           }),

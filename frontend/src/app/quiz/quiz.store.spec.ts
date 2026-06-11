@@ -108,19 +108,17 @@ describe('QuizStore – submitQ1Answer', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
-    const loadPromise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ sessionId: 's42' }));
-    await loadPromise;
+    store.initializeSession(makeSession({ sessionId: 's42' }));
 
     // don't await — flush both requests synchronously then await
     const submitPromise = store.submitQ1Answer('C');
-    const req = http.expectOne('/api/v1/sessions/s42/questions/q1/answers');
+    const req = http.expectOne('/api/v1/sessions/default/2026-06-02/questions/q1/answers');
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toMatchObject({ playerId: 'player-1', answer: 'C' });
     req.flush('');
     await drainMicrotasks();
     // backend returns answers: null while voting is Open — local state tracks the player's own answer
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ sessionId: 's42' }));
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ sessionId: 's42' }));
     await submitPromise;
 
     expect(store.myQ1Answer()).toBe('C');
@@ -139,14 +137,10 @@ describe('QuizStore – setQ1CorrectAnswer', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
-    const loadPromise = store.refresh();
-    http
-      .expectOne('/api/v1/sessions/today')
-      .flush(makeSession({ sessionId: 's42', hostId: 'host-1' }));
-    await loadPromise;
+    store.initializeSession(makeSession({ sessionId: 's42', hostId: 'host-1' }));
 
     const closePromise = store.setQ1CorrectAnswer('A');
-    const req = http.expectOne('/api/v1/sessions/s42/questions/q1/correct');
+    const req = http.expectOne('/api/v1/sessions/default/2026-06-02/questions/q1/correct');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toMatchObject({ hostId: 'host-1', correctAnswer: 'A' });
     req.flush(
@@ -173,17 +167,15 @@ describe('QuizStore – submitQ2Answer', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
-    const loadPromise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ sessionId: 's42' }));
-    await loadPromise;
+    store.initializeSession(makeSession({ sessionId: 's42' }));
 
     const submitPromise = store.submitQ2Answer('DE');
-    const req = http.expectOne('/api/v1/sessions/s42/questions/q2/answers');
+    const req = http.expectOne('/api/v1/sessions/default/2026-06-02/questions/q2/answers');
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toMatchObject({ playerId: 'player-1', answer: 'DE' });
     req.flush('');
     await drainMicrotasks();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ sessionId: 's42' }));
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ sessionId: 's42' }));
     await submitPromise;
 
     expect(store.myQ2Answer()).toBe('DE');
@@ -202,18 +194,16 @@ describe('QuizStore – setQ2CorrectAnswer', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
-    const loadPromise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(
+    store.initializeSession(
       makeSession({
         sessionId: 's42',
         hostId: 'host-1',
         voting: { q1: { status: 'Closed', correctAnswer: 'A' }, q2: { status: 'Open' } },
       }),
     );
-    await loadPromise;
 
     const closePromise = store.setQ2CorrectAnswer('DE');
-    const req = http.expectOne('/api/v1/sessions/s42/questions/q2/correct');
+    const req = http.expectOne('/api/v1/sessions/default/2026-06-02/questions/q2/correct');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toMatchObject({ hostId: 'host-1', correctAnswer: 'DE' });
     req.flush(
@@ -239,9 +229,10 @@ describe('QuizStore – computed signals', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const promise = store.refresh();
     http
-      .expectOne('/api/v1/sessions/today')
+      .expectOne('/api/v1/sessions/default/2026-06-02')
       .flush(makeSession({ voting: { q1: { status: 'Closed' }, q2: { status: 'Open' } } }));
     await promise;
 
@@ -257,8 +248,9 @@ describe('QuizStore – computed signals', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const promise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ hostId: 'host-1' }));
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ hostId: 'host-1' }));
     await promise;
 
     expect(store.isHost()).toBe(true);
@@ -273,8 +265,9 @@ describe('QuizStore – computed signals', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const promise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ hostId: 'host-1' }));
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ hostId: 'host-1' }));
     await promise;
 
     expect(store.isHost()).toBe(false);
@@ -289,8 +282,9 @@ describe('QuizStore – computed signals', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const promise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(
       makeSession({
         voting: {
           q1: { status: 'Open', answers: { 'player-1': { answer: 'B', displayName: 'Alice' } } },
@@ -312,8 +306,9 @@ describe('QuizStore – computed signals', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const promise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession());
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession());
     await promise;
 
     expect(store.myQ1Answer()).toBeNull();
@@ -328,8 +323,9 @@ describe('QuizStore – computed signals', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const promise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(
       makeSession({
         voting: {
           q1: { status: 'Closed', correctAnswer: 'A' },
@@ -355,8 +351,9 @@ describe('QuizStore – computed signals', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const promise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession());
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession());
     await promise;
 
     expect(store.myQ2Answer()).toBeNull();
@@ -367,8 +364,9 @@ describe('QuizStore – computed signals', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const promise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(
       makeSession({
         players: [
           { playerId: 'p1', displayName: 'Alice' },
@@ -390,8 +388,9 @@ describe('QuizStore – computed signals', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const promise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(
       makeSession({
         players: [
           { playerId: 'p1', displayName: 'Alice' },
@@ -420,9 +419,10 @@ describe('QuizStore – refresh', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate');
 
+    store.initializeSession(makeSession());
     const promise = store.refresh();
     http
-      .expectOne('/api/v1/sessions/today')
+      .expectOne('/api/v1/sessions/default/2026-06-02')
       .flush(makeSession({ phase: 'Active', sessionId: 'r1' }));
     await promise;
 
@@ -437,8 +437,9 @@ describe('QuizStore – refresh', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate');
 
+    store.initializeSession(makeSession());
     const promise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ phase: 'Ended' }));
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ phase: 'Ended' }));
     await promise;
 
     expect(navigateSpy).toHaveBeenCalledWith(['/results']);
@@ -453,8 +454,9 @@ describe('QuizStore – loadSession', () => {
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const promise = store.loadSession();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ sessionId: 'abc' }));
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ sessionId: 'abc' }));
     await promise;
 
     expect(store.session()?.sessionId).toBe('abc');
@@ -467,8 +469,9 @@ describe('QuizStore – loadSession', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate');
 
+    store.initializeSession(makeSession());
     const promise = store.loadSession();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ phase: 'Lobby' }));
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ phase: 'Lobby' }));
     await promise;
 
     expect(navigateSpy).toHaveBeenCalledWith(['/lobby']);
@@ -481,8 +484,9 @@ describe('QuizStore – loadSession', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate');
 
+    store.initializeSession(makeSession());
     const promise = store.loadSession();
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ phase: 'Ended' }));
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ phase: 'Ended' }));
     await promise;
 
     expect(navigateSpy).toHaveBeenCalledWith(['/results']);
@@ -503,18 +507,16 @@ describe('QuizStore – setQ2CorrectAnswer navigates to results', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate');
 
-    const loadPromise = store.refresh();
-    http.expectOne('/api/v1/sessions/today').flush(
+    store.initializeSession(
       makeSession({
         sessionId: 's42',
         hostId: 'host-1',
         voting: { q1: { status: 'Closed', correctAnswer: 'A' }, q2: { status: 'Open' } },
       }),
     );
-    await loadPromise;
 
     const closePromise = store.setQ2CorrectAnswer('DE');
-    http.expectOne('/api/v1/sessions/s42/questions/q2/correct').flush(
+    http.expectOne('/api/v1/sessions/default/2026-06-02/questions/q2/correct').flush(
       makeSession({
         sessionId: 's42',
         phase: 'Ended',
