@@ -35,6 +35,25 @@ function makePlayer(overrides: Partial<PlayerResult> = {}): PlayerResult {
   };
 }
 
+// ─── initial state ────────────────────────────────────────────────────────────
+
+describe('ResultsStore – initial state before load', () => {
+  it('returns empty/null for all computed signals before data is loaded', () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(ResultsStore);
+    expect(store.myResult()).toBeNull();
+    expect(store.sortedResults()).toEqual([]);
+    expect(store.correctCount()).toBe(0);
+    expect(store.myRank()).toBeNull();
+    expect(store.q1CorrectAnswer()).toBeNull();
+    expect(store.q2CorrectAnswer()).toBeNull();
+  });
+});
+
 // ─── load ─────────────────────────────────────────────────────────────────────
 
 describe('ResultsStore – load', () => {
@@ -178,6 +197,30 @@ describe('ResultsStore – q1CorrectAnswer / q2CorrectAnswer', () => {
 });
 
 // ─── enrichedResults ──────────────────────────────────────────────────────────
+
+describe('ResultsStore – correctCount with partial correct answers', () => {
+  it('counts only the correct answers the current player got right', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(ResultsStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    const loadPromise = store.load();
+    http.expectOne(RESULTS_URL).flush(
+      makeResults({
+        results: [
+          makePlayer({ playerId: 'p1', q1Correct: true, q2Correct: false, totalPoints: 1 }),
+        ],
+      }),
+    );
+    await loadPromise;
+
+    expect(store.correctCount()).toBe(1);
+  });
+});
 
 describe('ResultsStore – enrichedResults', () => {
   it('reads per-player answers directly from PlayerResult', async () => {

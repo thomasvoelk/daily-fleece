@@ -75,6 +75,31 @@ describe('Lobby – player list', () => {
   });
 });
 
+// ─── HOST badge ──────────────────────────────────────────────────────────────
+
+describe('Lobby – HOST badge', () => {
+  it('shows the HOST badge next to the host player and not for regular players', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p2', companyId: 'acme', displayName: 'Bob' }),
+    );
+    const { fixture } = await render(Lobby, { providers: PROVIDERS });
+    TestBed.inject(LobbyStore).initializeSession(
+      makeSession({
+        hostId: 'host-1',
+        players: [
+          { playerId: 'host-1', displayName: 'Alice' },
+          { playerId: 'p2', displayName: 'Bob' },
+        ],
+      }),
+    );
+    fixture.detectChanges();
+
+    screen.getByText('HOST');
+    expect(screen.getAllByText('HOST')).toHaveLength(1);
+  });
+});
+
 // ─── Start Quiz button ────────────────────────────────────────────────────────
 
 describe('Lobby – Start Quiz button', () => {

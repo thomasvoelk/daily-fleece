@@ -49,6 +49,53 @@ function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse 
   };
 }
 
+// ─── initial state ───────────────────────────────────────────────────────────
+
+describe('QuizStore – initial state', () => {
+  it('answerCount and q2AnswerCount return zeros before session loads', () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    expect(store.answerCount()).toEqual({ answered: 0, total: 0 });
+    expect(store.q2AnswerCount()).toEqual({ answered: 0, total: 0 });
+  });
+});
+
+// ─── no-op guards when session is null ───────────────────────────────────────
+
+describe('QuizStore – no-op guards with no session', () => {
+  it('submitQ1Answer does nothing when session is null', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+    await store.submitQ1Answer('A');
+    http.verify();
+  });
+
+  it('submitQ2Answer does nothing when session is null', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+    await store.submitQ2Answer('DE');
+    http.verify();
+  });
+
+  it('setQ1CorrectAnswer does nothing when session is null', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+    await store.setQ1CorrectAnswer('A');
+    http.verify();
+  });
+
+  it('setQ2CorrectAnswer does nothing when session is null', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+    await store.setQ2CorrectAnswer('DE');
+    http.verify();
+  });
+});
+
 // ─── submitQ1Answer ──────────────────────────────────────────────────────────
 
 describe('QuizStore – submitQ1Answer', () => {

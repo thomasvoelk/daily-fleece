@@ -143,6 +143,32 @@ describe('Leaderboard – entries rendered', () => {
   });
 });
 
+// ─── presentation glyph sorting ──────────────────────────────────────────────
+
+describe('Leaderboard – presentation glyph in display name', () => {
+  it('renders correctly when a display name contains the presentation glyph (🐰)', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p2', companyId: 'acme', displayName: 'Bob' }),
+    );
+    await render(Leaderboard, { providers: PROVIDERS });
+    const http = TestBed.inject(HttpTestingController);
+
+    http.expectOne('/api/v1/leaderboard').flush(
+      makeLeaderboard({
+        entries: [
+          { playerId: 'p1', displayName: 'Ali🐰e', sessionsParticipated: 3, totalPoints: 6 },
+          { playerId: 'p2', displayName: 'Bob', sessionsParticipated: 5, totalPoints: 10 },
+        ],
+      }),
+    );
+
+    // Ali🐰e gets a visual alignment bonus, ranking her above Bob despite fewer raw points
+    await screen.findByRole('row', { name: /Ali.*e/i });
+    screen.getByRole('row', { name: 'Bob' });
+  });
+});
+
 // ─── champion fireworks ──────────────────────────────────────────────────────
 
 describe('Leaderboard – champion fireworks', () => {

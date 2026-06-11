@@ -86,6 +86,23 @@
           "options": {
             "tsConfig": "tsconfig.spec.json",
             "setupFiles": ["src/app/shared/testing/setup.ts"]
+          },
+          "configurations": {
+            "ci": {
+              "watch": false,
+              "coverage": true,
+              "coverageExclude": [
+                "src/app/backend-client/**",
+                "src/app/shared/testing/**",
+                "scripts/**"
+              ],
+              "coverageThresholds": {
+                "statements": 90,
+                "lines": 90,
+                "functions": 90,
+                "branches": 90
+              }
+            }
           }
         }
       }

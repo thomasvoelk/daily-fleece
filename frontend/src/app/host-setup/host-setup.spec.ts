@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/angular';
+import { render, screen, fireEvent } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 import { provideRouter } from '@angular/router';
 import { HostSetup } from './host-setup';
@@ -37,6 +37,21 @@ describe('HostSetup – initial state', () => {
 // ─── file selection ──────────────────────────────────────────────────────────
 
 describe('HostSetup – file selection', () => {
+  it('does not update preview when a change event fires without a file', async () => {
+    await render(HostSetup, { providers: PROVIDERS });
+
+    const q1Input = screen.getByLabelText(/q1|knowledge/i);
+    const q2Input = screen.getByLabelText(/q2|geography/i);
+    fireEvent.change(q1Input);
+    fireEvent.change(q2Input);
+
+    // "Create Session" remains disabled — no files were selected
+    expect(screen.getByRole('button', { name: /create session/i })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+  });
+
   it('"Create Session" button becomes enabled after both file pickers have a file', async () => {
     const user = userEvent.setup();
     await render(HostSetup, { providers: PROVIDERS });

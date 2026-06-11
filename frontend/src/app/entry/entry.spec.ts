@@ -1,5 +1,7 @@
-import { render, screen } from '@testing-library/angular';
+import { render, screen, waitFor } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
+import { TestBed } from '@angular/core/testing';
+import { HttpTestingController } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 import { Entry } from './entry';
 import { EntryStore } from './entry.store';
@@ -48,6 +50,28 @@ describe('Entry – pre-fill from storage', () => {
 
     expect(screen.getByRole('textbox', { name: /company id/i })).toHaveValue('acme');
     expect(screen.getByRole('textbox', { name: /display name/i })).toHaveValue('Alice');
+  });
+});
+
+// ─── error phase ─────────────────────────────────────────────────────────────
+
+describe('Entry – error phase', () => {
+  it('shows an error alert when joining the lobby fails', async () => {
+    const user = userEvent.setup();
+    await render(Entry, { providers: PROVIDERS });
+    const http = TestBed.inject(HttpTestingController);
+
+    await user.type(screen.getByRole('textbox', { name: /company id/i }), 'acme');
+    await user.type(screen.getByRole('textbox', { name: /display name/i }), 'Alice');
+    await user.click(screen.getByRole('button', { name: /join lobby/i }));
+
+    http
+      .expectOne('/api/v1/players')
+      .flush('Server error', { status: 500, statusText: 'Internal Server Error' });
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBeTruthy();
+    });
   });
 });
 
