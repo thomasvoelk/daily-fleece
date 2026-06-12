@@ -11,6 +11,7 @@ export const sheriffConfig: SheriffConfig = {
     'src/app/quiz': 'domain:quiz',
     'src/app/results': 'domain:results',
     'src/app/shared': 'domain:shared',
+    'src/app/session': 'domain:session',
     'src/app/shared/testing': 'domain:shared',
   },
   depRules: {
