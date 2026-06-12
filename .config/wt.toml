@@ -1,8 +1,2 @@
 # Install frontend dependencies when creating a new worktree
 pre-start = "cd frontend && npm install"
-
-# Quality gates before pushing (all three run concurrently)
-[pre-push]
-frontend-build = "cd frontend && npm run build"
-frontend-test  = "cd frontend && npm run test:ci"
-backend-test   = "cd backend && ./mvnw verify"

@@ -19,3 +19,13 @@ pre-commit:
         - "frontend/src/**/*.{ts,html}"
       exclude: "frontend/src/app/backend-client/**"
       run: cd frontend && npm run lint
+
+pre-push:
+  parallel: true
+  commands:
+    frontend-build:
+      run: cd frontend && npm run build
+    frontend-test:
+      run: cd frontend && npm run test:ci
+    backend-test:
+      run: cd backend && ./mvnw verify
