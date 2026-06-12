@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { withStorageSync } from '@angular-architects/ngrx-toolkit';
 import { Api, registerPlayer, joinSessionByKey } from '../backend-client';
+import { TODAY } from '../shared';
 
 interface EntryState {
   playerId: string | null;
@@ -33,6 +34,7 @@ export const EntryStore = signalStore(
   withMethods((store) => {
     const api = inject(Api);
     const router = inject(Router);
+    const today = inject(TODAY);
     return {
       async createLobby(companyId: string, displayName: string): Promise<void> {
         patchState(store, { phase: 'loading', errorMessage: null });
@@ -58,7 +60,6 @@ export const EntryStore = signalStore(
           );
           patchState(store, { playerId: player.playerId, companyId, displayName });
 
-          const today = new Date().toISOString().slice(0, 10);
           await firstValueFrom(
             api.invoke(joinSessionByKey, {
               projectId: 'default',

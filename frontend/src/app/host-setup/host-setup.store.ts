@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { Api, createSessionByKey } from '../backend-client';
 import { EntryContext } from '../entry';
+import { TODAY } from '../shared';
 
 interface HostSetupState {
   q1: File | null;
@@ -29,6 +30,7 @@ export const HostSetupStore = signalStore(
     const api = inject(Api);
     const router = inject(Router);
     const entryStore = inject(EntryContext);
+    const today = inject(TODAY);
     return {
       selectQ1(file: File): void {
         patchState(store, { q1: file });
@@ -52,11 +54,10 @@ export const HostSetupStore = signalStore(
         if (!q1 || !q2) return; // canSubmit() already guarantees this; needed for type narrowing
         patchState(store, { phase: 'loading', errorMessage: null });
         try {
-          const date = new Date().toISOString().slice(0, 10);
           await firstValueFrom(
             api.invoke(createSessionByKey, {
               projectId: 'default',
-              date,
+              date: today,
               body: {
                 hostId: playerId,
                 hostDisplayName: displayName,

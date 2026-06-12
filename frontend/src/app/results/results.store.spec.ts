@@ -3,10 +3,9 @@ import { HttpTestingController } from '@angular/common/http/testing';
 import { ResultsStore } from './results.store';
 import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
 import { PlayerResult, SessionResultsResponse } from '../backend-client';
-
 mockLocalStorage();
 
-const TODAY = new Date().toISOString().slice(0, 10);
+const TODAY = '2026-06-12';
 const RESULTS_URL = `/api/v1/sessions/default/${TODAY}/results`;
 
 const PROVIDERS = [...provideTestEnvironment(), ResultsStore];

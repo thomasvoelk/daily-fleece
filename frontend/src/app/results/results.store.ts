@@ -3,6 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { Api, getSessionResultsByKey, SessionResultsResponse } from '../backend-client';
 import { EntryContext } from '../entry';
+import { TODAY } from '../shared';
 
 export interface EnrichedResult {
   playerId: string;
@@ -65,11 +66,11 @@ export const ResultsStore = signalStore(
   })),
   withMethods((store) => {
     const api = inject(Api);
+    const today = inject(TODAY);
     return {
       async load(): Promise<void> {
-        const date = new Date().toISOString().slice(0, 10);
         const data = await firstValueFrom(
-          api.invoke(getSessionResultsByKey, { projectId: 'default', date }),
+          api.invoke(getSessionResultsByKey, { projectId: 'default', date: today }),
         );
         patchState(store, { data });
       },

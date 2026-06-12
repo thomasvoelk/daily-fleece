@@ -48,7 +48,7 @@ describe('lobbyGuard', () => {
   it('redirects to / when GET /sessions/default/{date} fails', async () => {
     playerId.set('p1');
     const http = TestBed.inject(HttpTestingController);
-    const today = new Date().toISOString().slice(0, 10);
+    const today = '2026-06-12';
 
     const promise = runGuard() as Promise<GuardResult>;
     http
@@ -64,7 +64,7 @@ describe('lobbyGuard', () => {
     playerId.set('p1');
     const http = TestBed.inject(HttpTestingController);
     const store = TestBed.inject(LobbyStore);
-    const today = new Date().toISOString().slice(0, 10);
+    const today = '2026-06-12';
 
     const promise = runGuard() as Promise<GuardResult>;
     http.expectOne(`/api/v1/sessions/default/${today}`).flush(makeSession('s1'));

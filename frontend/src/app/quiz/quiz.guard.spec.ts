@@ -34,7 +34,7 @@ describe('quizGuard', () => {
 
   it('redirects to /lobby when session fetch fails', async () => {
     const http = TestBed.inject(HttpTestingController);
-    const today = new Date().toISOString().slice(0, 10);
+    const today = '2026-06-12';
 
     const promise = runGuard() as Promise<GuardResult>;
     http
@@ -48,7 +48,7 @@ describe('quizGuard', () => {
 
   it('redirects to /lobby when session is not Active', async () => {
     const http = TestBed.inject(HttpTestingController);
-    const today = new Date().toISOString().slice(0, 10);
+    const today = '2026-06-12';
 
     const promise = runGuard() as Promise<GuardResult>;
     http.expectOne(`/api/v1/sessions/default/${today}`).flush(makeSession({ phase: 'Lobby' }));
@@ -61,7 +61,7 @@ describe('quizGuard', () => {
   it('returns true and seeds the store when session is Active', async () => {
     const http = TestBed.inject(HttpTestingController);
     const store = TestBed.inject(QuizStore);
-    const today = new Date().toISOString().slice(0, 10);
+    const today = '2026-06-12';
 
     const promise = runGuard() as Promise<GuardResult>;
     http.expectOne(`/api/v1/sessions/default/${today}`).flush(makeSession({ sessionId: 'q42' }));

@@ -4,7 +4,6 @@ import { provideRouter, Router } from '@angular/router';
 import { HostSetupStore } from './host-setup.store';
 import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
 import { SessionResponse } from '../backend-client';
-
 mockLocalStorage();
 
 const PROVIDERS = [...provideTestEnvironment(), provideRouter([]), HostSetupStore];
@@ -28,7 +27,7 @@ function makeSession(): SessionResponse {
   };
 }
 
-const TODAY = new Date().toISOString().slice(0, 10);
+const TODAY = '2026-06-12';
 const CREATE_URL = `/api/v1/sessions/default/${TODAY}`;
 
 // ─── createSession ───────────────────────────────────────────────────────────

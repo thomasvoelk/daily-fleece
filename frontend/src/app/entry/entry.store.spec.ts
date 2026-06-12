@@ -3,7 +3,6 @@ import { HttpTestingController } from '@angular/common/http/testing';
 import { provideRouter, Router } from '@angular/router';
 import { EntryStore } from './entry.store';
 import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
-
 mockLocalStorage();
 
 const PROVIDERS = [...provideTestEnvironment(), provideRouter([]), EntryStore];
@@ -44,7 +43,7 @@ describe('EntryStore – joinLobby', () => {
     const http = TestBed.inject(HttpTestingController);
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate');
-    const today = new Date().toISOString().slice(0, 10);
+    const today = '2026-06-12';
 
     const promise = store.joinLobby('acme', 'Alice');
 

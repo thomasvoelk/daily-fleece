@@ -4,3 +4,5 @@ export type {
   ChunkyButtonVariant,
 } from './components/chunky-button/chunky-button';
 export { CountryList } from './country-list';
+export { AVATAR_TONES } from './avatar-tones';
+export { TODAY } from './today';
