@@ -9,7 +9,8 @@ const BACKEND = 'http://localhost:8080';
 
 export async function clearSession(): Promise<void> {
   const api = await request.newContext({ baseURL: BACKEND });
-  await api.delete('/api/v1/sessions/today');
+  const today = new Date().toISOString().slice(0, 10);
+  await api.delete(`/api/v1/sessions/default/${today}`);
   await api.dispose();
 }
 

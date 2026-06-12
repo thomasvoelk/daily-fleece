@@ -2,7 +2,7 @@ import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
-import { Api, createSession } from '../backend-client';
+import { Api, createSessionByKey } from '../backend-client';
 import { EntryContext } from '../entry';
 
 interface HostSetupState {
@@ -52,8 +52,11 @@ export const HostSetupStore = signalStore(
         if (!q1 || !q2) return; // canSubmit() already guarantees this; needed for type narrowing
         patchState(store, { phase: 'loading', errorMessage: null });
         try {
+          const date = new Date().toISOString().slice(0, 10);
           await firstValueFrom(
-            api.invoke(createSession, {
+            api.invoke(createSessionByKey, {
+              projectId: 'default',
+              date,
               body: {
                 hostId: playerId,
                 hostDisplayName: displayName,

@@ -21,8 +21,10 @@ export class Quiz {
   );
 
   protected photoUrl(question: 'q1' | 'q2'): string {
-    const id = this.quizStore.session()?.sessionId;
-    return id ? `${this.apiConfig.rootUrl}/sessions/${id}/photos/${question}` : '';
+    const session = this.quizStore.session();
+    return session
+      ? `${this.apiConfig.rootUrl}/sessions/${session.projectId}/${session.date}/photos/${question}`
+      : '';
   }
 
   protected submit(answer: 'A' | 'B' | 'C'): void {

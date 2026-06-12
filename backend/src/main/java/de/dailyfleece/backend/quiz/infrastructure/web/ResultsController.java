@@ -10,7 +10,6 @@ import de.dailyfleece.backend.quiz.domain.SessionKey;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,20 +22,6 @@ class ResultsController implements ResultsApi {
 
     ResultsController(GetSessionResultsUseCase getSessionResultsUseCase) {
         this.getSessionResultsUseCase = getSessionResultsUseCase;
-    }
-
-    @Override
-    public ResponseEntity<SessionResultsResponse> getSessionResults(String sessionId) {
-        Session session = getSessionResultsUseCase.get(UUID.fromString(sessionId));
-        List<PlayerResult> dtoResults = session.results().stream()
-                .map(r -> new PlayerResult(
-                        r.playerId().toString(),
-                        r.displayName().value(),
-                        r.q1Correct(),
-                        r.q2Correct(),
-                        r.totalPoints()))
-                .toList();
-        return ResponseEntity.ok(new SessionResultsResponse(sessionId, session.date(), dtoResults));
     }
 
     @Override

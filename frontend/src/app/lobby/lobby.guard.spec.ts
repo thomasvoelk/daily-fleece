@@ -45,13 +45,14 @@ describe('lobbyGuard', () => {
     expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe('/');
   });
 
-  it('redirects to / when GET /sessions/today fails', async () => {
+  it('redirects to / when GET /sessions/default/{date} fails', async () => {
     playerId.set('p1');
     const http = TestBed.inject(HttpTestingController);
+    const today = new Date().toISOString().slice(0, 10);
 
     const promise = runGuard() as Promise<GuardResult>;
     http
-      .expectOne('/api/v1/sessions/today')
+      .expectOne(`/api/v1/sessions/default/${today}`)
       .flush({ message: 'Not Found' }, { status: 404, statusText: 'Not Found' });
     const result = await promise;
 
@@ -63,9 +64,10 @@ describe('lobbyGuard', () => {
     playerId.set('p1');
     const http = TestBed.inject(HttpTestingController);
     const store = TestBed.inject(LobbyStore);
+    const today = new Date().toISOString().slice(0, 10);
 
     const promise = runGuard() as Promise<GuardResult>;
-    http.expectOne('/api/v1/sessions/today').flush(makeSession('s1'));
+    http.expectOne(`/api/v1/sessions/default/${today}`).flush(makeSession('s1'));
     const result = await promise;
 
     expect(result).toBe(true);

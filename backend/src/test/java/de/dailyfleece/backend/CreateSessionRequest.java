@@ -1,6 +1,8 @@
 package de.dailyfleece.backend;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.core.io.ByteArrayResource;
@@ -24,6 +26,7 @@ final class CreateSessionRequest {
 
     @SuppressWarnings("unchecked")
     ResponseEntity<Map<String, Object>> post() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("hostId", hostId.toString());
         body.add("hostDisplayName", hostDisplayName);
@@ -40,7 +43,7 @@ final class CreateSessionRequest {
             }
         });
         return http.post()
-                .uri("/sessions")
+                .uri("/sessions/default/" + today)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(body)
                 .retrieve()

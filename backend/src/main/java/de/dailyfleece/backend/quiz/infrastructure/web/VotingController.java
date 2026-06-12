@@ -38,25 +38,6 @@ class VotingController implements VotingApi {
     }
 
     @Override
-    public ResponseEntity<Void> submitAnswer(String sessionId, String question, SubmitAnswerRequest request) {
-        QuestionKey questionKey = parseQuestionKey(question);
-        UUID sessionUuid = UUID.fromString(sessionId);
-        UUID playerId = UUID.fromString(request.getPlayerId());
-        submitAnswerUseCase.submit(sessionUuid, questionKey, playerId, request.getAnswer());
-        return ResponseEntity.ok().build();
-    }
-
-    @Override
-    public ResponseEntity<SessionResponse> setCorrectAnswer(
-            String sessionId, String question, SetCorrectAnswerRequest request) {
-        QuestionKey questionKey = parseQuestionKey(question);
-        UUID sessionUuid = UUID.fromString(sessionId);
-        UUID hostId = UUID.fromString(request.getHostId());
-        Session session = setCorrectAnswerUseCase.set(sessionUuid, questionKey, hostId, request.getCorrectAnswer());
-        return ResponseEntity.ok(mapper.toResponse(session));
-    }
-
-    @Override
     public ResponseEntity<Void> submitAnswerByKey(
             String projectId, LocalDate date, String question, SubmitAnswerRequest request) {
         Session session = loadSessionUseCase.load(date).orElseThrow(() -> new NoSessionForDate(date));

@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { Api, getTodaySession } from '../backend-client';
+import { Api, getSessionByKey } from '../backend-client';
 import { EntryContext } from '../entry';
 import { LobbyStore } from './lobby.store';
 
@@ -14,7 +14,10 @@ export const lobbyGuard: CanActivateFn = async () => {
   const api = inject(Api);
   const store = inject(LobbyStore);
   try {
-    const session = await firstValueFrom(api.invoke(getTodaySession));
+    const date = new Date().toISOString().slice(0, 10);
+    const session = await firstValueFrom(
+      api.invoke(getSessionByKey, { projectId: 'default', date }),
+    );
     store.initializeSession(session);
     return true;
   } catch {

@@ -19,7 +19,6 @@ import de.dailyfleece.backend.quiz.domain.SessionKey;
 import de.dailyfleece.backend.shared.PlayerName;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.UUID;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -59,42 +58,11 @@ class SessionController implements SessionsApi {
     }
 
     @Override
-    public ResponseEntity<SessionResponse> createSession(
-            String hostId, String hostDisplayName, MultipartFile q1, MultipartFile q2) {
-        SessionKey key = new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault()));
-        return createSessionForKey(key, hostId, hostDisplayName, q1, q2);
-    }
-
-    @Override
-    public ResponseEntity<Resource> getSessionPhoto(String sessionId, String question) {
-        Photo photo = loadSessionPhotoUseCase.load(UUID.fromString(sessionId), question);
-        MediaType contentType = PhotoTypeRegistry.toMediaType(photo.photoType());
-        return ResponseEntity.ok().contentType(contentType).body(new InputStreamResource(photo.data()));
-    }
-
-    @Override
     public ResponseEntity<Resource> getSessionPhotoByKey(String projectId, LocalDate date, String question) {
         Session session = loadSessionUseCase.load(date).orElseThrow(() -> new NoSessionForDate(date));
         Photo photo = loadSessionPhotoUseCase.load(session.sessionId(), question);
         MediaType contentType = PhotoTypeRegistry.toMediaType(photo.photoType());
         return ResponseEntity.ok().contentType(contentType).body(new InputStreamResource(photo.data()));
-    }
-
-    @Override
-    public ResponseEntity<Void> deleteTodaySession() {
-        LocalDate today = LocalDate.now(ZoneId.systemDefault());
-        deleteSessionUseCase.delete(today);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Override
-    public ResponseEntity<SessionResponse> getTodaySession() {
-        LocalDate today = LocalDate.now(ZoneId.systemDefault());
-        return loadSessionUseCase
-                .load(today)
-                .map(mapper::toResponse)
-                .map(ResponseEntity::ok)
-                .orElseThrow(NoSessionForDate::today);
     }
 
     @Override
@@ -135,29 +103,12 @@ class SessionController implements SessionsApi {
     }
 
     @Override
-    public ResponseEntity<SessionResponse> joinSession(String sessionId, JoinSessionRequest request) {
-        UUID sessionUuid = UUID.fromString(sessionId);
-        UUID playerId = UUID.fromString(request.getPlayerId());
-        PlayerName displayName = new PlayerName(request.getDisplayName());
-        Session session = joinSessionUseCase.join(sessionUuid, playerId, displayName);
-        return ResponseEntity.ok(mapper.toResponse(session));
-    }
-
-    @Override
     public ResponseEntity<SessionResponse> startSessionByKey(
             String projectId, LocalDate date, HostActionRequest request) {
         Session sessionForKey = loadSessionUseCase.load(date).orElseThrow(() -> new NoSessionForDate(date));
         UUID hostId = UUID.fromString(request.getHostId());
         Session updated = startSessionUseCase.start(sessionForKey.sessionId(), hostId);
         return ResponseEntity.ok(mapper.toResponse(updated));
-    }
-
-    @Override
-    public ResponseEntity<SessionResponse> startSession(String sessionId, HostActionRequest request) {
-        UUID sessionUuid = UUID.fromString(sessionId);
-        UUID hostId = UUID.fromString(request.getHostId());
-        Session session = startSessionUseCase.start(sessionUuid, hostId);
-        return ResponseEntity.ok(mapper.toResponse(session));
     }
 
     private ResponseEntity<SessionResponse> createSessionForKey(

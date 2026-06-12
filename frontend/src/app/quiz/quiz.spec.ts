@@ -79,10 +79,10 @@ describe('Quiz – a11y', () => {
 
 describe('Quiz – Q1 photo', () => {
   it('renders the photo for the active session', async () => {
-    await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
+    await renderQuiz({ session: signal(makeSession()) });
 
     const img = screen.getByRole('img', { name: /question 1/i });
-    expect(img).toHaveAttribute('src', '/api/v1/sessions/abc/photos/q1');
+    expect(img).toHaveAttribute('src', '/api/v1/sessions/default/2026-06-02/photos/q1');
   });
 
   it('derives the Q1 photo URL from ApiConfiguration.rootUrl', async () => {
@@ -95,7 +95,7 @@ describe('Quiz – Q1 photo', () => {
         provideRouter([]),
         {
           provide: QuizStore,
-          useValue: makeStoreMock({ session: signal(makeSession({ sessionId: 'abc' })) }),
+          useValue: makeStoreMock({ session: signal(makeSession()) }),
         },
         { provide: ApiConfiguration, useValue: config },
       ],
@@ -103,7 +103,7 @@ describe('Quiz – Q1 photo', () => {
 
     expect(screen.getByRole('img', { name: /question 1/i })).toHaveAttribute(
       'src',
-      '/proxy/api/v2/sessions/abc/photos/q1',
+      '/proxy/api/v2/sessions/default/2026-06-02/photos/q1',
     );
   });
 });
@@ -391,11 +391,11 @@ describe('Quiz – Q2 photo', () => {
   it('renders the Q2 photo when q2Status is Open', async () => {
     await renderQuiz({
       q2Status: signal('Open' as const),
-      session: signal(makeSession({ sessionId: 'abc' })),
+      session: signal(makeSession()),
     });
 
     const img = screen.getByRole('img', { name: /question 2/i });
-    expect(img).toHaveAttribute('src', '/api/v1/sessions/abc/photos/q2');
+    expect(img).toHaveAttribute('src', '/api/v1/sessions/default/2026-06-02/photos/q2');
   });
 
   it('does not render the Q2 photo when q2Status is null', async () => {

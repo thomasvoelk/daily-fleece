@@ -28,10 +28,13 @@ function makeSession(): SessionResponse {
   };
 }
 
+const TODAY = new Date().toISOString().slice(0, 10);
+const CREATE_URL = `/api/v1/sessions/default/${TODAY}`;
+
 // ─── createSession ───────────────────────────────────────────────────────────
 
 describe('HostSetupStore – createSession', () => {
-  it('posts FormData with hostId, hostDisplayName, q1, q2 to POST /sessions', async () => {
+  it('posts FormData with hostId, hostDisplayName, q1, q2 to POST /sessions/default/{date}', async () => {
     seedPlayer('p1', 'Alice');
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(HostSetupStore);
@@ -44,7 +47,7 @@ describe('HostSetupStore – createSession', () => {
 
     const promise = store.createSession();
 
-    const req = http.expectOne('/api/v1/sessions');
+    const req = http.expectOne(CREATE_URL);
     expect(req.request.method).toBe('POST');
     const fd = req.request.body as FormData;
     expect(fd.get('hostId')).toBe('p1');
@@ -67,7 +70,7 @@ describe('HostSetupStore – createSession', () => {
     store.selectQ2(new File(['x'], 'q2.jpg', { type: 'image/jpeg' }));
 
     const promise = store.createSession();
-    http.expectOne('/api/v1/sessions').flush(makeSession());
+    http.expectOne(CREATE_URL).flush(makeSession());
     await promise;
 
     expect(navigateSpy).toHaveBeenCalledWith(['/lobby']);
@@ -84,7 +87,7 @@ describe('HostSetupStore – createSession', () => {
 
     await store.createSession();
 
-    http.expectNone('/api/v1/sessions');
+    http.expectNone(CREATE_URL);
     expect(store.phase()).toBe('error');
     expect(store.errorMessage()).toBeTruthy();
   });
@@ -100,7 +103,7 @@ describe('HostSetupStore – createSession', () => {
 
     const promise = store.createSession();
     http
-      .expectOne('/api/v1/sessions')
+      .expectOne(CREATE_URL)
       .flush({ message: 'Server Error' }, { status: 500, statusText: 'Server Error' });
     await promise;
 

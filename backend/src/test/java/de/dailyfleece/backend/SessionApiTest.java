@@ -73,7 +73,6 @@ class SessionApiTest {
     EventConfig.EventStore eventStore;
 
     RestClient http;
-    CreateSessionRequest createSession;
 
     @BeforeEach
     void setup() {
@@ -86,483 +85,9 @@ class SessionApiTest {
                 .baseUrl("http://localhost:" + port + "/api/v1")
                 .defaultStatusHandler(status -> true, (req, res) -> {})
                 .build();
-        createSession = new CreateSessionRequest(http, HOST_ID, "Host");
     }
 
-    @Test
-    void deleteTodaySession_returns_204_when_no_session_exists() {
-        ResponseEntity<Void> response =
-                http.delete().uri("/sessions/today").retrieve().toBodilessEntity();
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-    }
-
-    @Test
-    void deleteTodaySession_returns_204_and_removes_session() {
-        sessionRepository.save(Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host")));
-
-        ResponseEntity<Void> response =
-                http.delete().uri("/sessions/today").retrieve().toBodilessEntity();
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        assertThat(sessionRepository.findByDate(LocalDate.now(ZoneId.systemDefault())))
-                .isEmpty();
-    }
-
-    @Test
-    void deleteTodaySession_cascade_deletes_photos() {
-        postSession();
-
-        http.delete().uri("/sessions/today").retrieve().toBodilessEntity();
-
-        assertThat(mongoTemplate.getDb().getCollection("fs.files").countDocuments())
-                .isZero();
-    }
-
-    @Test
-    void getTodaySession_returns_404_when_no_session_today() {
-        ResponseEntity<Map<String, Object>> response =
-                http.get().uri("/sessions/today").retrieve().toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void getTodaySession_returns_200_with_session() {
-        sessionRepository.save(Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host")));
-
-        ResponseEntity<Map<String, Object>> response =
-                http.get().uri("/sessions/today").retrieve().toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).containsKey("sessionId");
-        assertThat(response.getBody()).containsEntry("phase", "Lobby");
-    }
-
-    @Test
-    void joinSession_returns_200_with_updated_player_list() {
-        ResponseEntity<Map<String, Object>> registerResponse = http.post()
-                .uri("/players")
-                .body(Map.of("companyId", "anna.schmidt", "displayName", "Anna"))
-                .retrieve()
-                .toEntity(responseType());
-        String playerId =
-                (String) Objects.requireNonNull(registerResponse.getBody()).get("playerId");
-
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        sessionRepository.save(session);
-
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/" + session.sessionId() + "/join")
-                .body(Map.of("playerId", playerId, "displayName", "Anna"))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).containsKey("players");
-    }
-
-    @Test
-    void joinSession_unknown_sessionId_returns_404() {
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/" + UUID.randomUUID() + "/join")
-                .body(Map.of("playerId", UUID.randomUUID().toString(), "displayName", "Anna"))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void getTodaySession_unknown_api_version_returns_400() {
-        RestClient badVersion = RestClient.builder()
-                .baseUrl("http://localhost:" + port + "/api/v2")
-                .defaultStatusHandler(status -> true, (req, res) -> {})
-                .build();
-
-        ResponseEntity<Map<String, Object>> response =
-                badVersion.get().uri("/sessions/today").retrieve().toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    void getTodaySession_missing_api_version_returns_404() {
-        RestClient noVersion = RestClient.builder()
-                .baseUrl("http://localhost:" + port + "/api")
-                .defaultStatusHandler(status -> true, (req, res) -> {})
-                .build();
-
-        ResponseEntity<Map<String, Object>> response =
-                noVersion.get().uri("/sessions/today").retrieve().toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void joinSession_active_session_returns_409() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        sessionRepository.save(session);
-
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/" + session.sessionId() + "/join")
-                .body(Map.of("playerId", UUID.randomUUID().toString(), "displayName", "Anna"))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-    }
-
-    @Test
-    void createSession_returns_201_with_host_as_first_player() {
-        ResponseEntity<Map<String, Object>> response = postSession();
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> players = Objects.requireNonNull((List<Map<String, Object>>)
-                Objects.requireNonNull(response.getBody()).get("players"));
-        assertThat(players).hasSize(1);
-        assertThat(players.get(0)).containsEntry("playerId", HOST_ID.toString()).containsEntry("displayName", "Host");
-    }
-
-    @Test
-    void startSession_returns_200_with_active_phase() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        sessionRepository.save(session);
-
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/" + session.sessionId() + "/start")
-                .body(Map.of("hostId", HOST_ID.toString()))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).containsEntry("phase", "Active");
-    }
-
-    @Test
-    void startSession_returns_403_when_caller_is_not_the_host() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        sessionRepository.save(session);
-
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/" + session.sessionId() + "/start")
-                .body(Map.of("hostId", UUID.randomUUID().toString()))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-    }
-
-    @Test
-    void startSession_returns_409_when_session_already_started() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        sessionRepository.save(session);
-
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/" + session.sessionId() + "/start")
-                .body(Map.of("hostId", HOST_ID.toString()))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-    }
-
-    @Test
-    void startSession_returns_404_when_session_not_found() {
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/" + UUID.randomUUID() + "/start")
-                .body(Map.of("hostId", HOST_ID.toString()))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void createSession_accepts_5MB_photos() {
-        byte[] fiveMB = new byte[5 * 1024 * 1024];
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("hostId", HOST_ID.toString());
-        body.add("hostDisplayName", "Host");
-        body.add("q1", new ByteArrayResource(fiveMB) {
-            @Override
-            public String getFilename() {
-                return "q1.jpg";
-            }
-        });
-        body.add("q2", new ByteArrayResource(fiveMB) {
-            @Override
-            public String getFilename() {
-                return "q2.jpg";
-            }
-        });
-
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(body)
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    }
-
-    @Test
-    void createSession_duplicate_day_returns_409() {
-        postSession();
-
-        ResponseEntity<Map<String, Object>> response = postSession();
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-    }
-
-    @Test
-    void setCorrectAnswer_returns_200_with_q1_closed_and_q2_open() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        session.submitAnswer(QuestionKey.Q1, HOST_ID, "A");
-        sessionRepository.save(session);
-
-        Map<String, Object> voting =
-                postCorrectAnswerAndGetVoting("/sessions/" + session.sessionId() + "/questions/q1/correct", "B");
-
-        @SuppressWarnings("unchecked")
-        Map<String, Object> q1 = Objects.requireNonNull((Map<String, Object>) voting.get("q1"));
-        @SuppressWarnings("unchecked")
-        Map<String, Object> q2 = Objects.requireNonNull((Map<String, Object>) voting.get("q2"));
-        assertThat(q1).containsEntry("status", "Closed").containsEntry("correctAnswer", "B");
-        @SuppressWarnings("unchecked")
-        Map<String, Object> answers = Objects.requireNonNull((Map<String, Object>) q1.get("answers"));
-        @SuppressWarnings("unchecked")
-        Map<String, Object> hostAnswer = Objects.requireNonNull((Map<String, Object>) answers.get(HOST_ID.toString()));
-        assertThat(hostAnswer).containsEntry("displayName", "Host").containsEntry("answer", "A");
-        assertThat(q2).containsEntry("status", "Open");
-    }
-
-    @Test
-    void setCorrectAnswer_on_q2_returns_200_with_session_ended() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        session.setCorrectAnswer(QuestionKey.Q1, "A");
-        sessionRepository.save(session);
-
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/" + session.sessionId() + "/questions/q2/correct")
-                .body(Map.of("hostId", HOST_ID.toString(), "correctAnswer", "DE"))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).containsEntry("phase", "Ended");
-    }
-
-    @Test
-    void setCorrectAnswer_on_q2_publishes_SessionEndedDomainEvent() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
-        session.setCorrectAnswer(QuestionKey.Q1, "B");
-        session.submitAnswer(QuestionKey.Q2, HOST_ID, "DE");
-        sessionRepository.save(session);
-
-        http.post()
-                .uri("/sessions/" + session.sessionId() + "/questions/q2/correct")
-                .body(Map.of("hostId", HOST_ID.toString(), "correctAnswer", "DE"))
-                .retrieve()
-                .toBodilessEntity();
-
-        assertThat(eventStore.sessionEndedEvents).hasSize(1);
-        SessionEndedDomainEvent event = eventStore.sessionEndedEvents.get(0);
-        assertThat(event.sessionId()).isEqualTo(session.sessionId());
-        assertThat(event.scores()).hasSize(1);
-        assertThat(event.scores().get(0).playerId()).isEqualTo(HOST_ID);
-        assertThat(event.scores().get(0).pointsEarned()).isEqualTo(2);
-    }
-
-    @Test
-    void setCorrectAnswer_returns_403_when_caller_is_not_host() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        sessionRepository.save(session);
-
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/" + session.sessionId() + "/questions/q1/correct")
-                .body(Map.of("hostId", UUID.randomUUID().toString(), "correctAnswer", "A"))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-    }
-
-    @Test
-    void submitAnswer_returns_200_for_open_voting() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        sessionRepository.save(session);
-
-        ResponseEntity<Void> response = http.put()
-                .uri("/sessions/" + session.sessionId() + "/questions/q1/answers")
-                .body(Map.of("playerId", HOST_ID.toString(), "answer", "A"))
-                .retrieve()
-                .toBodilessEntity();
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @Test
-    void getTodaySession_answerCount_reflects_submitted_answers() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
-        sessionRepository.save(session);
-
-        ResponseEntity<Map<String, Object>> response =
-                http.get().uri("/sessions/today").retrieve().toEntity(responseType());
-
-        @SuppressWarnings("unchecked")
-        Map<String, Object> voting =
-                (Map<String, Object>) Objects.requireNonNull(response.getBody()).get("voting");
-        @SuppressWarnings("unchecked")
-        Map<String, Object> q1 =
-                (Map<String, Object>) Objects.requireNonNull(voting).get("q1");
-        assertThat(q1).containsEntry("answerCount", 1);
-    }
-
-    @Test
-    void submitAnswer_returns_409_when_voting_is_closed() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        session.setCorrectAnswer(QuestionKey.Q1, "A");
-        sessionRepository.save(session);
-
-        ResponseEntity<Map<String, Object>> response = http.put()
-                .uri("/sessions/" + session.sessionId() + "/questions/q1/answers")
-                .body(Map.of("playerId", HOST_ID.toString(), "answer", "B"))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-    }
-
-    @Test
-    void getSessionResults_returns_200_with_per_player_results_for_ended_session() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
-        session.setCorrectAnswer(QuestionKey.Q1, "B");
-        session.submitAnswer(QuestionKey.Q2, HOST_ID, "DE");
-        session.setCorrectAnswer(QuestionKey.Q2, "DE");
-        sessionRepository.save(session);
-
-        ResponseEntity<Map<String, Object>> response = http.get()
-                .uri("/sessions/" + session.sessionId() + "/results")
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> results = Objects.requireNonNull((List<Map<String, Object>>)
-                Objects.requireNonNull(response.getBody()).get("results"));
-        assertThat(results).hasSize(1);
-        assertThat(results.get(0))
-                .containsEntry("playerId", HOST_ID.toString())
-                .containsEntry("q1Correct", true)
-                .containsEntry("q2Correct", true)
-                .containsEntry("totalPoints", 2);
-    }
-
-    @Test
-    void getSessionResults_returns_409_when_session_not_ended() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        sessionRepository.save(session);
-
-        ResponseEntity<Map<String, Object>> response = http.get()
-                .uri("/sessions/" + session.sessionId() + "/results")
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-    }
-
-    @Test
-    void getSessionResults_returns_404_when_session_not_found() {
-        ResponseEntity<Map<String, Object>> response = http.get()
-                .uri("/sessions/" + UUID.randomUUID() + "/results")
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void submitAnswer_returns_400_for_invalid_question_key() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        sessionRepository.save(session);
-
-        ResponseEntity<Map<String, Object>> response = http.put()
-                .uri("/sessions/" + session.sessionId() + "/questions/q9/answers")
-                .body(Map.of("playerId", HOST_ID.toString(), "answer", "A"))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
+    // ─── getSessionByKey ─────────────────────────────────────────────────────
 
     @Test
     void getSessionByKey_returns_200_with_session() {
@@ -590,6 +115,31 @@ class SessionApiTest {
     }
 
     @Test
+    void getSessionByKey_answerCount_reflects_submitted_answers() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.start();
+        session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
+        sessionRepository.save(session);
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response =
+                http.get().uri("/sessions/default/" + today).retrieve().toEntity(responseType());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> voting =
+                (Map<String, Object>) Objects.requireNonNull(response.getBody()).get("voting");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> q1 =
+                (Map<String, Object>) Objects.requireNonNull(voting).get("q1");
+        assertThat(q1).containsEntry("answerCount", 1);
+    }
+
+    // ─── createSessionByKey ──────────────────────────────────────────────────
+
+    @Test
     void createSessionByKey_returns_201_with_projectId_and_date() {
         String today = LocalDate.now(ZoneId.systemDefault()).toString();
 
@@ -609,6 +159,38 @@ class SessionApiTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
+
+    @Test
+    void createSessionByKey_accepts_5MB_photos() {
+        byte[] fiveMB = new byte[5 * 1024 * 1024];
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("hostId", HOST_ID.toString());
+        body.add("hostDisplayName", "Host");
+        body.add("q1", new ByteArrayResource(fiveMB) {
+            @Override
+            public String getFilename() {
+                return "q1.jpg";
+            }
+        });
+        body.add("q2", new ByteArrayResource(fiveMB) {
+            @Override
+            public String getFilename() {
+                return "q2.jpg";
+            }
+        });
+
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(body)
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    }
+
+    // ─── deleteSessionByKey ──────────────────────────────────────────────────
 
     @Test
     void deleteSessionByKey_returns_204_and_removes_session() {
@@ -631,6 +213,306 @@ class SessionApiTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
+
+    // ─── joinSessionByKey ────────────────────────────────────────────────────
+
+    @Test
+    void joinSessionByKey_returns_200_with_updated_player_list() {
+        ResponseEntity<Map<String, Object>> registerResponse = http.post()
+                .uri("/players")
+                .body(Map.of("companyId", "anna.schmidt", "displayName", "Anna"))
+                .retrieve()
+                .toEntity(responseType());
+        String playerId =
+                (String) Objects.requireNonNull(registerResponse.getBody()).get("playerId");
+
+        sessionRepository.save(Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host")));
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/join")
+                .body(Map.of("playerId", playerId, "displayName", "Anna"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).containsKey("players");
+    }
+
+    @Test
+    void joinSessionByKey_returns_404_when_no_session_for_date() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/join")
+                .body(Map.of("playerId", UUID.randomUUID().toString(), "displayName", "Anna"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void joinSessionByKey_active_session_returns_409() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/join")
+                .body(Map.of("playerId", UUID.randomUUID().toString(), "displayName", "Anna"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    // ─── startSessionByKey ───────────────────────────────────────────────────
+
+    @Test
+    void startSessionByKey_returns_200_with_active_phase() {
+        sessionRepository.save(Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host")));
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/start")
+                .body(Map.of("hostId", HOST_ID.toString()))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).containsEntry("phase", "Active");
+    }
+
+    @Test
+    void startSessionByKey_returns_404_when_no_session_for_date() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/start")
+                .body(Map.of("hostId", HOST_ID.toString()))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void startSessionByKey_returns_403_when_caller_is_not_the_host() {
+        sessionRepository.save(Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host")));
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/start")
+                .body(Map.of("hostId", UUID.randomUUID().toString()))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void startSessionByKey_returns_409_when_session_already_started() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/start")
+                .body(Map.of("hostId", HOST_ID.toString()))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    // ─── submitAnswerByKey ───────────────────────────────────────────────────
+
+    @Test
+    void submitAnswerByKey_returns_404_when_no_session_for_date() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.put()
+                .uri("/sessions/default/" + today + "/questions/q1/answers")
+                .body(Map.of("playerId", HOST_ID.toString(), "answer", "A"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void submitAnswerByKey_returns_200_for_open_voting() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Void> response = http.put()
+                .uri("/sessions/default/" + today + "/questions/q1/answers")
+                .body(Map.of("playerId", HOST_ID.toString(), "answer", "A"))
+                .retrieve()
+                .toBodilessEntity();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void submitAnswerByKey_returns_409_when_voting_is_closed() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.start();
+        session.setCorrectAnswer(QuestionKey.Q1, "A");
+        sessionRepository.save(session);
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.put()
+                .uri("/sessions/default/" + today + "/questions/q1/answers")
+                .body(Map.of("playerId", HOST_ID.toString(), "answer", "B"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void submitAnswerByKey_returns_400_for_invalid_question_key() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.put()
+                .uri("/sessions/default/" + today + "/questions/q9/answers")
+                .body(Map.of("playerId", HOST_ID.toString(), "answer", "A"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    // ─── setCorrectAnswerByKey ────────────────────────────────────────────────
+
+    @Test
+    void setCorrectAnswerByKey_returns_404_when_no_session_for_date() {
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/questions/q1/correct")
+                .body(Map.of("hostId", HOST_ID.toString(), "correctAnswer", "B"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void setCorrectAnswerByKey_returns_200_with_q1_closed() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        Map<String, Object> voting =
+                postCorrectAnswerAndGetVoting("/sessions/default/" + today + "/questions/q1/correct", "B");
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> q1 = Objects.requireNonNull((Map<String, Object>) voting.get("q1"));
+        assertThat(q1).containsEntry("status", "Closed").containsEntry("correctAnswer", "B");
+    }
+
+    @Test
+    void setCorrectAnswerByKey_on_q2_returns_200_with_session_ended() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.start();
+        session.setCorrectAnswer(QuestionKey.Q1, "A");
+        sessionRepository.save(session);
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/questions/q2/correct")
+                .body(Map.of("hostId", HOST_ID.toString(), "correctAnswer", "DE"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).containsEntry("phase", "Ended");
+    }
+
+    @Test
+    void setCorrectAnswerByKey_on_q2_publishes_SessionEndedDomainEvent() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.start();
+        session.submitAnswer(QuestionKey.Q1, HOST_ID, "B");
+        session.setCorrectAnswer(QuestionKey.Q1, "B");
+        session.submitAnswer(QuestionKey.Q2, HOST_ID, "DE");
+        sessionRepository.save(session);
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        http.post()
+                .uri("/sessions/default/" + today + "/questions/q2/correct")
+                .body(Map.of("hostId", HOST_ID.toString(), "correctAnswer", "DE"))
+                .retrieve()
+                .toBodilessEntity();
+
+        assertThat(eventStore.sessionEndedEvents).hasSize(1);
+        SessionEndedDomainEvent event = eventStore.sessionEndedEvents.get(0);
+        assertThat(event.sessionId()).isEqualTo(session.sessionId());
+        assertThat(event.scores()).hasSize(1);
+        assertThat(event.scores().get(0).playerId()).isEqualTo(HOST_ID);
+        assertThat(event.scores().get(0).pointsEarned()).isEqualTo(2);
+    }
+
+    @Test
+    void setCorrectAnswerByKey_returns_403_when_caller_is_not_host() {
+        Session session = Session.create(
+                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
+                HOST_ID,
+                new PlayerName("Host"));
+        session.start();
+        sessionRepository.save(session);
+
+        String today = LocalDate.now(ZoneId.systemDefault()).toString();
+        ResponseEntity<Map<String, Object>> response = http.post()
+                .uri("/sessions/default/" + today + "/questions/q1/correct")
+                .body(Map.of("hostId", UUID.randomUUID().toString(), "correctAnswer", "A"))
+                .retrieve()
+                .toEntity(responseType());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    // ─── getSessionResultsByKey ───────────────────────────────────────────────
 
     @Test
     void getSessionResultsByKey_returns_enriched_results_for_ended_session() {
@@ -697,74 +579,6 @@ class SessionApiTest {
     }
 
     @Test
-    void joinSessionByKey_returns_200_with_updated_player_list() {
-        ResponseEntity<Map<String, Object>> registerResponse = http.post()
-                .uri("/players")
-                .body(Map.of("companyId", "anna.schmidt", "displayName", "Anna"))
-                .retrieve()
-                .toEntity(responseType());
-        String playerId =
-                (String) Objects.requireNonNull(registerResponse.getBody()).get("playerId");
-
-        sessionRepository.save(Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host")));
-
-        String today = LocalDate.now(ZoneId.systemDefault()).toString();
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/default/" + today + "/join")
-                .body(Map.of("playerId", playerId, "displayName", "Anna"))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).containsKey("players");
-    }
-
-    @Test
-    void startSessionByKey_returns_200_with_active_phase() {
-        sessionRepository.save(Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host")));
-
-        String today = LocalDate.now(ZoneId.systemDefault()).toString();
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/default/" + today + "/start")
-                .body(Map.of("hostId", HOST_ID.toString()))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).containsEntry("phase", "Active");
-    }
-
-    @Test
-    void startSessionByKey_returns_404_when_no_session_for_date() {
-        String today = LocalDate.now(ZoneId.systemDefault()).toString();
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/default/" + today + "/start")
-                .body(Map.of("hostId", HOST_ID.toString()))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void joinSessionByKey_returns_404_when_no_session_for_date() {
-        String today = LocalDate.now(ZoneId.systemDefault()).toString();
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/default/" + today + "/join")
-                .body(Map.of("playerId", UUID.randomUUID().toString(), "displayName", "Anna"))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
     void getSessionResultsByKey_returns_404_when_no_session_for_date() {
         String today = LocalDate.now(ZoneId.systemDefault()).toString();
         ResponseEntity<Map<String, Object>> response = http.get()
@@ -775,66 +589,7 @@ class SessionApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
-    @Test
-    void setCorrectAnswerByKey_returns_404_when_no_session_for_date() {
-        String today = LocalDate.now(ZoneId.systemDefault()).toString();
-        ResponseEntity<Map<String, Object>> response = http.post()
-                .uri("/sessions/default/" + today + "/questions/q1/correct")
-                .body(Map.of("hostId", HOST_ID.toString(), "correctAnswer", "B"))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void setCorrectAnswerByKey_returns_200_with_q1_closed() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        sessionRepository.save(session);
-
-        String today = LocalDate.now(ZoneId.systemDefault()).toString();
-        Map<String, Object> voting =
-                postCorrectAnswerAndGetVoting("/sessions/default/" + today + "/questions/q1/correct", "B");
-
-        @SuppressWarnings("unchecked")
-        Map<String, Object> q1 = Objects.requireNonNull((Map<String, Object>) voting.get("q1"));
-        assertThat(q1).containsEntry("status", "Closed").containsEntry("correctAnswer", "B");
-    }
-
-    @Test
-    void submitAnswerByKey_returns_404_when_no_session_for_date() {
-        String today = LocalDate.now(ZoneId.systemDefault()).toString();
-        ResponseEntity<Map<String, Object>> response = http.put()
-                .uri("/sessions/default/" + today + "/questions/q1/answers")
-                .body(Map.of("playerId", HOST_ID.toString(), "answer", "A"))
-                .retrieve()
-                .toEntity(responseType());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void submitAnswerByKey_returns_200_for_open_voting() {
-        Session session = Session.create(
-                new SessionKey(new ProjectId("default"), LocalDate.now(ZoneId.systemDefault())),
-                HOST_ID,
-                new PlayerName("Host"));
-        session.start();
-        sessionRepository.save(session);
-
-        String today = LocalDate.now(ZoneId.systemDefault()).toString();
-        ResponseEntity<Void> response = http.put()
-                .uri("/sessions/default/" + today + "/questions/q1/answers")
-                .body(Map.of("playerId", HOST_ID.toString(), "answer", "A"))
-                .retrieve()
-                .toBodilessEntity();
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
+    // ─── helpers ─────────────────────────────────────────────────────────────
 
     private ResponseEntity<Map<String, Object>> endSessionAndGetResultsByKey(Session session) {
         session.start();
@@ -848,10 +603,6 @@ class SessionApiTest {
                 .uri("/sessions/default/" + today + "/results")
                 .retrieve()
                 .toEntity(responseType());
-    }
-
-    private ResponseEntity<Map<String, Object>> postSession() {
-        return createSession.post();
     }
 
     @SuppressWarnings("unchecked")

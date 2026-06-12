@@ -34,10 +34,11 @@ describe('quizGuard', () => {
 
   it('redirects to /lobby when session fetch fails', async () => {
     const http = TestBed.inject(HttpTestingController);
+    const today = new Date().toISOString().slice(0, 10);
 
     const promise = runGuard() as Promise<GuardResult>;
     http
-      .expectOne('/api/v1/sessions/today')
+      .expectOne(`/api/v1/sessions/default/${today}`)
       .flush({ message: 'Not Found' }, { status: 404, statusText: 'Not Found' });
     const result = await promise;
 
@@ -47,9 +48,10 @@ describe('quizGuard', () => {
 
   it('redirects to /lobby when session is not Active', async () => {
     const http = TestBed.inject(HttpTestingController);
+    const today = new Date().toISOString().slice(0, 10);
 
     const promise = runGuard() as Promise<GuardResult>;
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ phase: 'Lobby' }));
+    http.expectOne(`/api/v1/sessions/default/${today}`).flush(makeSession({ phase: 'Lobby' }));
     const result = await promise;
 
     expect(result).toBeInstanceOf(UrlTree);
@@ -59,9 +61,10 @@ describe('quizGuard', () => {
   it('returns true and seeds the store when session is Active', async () => {
     const http = TestBed.inject(HttpTestingController);
     const store = TestBed.inject(QuizStore);
+    const today = new Date().toISOString().slice(0, 10);
 
     const promise = runGuard() as Promise<GuardResult>;
-    http.expectOne('/api/v1/sessions/today').flush(makeSession({ sessionId: 'q42' }));
+    http.expectOne(`/api/v1/sessions/default/${today}`).flush(makeSession({ sessionId: 'q42' }));
     const result = await promise;
 
     expect(result).toBe(true);

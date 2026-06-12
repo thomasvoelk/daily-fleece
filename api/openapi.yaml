@@ -25,9 +25,9 @@ info:
     ```
 
     Transitions are triggered by host actions:
-    - `POST /sessions/{id}/start` — Lobby → Active (opens Q1 voting)
-    - `POST /sessions/{id}/questions/q1/correct` — closes Q1 voting, scores Q1, opens Q2 voting
-    - `POST /sessions/{id}/questions/q2/correct` — closes Q2 voting, scores Q2, ends session
+    - `POST /sessions/{projectId}/{date}/start` — Lobby → Active (opens Q1 voting)
+    - `POST /sessions/{projectId}/{date}/questions/q1/correct` — closes Q1 voting, scores Q1, opens Q2 voting
+    - `POST /sessions/{projectId}/{date}/questions/q2/correct` — closes Q2 voting, scores Q2, ends session
 
     ## Stub authentication
 
@@ -43,8 +43,8 @@ info:
     ## One session per day
 
     Sessions are scoped to a project (one global project for now) and a calendar
-    date (server timezone). At most one session exists per day. `GET /sessions/today`
-    is the entry point for all clients on app open.
+    date (server timezone). At most one session exists per day. Clients address sessions
+    by natural key: `GET /sessions/{projectId}/{date}`.
 
     ## Error responses
 
@@ -110,133 +110,13 @@ paths:
   # Sessions
   # ---------------------------------------------------------------------------
 
-  /sessions/today:
-    get:
-      operationId: getTodaySession
-      tags: [Sessions]
-      summary: Get today's session
-      description: |
-        Returns the session for today's date (server timezone) in the default
-        project, regardless of its phase (Lobby, Active, or Ended).
-
-        This is the entry point called by every client on app open. The client
-        uses the returned `phase` to decide which screen to render:
-        - `Lobby` — show lobby screen; host may still be setting up
-        - `Active` — show the current question screen
-        - `Ended` — show results or leaderboard
-
-        Returns 404 if no session has been created today. The host should then
-        proceed to `POST /sessions`.
-      responses:
-        "200":
-          description: Today's session.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SessionResponse"
-        "404":
-          description: No session exists for today.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/session-not-found"
-                title: "Session Not Found"
-                status: 404
-                detail: "No session exists for today."
-    delete:
-      operationId: deleteTodaySession
-      tags: [Sessions]
-      summary: Delete today's session
-      description: |
-        Deletes the session for today's date (server timezone), including its
-        GridFS photos (cascade). Idempotent: returns 204 even if no session
-        exists for today. Used by the e2e test suite to reset state between runs.
-      responses:
-        "204":
-          description: Session deleted (or did not exist).
-
-  /sessions:
-    post:
-      operationId: createSession
-      tags: [Sessions]
-      summary: Create today's session
-      description: |
-        Creates a new session for today in the Lobby phase. Both photos and
-        the host's identity are submitted in a single multipart request. The
-        host is automatically added as the first player.
-
-        Photos are stored in MongoDB GridFS with a 28-day TTL (see ADR-0005,
-        ADR-0015). The session document holds the GridFS references internally;
-        they are not exposed in the response. Clients retrieve photos via
-        `GET /sessions/{id}/photos/{question}`.
-
-        Returns 409 if a session already exists for today — the client should
-        redirect the host to `GET /sessions/today` instead.
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/CreateSessionRequest"
-      responses:
-        "201":
-          description: Session created in Lobby phase.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SessionResponse"
-        "409":
-          description: A session already exists for today.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/session-already-exists"
-                title: "Session Already Exists"
-                status: 409
-                detail: "A session already exists for 2026-05-25. Use GET /sessions/today to join it."
-
-  /sessions/{sessionId}:
-    get:
-      operationId: getSession
-      tags: [Sessions]
-      summary: Get session state
-      description: |
-        Returns the full session document. Used by clients after reconnect to
-        determine the current phase and render the correct screen.
-      parameters:
-        - $ref: "#/components/parameters/SessionId"
-      responses:
-        "200":
-          description: Session state.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SessionResponse"
-        "404":
-          description: Session not found.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/session-not-found"
-                title: "Session Not Found"
-                status: 404
-                detail: "No session found with ID s-7c2d1e."
-
   /sessions/{projectId}/{date}:
     get:
       operationId: getSessionByKey
       tags: [Sessions]
       summary: Get session by natural key
       description: |
-        Returns the session for the given project and date. Clients that know
-        today's date (browser clock) and the project ID can address any session
-        directly without a prior `GET /sessions/today` lookup.
+        Returns the session for the given project and date.
       parameters:
         - $ref: "#/components/parameters/ProjectId"
         - $ref: "#/components/parameters/SessionDate"
@@ -310,352 +190,9 @@ paths:
         "204":
           description: Session deleted (or did not exist).
 
-  /sessions/{sessionId}/photos/{question}:
-    get:
-      operationId: getSessionPhoto
-      tags: [Sessions]
-      summary: Get a session photo
-      description: |
-        Returns the raw image bytes for the Q1 or Q2 photo uploaded when the
-        session was created. Available in any session phase. The `Content-Type`
-        header reflects the original upload format.
-      parameters:
-        - $ref: "#/components/parameters/SessionId"
-        - $ref: "#/components/parameters/Question"
-      responses:
-        "200":
-          description: Photo image bytes.
-          content:
-            image/*:
-              schema:
-                type: string
-                format: binary
-        "404":
-          description: Session not found or photo expired (28-day TTL).
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/session-not-found"
-                title: "Session Not Found"
-                status: 404
-                detail: "No session found with ID s-7c2d1e."
-
-  /sessions/{sessionId}/join:
-    post:
-      operationId: joinSession
-      tags: [Sessions]
-      summary: Join the session lobby
-      description: |
-        Adds the player to the session's player list. Only possible while the
-        session is in Lobby phase.
-
-        Returns 409 if the session has already started — the client should
-        show a "session in progress" message.
-      parameters:
-        - $ref: "#/components/parameters/SessionId"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/JoinSessionRequest"
-            example:
-              playerId: "p-4f3a9b"
-              displayName: "Thomas"
-      responses:
-        "200":
-          description: Joined successfully. Returns updated session state.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SessionResponse"
-        "404":
-          description: Session not found.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/session-not-found"
-                title: "Session Not Found"
-                status: 404
-                detail: "No session found with ID s-7c2d1e."
-        "409":
-          description: Session is already active; cannot join.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/session-already-active"
-                title: "Session Already Active"
-                status: 409
-                detail: "This session is already in progress. New players cannot join."
-
-  /sessions/{sessionId}/start:
-    post:
-      operationId: startSession
-      tags: [Sessions]
-      summary: Start the session
-      description: |
-        Transitions the session from Lobby to Active phase and opens Q1 voting.
-        Only the host may call this endpoint.
-      parameters:
-        - $ref: "#/components/parameters/SessionId"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/HostActionRequest"
-            example:
-              hostId: "p-4f3a9b"
-      responses:
-        "200":
-          description: Session started. Returns updated session state.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SessionResponse"
-        "403":
-          description: Caller is not the host.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/not-the-host"
-                title: "Forbidden"
-                status: 403
-                detail: "Only the host may start the session."
-        "404":
-          description: Session not found.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/session-not-found"
-                title: "Session Not Found"
-                status: 404
-                detail: "No session found with ID s-7c2d1e."
-        "409":
-          description: Session is not in Lobby phase.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/invalid-phase-transition"
-                title: "Invalid Phase Transition"
-                status: 409
-                detail: "Session s-7c2d1e is in Active phase and cannot be started again."
-
-  # ---------------------------------------------------------------------------
-  # Voting
-  # ---------------------------------------------------------------------------
-
-  /sessions/{sessionId}/questions/{question}/answers:
-    put:
-      operationId: submitAnswer
-      tags: [Voting]
-      summary: Submit or change an answer
-      description: |
-        Records the player's answer for the given question. Idempotent — calling
-        again with a different value overwrites the previous answer. Players may
-        change their answer any number of times while voting is open.
-
-        **Q1** — `answer` must be one of `A`, `B`, `C`.
-        **Q2** — `answer` must be an ISO 3166-1 alpha-2 country code (e.g. `DE`).
-
-        Returns 409 if voting is already closed for this question.
-
-        Individual answers are not visible to other players while voting is open.
-        They are revealed to all when the host sets the correct answer.
-      parameters:
-        - $ref: "#/components/parameters/SessionId"
-        - $ref: "#/components/parameters/Question"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SubmitAnswerRequest"
-            examples:
-              q1Answer:
-                summary: Q1 multiple-choice answer
-                value:
-                  playerId: "p-4f3a9b"
-                  answer: "B"
-              q2Answer:
-                summary: Q2 country answer
-                value:
-                  playerId: "p-4f3a9b"
-                  answer: "DE"
-      responses:
-        "200":
-          description: Answer recorded.
-        "404":
-          description: Session not found.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/session-not-found"
-                title: "Session Not Found"
-                status: 404
-                detail: "No session found with ID s-7c2d1e."
-        "409":
-          description: Voting is already closed for this question.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/voting-closed"
-                title: "Voting Closed"
-                status: 409
-                detail: "Voting for q1 is already closed."
-
-  /sessions/{sessionId}/questions/{question}/correct:
-    post:
-      operationId: setCorrectAnswer
-      tags: [Voting]
-      summary: Set the correct answer
-      description: |
-        Host declares the correct answer for the question. This single action:
-        1. Closes voting (no further answers accepted)
-        2. Records the correct answer
-        3. Awards 1 point to each player who answered correctly
-        4. For Q1: opens Q2 voting
-        5. For Q2: ends the session
-
-        **Q1** — `correctAnswer` must be one of `A`, `B`, `C`.
-        **Q2** — `correctAnswer` must be an ISO 3166-1 alpha-2 country code (e.g. `DE`).
-      parameters:
-        - $ref: "#/components/parameters/SessionId"
-        - $ref: "#/components/parameters/Question"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SetCorrectAnswerRequest"
-            examples:
-              q1Correct:
-                summary: Q1 correct answer
-                value:
-                  hostId: "p-4f3a9b"
-                  correctAnswer: "B"
-              q2Correct:
-                summary: Q2 correct answer
-                value:
-                  hostId: "p-4f3a9b"
-                  correctAnswer: "DE"
-      responses:
-        "200":
-          description: Correct answer set, voting closed, scores updated.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SessionResponse"
-        "403":
-          description: Caller is not the host.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/not-the-host"
-                title: "Forbidden"
-                status: 403
-                detail: "Only the host may set the correct answer."
-        "404":
-          description: Session not found.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/session-not-found"
-                title: "Session Not Found"
-                status: 404
-                detail: "No session found with ID s-7c2d1e."
-        "409":
-          description: Correct answer already set for this question.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/answer-already-set"
-                title: "Answer Already Set"
-                status: 409
-                detail: "The correct answer for q1 has already been set."
-
   # ---------------------------------------------------------------------------
   # Results
   # ---------------------------------------------------------------------------
-
-  /sessions/{sessionId}/results:
-    get:
-      operationId: getSessionResults
-      tags: [Results]
-      summary: Get session results
-      description: |
-        Returns per-player Q1 and Q2 outcomes for the session. Correctness is
-        derived at read time by comparing each player's answer against the stored
-        correct answer — it is never stored separately.
-
-        Only available once the session has Ended.
-      parameters:
-        - $ref: "#/components/parameters/SessionId"
-      responses:
-        "200":
-          description: Session results.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SessionResultsResponse"
-              example:
-                sessionId: "s-7c2d1e"
-                date: "2026-05-25"
-                results:
-                  - playerId: "p-4f3a9b"
-                    displayName: "Thomas"
-                    q1Correct: true
-                    q2Correct: false
-                    totalPoints: 1
-                  - playerId: "p-8b1c3a"
-                    displayName: "Anna"
-                    q1Correct: true
-                    q2Correct: true
-                    totalPoints: 2
-        "404":
-          description: Session not found.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/session-not-found"
-                title: "Session Not Found"
-                status: 404
-                detail: "No session found with ID s-7c2d1e."
-        "409":
-          description: Session has not ended yet.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-              example:
-                type: "/problems/session-not-ended"
-                title: "Session Not Ended"
-                status: 409
-                detail: "Results are only available after the session has ended. Current phase: Active."
 
   /sessions/{projectId}/{date}/results:
     get:
@@ -664,8 +201,7 @@ paths:
       summary: Get enriched session results by natural key
       description: |
         Returns per-player Q1 and Q2 outcomes including each player's submitted
-        answers and the session's correct answers. Single-request alternative to
-        `GET /sessions/{sessionId}/results` — no prior session-ID lookup needed.
+        answers and the session's correct answers.
 
         Only available once the session has Ended.
       parameters:
@@ -832,6 +368,10 @@ paths:
                 title: "Invalid Phase Transition"
                 status: 409
                 detail: "Session is in Active phase and cannot be started again."
+
+  # ---------------------------------------------------------------------------
+  # Voting
+  # ---------------------------------------------------------------------------
 
   /sessions/{projectId}/{date}/questions/{question}/answers:
     put:
@@ -1039,15 +579,6 @@ paths:
 
 components:
   parameters:
-    SessionId:
-      name: sessionId
-      in: path
-      required: true
-      description: The session ID returned by `POST /sessions` or `GET /sessions/today`.
-      schema:
-        type: string
-      example: "s-7c2d1e"
-
     ProjectId:
       name: projectId
       in: path

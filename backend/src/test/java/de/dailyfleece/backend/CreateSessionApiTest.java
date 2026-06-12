@@ -46,7 +46,7 @@ class CreateSessionApiTest {
     }
 
     @Test
-    void createSession_returns_201_with_host_as_first_player() {
+    void createSessionByKey_returns_201_with_host_as_first_player() {
         ResponseEntity<Map<String, Object>> response = postSession();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -60,7 +60,7 @@ class CreateSessionApiTest {
     }
 
     @Test
-    void createSession_duplicate_returns_409() {
+    void createSessionByKey_duplicate_returns_409() {
         postSession();
 
         ResponseEntity<Map<String, Object>> response = postSession();
