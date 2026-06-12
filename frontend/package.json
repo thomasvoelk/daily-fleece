@@ -25,7 +25,7 @@
       "@angular/core": "$@angular/core"
     }
   },
-  "packageManager": "npm@11.16.0",
+  "packageManager": "npm@11.17.0",
   "dependencies": {
     "@angular-architects/ngrx-toolkit": "21.0.1",
     "@angular/cdk": "22.0.1",
