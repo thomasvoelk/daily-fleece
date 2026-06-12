@@ -19,6 +19,6 @@ export const sheriffConfig: SheriffConfig = {
     'root:backend-client': [],
     'domain:shared': [],
     'domain:entry': ['domain:shared', 'root', 'root:backend-client'],
-    'domain:*': ['domain:shared', 'domain:entry', 'root', 'root:backend-client'],
+    'domain:*': ['domain:shared', 'domain:entry', 'domain:session', 'root', 'root:backend-client'],
   },
 };

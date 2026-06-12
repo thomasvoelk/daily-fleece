@@ -1,25 +1,35 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
-import { Api, getSessionByKey } from '../backend-client';
-import { TODAY } from '../shared';
+import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
+import { EntryContext } from '../entry';
+import { SessionResponse } from '../backend-client';
+import { sessionAccessPolicy, RouteType } from '../session';
 import { QuizStore } from './quiz.store';
 
-export const quizGuard: CanActivateFn = async () => {
+export const quizGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const router = inject(Router);
-  const redirect = () => router.createUrlTree(['/lobby']);
+  const session = route.data['session'] as SessionResponse | null;
 
-  const api = inject(Api);
-  const store = inject(QuizStore);
-  const today = inject(TODAY);
-  try {
-    const session = await firstValueFrom(
-      api.invoke(getSessionByKey, { projectId: 'default', date: today }),
-    );
-    if (session.phase !== 'Active') return redirect();
-    store.initializeSession(session);
-    return true;
-  } catch {
-    return redirect();
+  if (!session) return router.createUrlTree(['/']);
+
+  const hasIdentity = !!inject(EntryContext).playerId();
+  const urlSegment = route.url[route.url.length - 1]?.path ?? 'q1';
+  const routeType: RouteType = urlSegment === 'q2' ? 'q2' : 'q1';
+
+  const access = sessionAccessPolicy(session, hasIdentity, routeType);
+  if (access !== 'allow') {
+    return router.createUrlTree([access.redirect]);
   }
+
+  if (session.phase === 'Active') {
+    const { q1, q2 } = session.voting;
+    if (routeType === 'q1' && q1.status === 'Closed' && q2.status === 'Open') {
+      return router.createUrlTree([`/session/${session.projectId}/${session.date}/q2`]);
+    }
+    if (routeType === 'q2' && q2.status === 'Closed' && q1.status === 'Open') {
+      return router.createUrlTree([`/session/${session.projectId}/${session.date}/q1`]);
+    }
+  }
+
+  inject(QuizStore).initializeSession(session);
+  return true;
 };

@@ -1,14 +1,20 @@
+import { signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { MaybeAsync, GuardResult, Router, UrlTree, provideRouter } from '@angular/router';
-import { HttpTestingController } from '@angular/common/http/testing';
+import {
+  ActivatedRouteSnapshot,
+  MaybeAsync,
+  GuardResult,
+  Router,
+  UrlTree,
+  provideRouter,
+} from '@angular/router';
 import { quizGuard } from './quiz.guard';
 import { QuizStore } from './quiz.store';
+import { EntryContext } from '../entry';
 import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
 import { SessionResponse } from '../backend-client';
 
 mockLocalStorage();
-
-const PROVIDERS = [...provideTestEnvironment(), provideRouter([]), QuizStore];
 
 function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse {
   return {
@@ -23,51 +29,92 @@ function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse 
   };
 }
 
+function makeRoute(
+  session: SessionResponse | null,
+  urlSegment: 'q1' | 'q2' = 'q1',
+): ActivatedRouteSnapshot {
+  return {
+    data: { session },
+    url: [{ path: urlSegment }],
+  } as unknown as ActivatedRouteSnapshot;
+}
+
 describe('quizGuard', () => {
-  function runGuard(): MaybeAsync<GuardResult> {
-    return TestBed.runInInjectionContext(() => quizGuard({} as never, {} as never));
+  let playerId: WritableSignal<string | null>;
+
+  function runGuard(
+    session: SessionResponse | null = makeSession(),
+    urlSegment: 'q1' | 'q2' = 'q1',
+  ): MaybeAsync<GuardResult> {
+    return TestBed.runInInjectionContext(() =>
+      quizGuard(makeRoute(session, urlSegment), {} as never),
+    );
   }
 
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: PROVIDERS });
+    playerId = signal(null);
+    TestBed.configureTestingModule({
+      providers: [
+        ...provideTestEnvironment(),
+        provideRouter([]),
+        QuizStore,
+        { provide: EntryContext, useValue: { playerId } },
+      ],
+    });
   });
 
-  it('redirects to /lobby when session fetch fails', async () => {
-    const http = TestBed.inject(HttpTestingController);
-    const today = '2026-06-12';
-
-    const promise = runGuard() as Promise<GuardResult>;
-    http
-      .expectOne(`/api/v1/sessions/default/${today}`)
-      .flush({ message: 'Not Found' }, { status: 404, statusText: 'Not Found' });
-    const result = await promise;
-
+  it('redirects to / when session is null', async () => {
+    playerId.set('p1');
+    const result = await runGuard(null);
     expect(result).toBeInstanceOf(UrlTree);
-    expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe('/lobby');
+    expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe('/');
   });
 
-  it('redirects to /lobby when session is not Active', async () => {
-    const http = TestBed.inject(HttpTestingController);
-    const today = '2026-06-12';
-
-    const promise = runGuard() as Promise<GuardResult>;
-    http.expectOne(`/api/v1/sessions/default/${today}`).flush(makeSession({ phase: 'Lobby' }));
-    const result = await promise;
-
+  it('redirects to / when Active session and no identity', async () => {
+    const result = await runGuard();
     expect(result).toBeInstanceOf(UrlTree);
-    expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe('/lobby');
+    expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe('/');
   });
 
-  it('returns true and seeds the store when session is Active', async () => {
-    const http = TestBed.inject(HttpTestingController);
+  it('returns true and seeds the store when Active session with identity', async () => {
+    playerId.set('p1');
     const store = TestBed.inject(QuizStore);
-    const today = '2026-06-12';
-
-    const promise = runGuard() as Promise<GuardResult>;
-    http.expectOne(`/api/v1/sessions/default/${today}`).flush(makeSession({ sessionId: 'q42' }));
-    const result = await promise;
-
+    const result = await runGuard(makeSession({ sessionId: 'q42' }));
     expect(result).toBe(true);
     expect(store.session()?.sessionId).toBe('q42');
+  });
+
+  it('redirects to /q2 when on q1 route but Q1 is Closed and Q2 is Open', async () => {
+    playerId.set('p1');
+    const session = makeSession({
+      voting: { q1: { status: 'Closed' }, q2: { status: 'Open' } },
+    });
+    const result = await runGuard(session, 'q1');
+    expect(result).toBeInstanceOf(UrlTree);
+    expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe(
+      '/session/default/2026-06-02/q2',
+    );
+  });
+
+  it('redirects to /q1 when on q2 route but Q2 is Closed and Q1 is Open', async () => {
+    playerId.set('p1');
+    const session = makeSession({
+      voting: { q1: { status: 'Open' }, q2: { status: 'Closed' } },
+    });
+    const result = await runGuard(session, 'q2');
+    expect(result).toBeInstanceOf(UrlTree);
+    expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe(
+      '/session/default/2026-06-02/q1',
+    );
+  });
+
+  it('allows /q1 access for Ended session without identity', async () => {
+    const result = await runGuard(makeSession({ phase: 'Ended' }), 'q1');
+    expect(result).toBe(true);
+  });
+
+  it('allows /q2 access for Ended session without identity', async () => {
+    const result = await runGuard(makeSession({ phase: 'Ended' }), 'q2');
+    expect(result).toBe(true);
   });
 });

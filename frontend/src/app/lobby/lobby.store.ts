@@ -44,7 +44,7 @@ export const LobbyStore = signalStore(
         );
         patchState(store, { session });
         if (session.phase === 'Active') {
-          await router.navigate(['/quiz']);
+          await router.navigate([`/session/default/${session.date}/q1`]);
         } else {
           patchState(store, {
             error: $localize`:lobby|Error shown when quiz has not started yet@@lobby.quizNotStarted:Quiz not started yet. Please wait.`,
@@ -63,7 +63,7 @@ export const LobbyStore = signalStore(
             body: { hostId: playerId },
           }),
         );
-        await router.navigate(['/quiz']);
+        await router.navigate([`/session/default/${session.date}/q1`]);
       },
     };
   }),

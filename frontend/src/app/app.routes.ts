@@ -13,7 +13,11 @@ export const routes: Routes = [
   {
     path: 'session/:projectId/:date',
     resolve: { session: sessionResolver },
-    children: [{ path: 'lobby', component: Lobby, canActivate: [lobbyGuard] }],
+    children: [
+      { path: 'lobby', component: Lobby, canActivate: [lobbyGuard] },
+      { path: 'q1', component: Quiz, canActivate: [quizGuard] },
+      { path: 'q2', component: Quiz, canActivate: [quizGuard] },
+    ],
   },
   {
     path: 'lobby',
@@ -22,8 +26,14 @@ export const routes: Routes = [
       return `/session/default/${today}/lobby`;
     },
   },
+  {
+    path: 'quiz',
+    redirectTo: () => {
+      const today = inject(TODAY);
+      return `/session/default/${today}/q1`;
+    },
+  },
   { path: 'host', component: HostSetup, canActivate: [hasPlayerIdGuard] },
-  { path: 'quiz', component: Quiz, canActivate: [quizGuard] },
   { path: 'results', component: Results },
   { path: 'leaderboard', component: Leaderboard },
 ];
