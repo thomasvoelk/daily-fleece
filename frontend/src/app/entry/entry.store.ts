@@ -69,7 +69,7 @@ export const EntryStore = signalStore(
           );
 
           patchState(store, { phase: 'idle' });
-          await router.navigate(['/lobby']);
+          await router.navigate(['/session', 'default', today, 'lobby']);
         } catch {
           patchState(store, {
             phase: 'error',

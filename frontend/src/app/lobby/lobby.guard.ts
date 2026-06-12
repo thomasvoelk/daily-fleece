@@ -1,27 +1,18 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
-import { Api, getSessionByKey } from '../backend-client';
+import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { EntryContext } from '../entry';
-import { TODAY } from '../shared';
+import { SessionResponse } from '../backend-client';
 import { LobbyStore } from './lobby.store';
 
-export const lobbyGuard: CanActivateFn = async () => {
+export const lobbyGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const router = inject(Router);
   const redirect = () => router.createUrlTree(['/']);
 
   if (!inject(EntryContext).playerId()) return redirect();
 
-  const api = inject(Api);
-  const store = inject(LobbyStore);
-  const today = inject(TODAY);
-  try {
-    const session = await firstValueFrom(
-      api.invoke(getSessionByKey, { projectId: 'default', date: today }),
-    );
-    store.initializeSession(session);
-    return true;
-  } catch {
-    return redirect();
-  }
+  const session = route.data['session'] as SessionResponse | null;
+  if (!session) return redirect();
+
+  inject(LobbyStore).initializeSession(session);
+  return true;
 };

@@ -37,7 +37,7 @@ describe('EntryStore – createLobby', () => {
 // ─── joinLobby ───────────────────────────────────────────────────────────────
 
 describe('EntryStore – joinLobby', () => {
-  it("calls registerPlayer then joinSessionByKey for today's date, then navigates to /lobby", async () => {
+  it("calls registerPlayer then joinSessionByKey for today's date, then navigates to /session/default/<today>/lobby", async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(EntryStore);
     const http = TestBed.inject(HttpTestingController);
@@ -56,6 +56,6 @@ describe('EntryStore – joinLobby', () => {
 
     await promise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/lobby']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', today, 'lobby']);
   });
 });
