@@ -30,10 +30,10 @@ describe('Entry – idle state', () => {
   it('shows Company ID, Display Name inputs and both action buttons', async () => {
     await render(Entry, { providers: PROVIDERS });
 
-    screen.getByRole('textbox', { name: /firmen-id/i });
-    screen.getByRole('textbox', { name: /anzeigename/i });
-    screen.getByRole('button', { name: /lobby beitreten/i });
-    screen.getByRole('button', { name: /lobby erstellen/i });
+    screen.getByRole('textbox', { name: 'Firmen-ID' });
+    screen.getByRole('textbox', { name: 'Anzeigename' });
+    screen.getByRole('button', { name: 'Lobby beitreten' });
+    screen.getByRole('button', { name: 'Lobby erstellen' });
   });
 });
 
@@ -48,8 +48,8 @@ describe('Entry – pre-fill from storage', () => {
 
     await render(Entry, { providers: PROVIDERS });
 
-    expect(screen.getByRole('textbox', { name: /firmen-id/i })).toHaveValue('acme');
-    expect(screen.getByRole('textbox', { name: /anzeigename/i })).toHaveValue('Alice');
+    expect(screen.getByRole('textbox', { name: 'Firmen-ID' })).toHaveValue('acme');
+    expect(screen.getByRole('textbox', { name: 'Anzeigename' })).toHaveValue('Alice');
   });
 });
 
@@ -61,9 +61,9 @@ describe('Entry – error phase', () => {
     await render(Entry, { providers: PROVIDERS });
     const http = TestBed.inject(HttpTestingController);
 
-    await user.type(screen.getByRole('textbox', { name: /firmen-id/i }), 'acme');
-    await user.type(screen.getByRole('textbox', { name: /anzeigename/i }), 'Alice');
-    await user.click(screen.getByRole('button', { name: /lobby beitreten/i }));
+    await user.type(screen.getByRole('textbox', { name: 'Firmen-ID' }), 'acme');
+    await user.type(screen.getByRole('textbox', { name: 'Anzeigename' }), 'Alice');
+    await user.click(screen.getByRole('button', { name: 'Lobby beitreten' }));
 
     http
       .expectOne('/api/v1/players')
@@ -82,8 +82,8 @@ describe('Entry – validation', () => {
     const user = userEvent.setup();
     await render(Entry, { providers: PROVIDERS });
 
-    await user.click(screen.getByRole('button', { name: /lobby beitreten/i }));
+    await user.click(screen.getByRole('button', { name: 'Lobby beitreten' }));
 
-    await screen.findAllByText(/pflichtfeld/i);
+    await screen.findAllByText('Pflichtfeld');
   });
 });

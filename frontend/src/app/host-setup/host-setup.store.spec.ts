@@ -107,7 +107,7 @@ describe('HostSetupStore – createSession', () => {
     await promise;
 
     expect(store.phase()).toBe('error');
-    expect(store.errorMessage()).toMatch(/etwas ist schiefgelaufen/i);
+    expect(store.errorMessage()).toBe('Etwas ist schiefgelaufen. Bitte erneut versuchen.');
     expect(store.canSubmit()).toBe(true);
   });
 });

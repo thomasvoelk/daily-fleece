@@ -15,7 +15,7 @@ interface ParsedEntry {
   messageParts: TemplateStringsArray;
   placeholderNames: string[];
 }
-const cookedTranslations: Record<string, string> = {};
+const translationStrings: Record<string, string> = {};
 for (const [id, raw] of Object.entries(translations)) {
   const parsed = raw as unknown as ParsedEntry;
   const parts = parsed.messageParts;
@@ -24,10 +24,10 @@ for (const [id, raw] of Object.entries(translations)) {
   for (let i = 0; i < names.length; i++) {
     cooked += `{$${names[i]}}` + parts[i + 1];
   }
-  cookedTranslations[id] = cooked;
+  translationStrings[id] = cooked;
 }
 
-loadTranslations(cookedTranslations);
+loadTranslations(translationStrings);
 
 // JSDOM doesn't implement the Canvas API. Angular CDK probes for canvas capabilities
 // during component rendering, which produces "Not implemented: HTMLCanvasElement.getContext"

@@ -352,7 +352,7 @@ describe('Results – Zum Leaderboard button', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate');
 
-    await user.click(screen.getByRole('button', { name: /leaderboard/i }));
+    await user.click(screen.getByRole('button', { name: 'Zum Leaderboard' }));
 
     expect(navigateSpy).toHaveBeenCalledWith(['/leaderboard']);
   });

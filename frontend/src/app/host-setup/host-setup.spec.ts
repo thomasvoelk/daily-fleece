@@ -27,7 +27,7 @@ describe('HostSetup – a11y', () => {
 describe('HostSetup – initial state', () => {
   it('"Create Session" button is aria-disabled when no files are selected', async () => {
     await render(HostSetup, { providers: PROVIDERS });
-    expect(screen.getByRole('button', { name: /session erstellen/i })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Session erstellen' })).toHaveAttribute(
       'aria-disabled',
       'true',
     );
@@ -40,13 +40,13 @@ describe('HostSetup – file selection', () => {
   it('does not update preview when a change event fires without a file', async () => {
     await render(HostSetup, { providers: PROVIDERS });
 
-    const q1Input = screen.getByLabelText(/f1|wissen/i);
-    const q2Input = screen.getByLabelText(/f2|geografie/i);
+    const q1Input = screen.getByLabelText('F1 — Wissen (Kalenderblatt)');
+    const q2Input = screen.getByLabelText('F2 — Geografie (Ort)');
     fireEvent.change(q1Input);
     fireEvent.change(q2Input);
 
     // "Create Session" remains disabled — no files were selected
-    expect(screen.getByRole('button', { name: /session erstellen/i })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Session erstellen' })).toHaveAttribute(
       'aria-disabled',
       'true',
     );
@@ -56,12 +56,12 @@ describe('HostSetup – file selection', () => {
     const user = userEvent.setup();
     await render(HostSetup, { providers: PROVIDERS });
 
-    const q1Input = screen.getByLabelText(/f1|wissen/i);
-    const q2Input = screen.getByLabelText(/f2|geografie/i);
+    const q1Input = screen.getByLabelText('F1 — Wissen (Kalenderblatt)');
+    const q2Input = screen.getByLabelText('F2 — Geografie (Ort)');
 
     await user.upload(q1Input, new File(['img'], 'q1.jpg', { type: 'image/jpeg' }));
     await user.upload(q2Input, new File(['img'], 'q2.jpg', { type: 'image/jpeg' }));
 
-    expect(screen.getByRole('button', { name: /session erstellen/i })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Session erstellen' })).not.toBeDisabled();
   });
 });

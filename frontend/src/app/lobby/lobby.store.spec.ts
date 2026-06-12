@@ -72,7 +72,7 @@ describe('LobbyStore – goToQuiz', () => {
     http.expectOne('/api/v1/sessions/default/2026-05-31').flush(makeSession({ phase: 'Lobby' }));
     await promise;
 
-    expect(store.error()).toMatch(/noch nicht gestartet/i);
+    expect(store.error()).toBe('Quiz noch nicht gestartet. Bitte warten.');
     expect(navigateSpy).not.toHaveBeenCalled();
   });
 });

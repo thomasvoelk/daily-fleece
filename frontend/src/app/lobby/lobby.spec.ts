@@ -112,7 +112,7 @@ describe('Lobby – Start Quiz button', () => {
     TestBed.inject(LobbyStore).initializeSession(makeSession({ hostId: 'host-1' }));
     fixture.detectChanges();
 
-    screen.getByRole('button', { name: /quiz starten/i });
+    screen.getByRole('button', { name: 'Quiz starten' });
   });
 
   it('is absent for a regular player', async () => {
@@ -124,7 +124,7 @@ describe('Lobby – Start Quiz button', () => {
     TestBed.inject(LobbyStore).initializeSession(makeSession({ hostId: 'host-1' }));
     fixture.detectChanges();
 
-    expect(screen.queryByRole('button', { name: /quiz starten/i })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Quiz starten' })).toBeNull();
   });
 });
 
@@ -140,7 +140,7 @@ describe('Lobby – Go to Quiz button', () => {
     TestBed.inject(LobbyStore).initializeSession(makeSession({ hostId: 'host-1' }));
     fixture.detectChanges();
 
-    screen.getByRole('button', { name: /zum quiz/i });
+    screen.getByRole('button', { name: 'Zum Quiz' });
   });
 
   it('shows error when session is still in Lobby phase', async () => {
@@ -152,12 +152,12 @@ describe('Lobby – Go to Quiz button', () => {
     store.initializeSession(makeSession({ players: [{ playerId: 'p1', displayName: 'Alice' }] }));
     fixture.detectChanges();
 
-    await user.click(screen.getByRole('button', { name: /zum quiz/i }));
+    await user.click(screen.getByRole('button', { name: 'Zum Quiz' }));
     http
       .expectOne('/api/v1/sessions/default/2026-05-31')
       .flush(makeSession({ phase: 'Lobby', players: [{ playerId: 'p1', displayName: 'Alice' }] }));
 
-    await screen.findByText(/noch nicht gestartet/i);
+    await screen.findByText('Quiz noch nicht gestartet. Bitte warten.');
     expect(screen.getByText('Alice')).toBeTruthy();
   });
 });

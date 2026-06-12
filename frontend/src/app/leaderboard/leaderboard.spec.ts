@@ -164,7 +164,7 @@ describe('Leaderboard – presentation glyph in display name', () => {
     );
 
     // Ali🐰e gets a visual alignment bonus, ranking her above Bob despite fewer raw points
-    await screen.findByRole('row', { name: /Ali.*e/i });
+    await screen.findByRole('row', { name: 'Ali🐰e' });
     screen.getByRole('row', { name: 'Bob' });
   });
 });
