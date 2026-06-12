@@ -81,7 +81,7 @@ describe('Quiz – Q1 photo', () => {
   it('renders the photo for the active session', async () => {
     await renderQuiz({ session: signal(makeSession()) });
 
-    const img = screen.getByRole('img', { name: /question 1/i });
+    const img = screen.getByRole('img', { name: /frage 1/i });
     expect(img).toHaveAttribute('src', '/api/v1/sessions/default/2026-06-02/photos/q1');
   });
 
@@ -101,7 +101,7 @@ describe('Quiz – Q1 photo', () => {
       ],
     });
 
-    expect(screen.getByRole('img', { name: /question 1/i })).toHaveAttribute(
+    expect(screen.getByRole('img', { name: /frage 1/i })).toHaveAttribute(
       'src',
       '/proxy/api/v2/sessions/default/2026-06-02/photos/q1',
     );
@@ -114,7 +114,7 @@ describe('Quiz – answer radio buttons', () => {
   it('shows A, B, C as radio inputs', async () => {
     await renderQuiz();
 
-    const answerGroup = screen.getByRole('radiogroup', { name: /answer/i });
+    const answerGroup = screen.getByRole('radiogroup', { name: /antwort/i });
     within(answerGroup).getByRole('radio', { name: 'A' });
     within(answerGroup).getByRole('radio', { name: 'B' });
     within(answerGroup).getByRole('radio', { name: 'C' });
@@ -123,7 +123,7 @@ describe('Quiz – answer radio buttons', () => {
   it("checks the radio matching the player's submitted answer", async () => {
     await renderQuiz({ myQ1Answer: signal('B' as const) });
 
-    const answerGroup = screen.getByRole('radiogroup', { name: /answer/i });
+    const answerGroup = screen.getByRole('radiogroup', { name: /antwort/i });
     expect(within(answerGroup).getByRole('radio', { name: 'B' })).toBeChecked();
     expect(within(answerGroup).getByRole('radio', { name: 'A' })).not.toBeChecked();
     expect(within(answerGroup).getByRole('radio', { name: 'C' })).not.toBeChecked();
@@ -131,12 +131,12 @@ describe('Quiz – answer radio buttons', () => {
 
   it('hides Q1 A/B/C radio group when Q2 voting is open', async () => {
     await renderQuiz({ q1Status: signal('Closed' as const), q2Status: signal('Open' as const) });
-    expect(screen.queryByRole('radiogroup', { name: /answer/i })).toBeNull();
+    expect(screen.queryByRole('radiogroup', { name: /antwort/i })).toBeNull();
   });
 
   it('hides Q1 A/B/C radio group when Q1 voting is Closed', async () => {
     await renderQuiz({ q1Status: signal('Closed' as const) });
-    expect(screen.queryByRole('radiogroup', { name: /answer/i })).toBeNull();
+    expect(screen.queryByRole('radiogroup', { name: /antwort/i })).toBeNull();
   });
 
   it('calls submitQ1Answer when a radio is clicked', async () => {
@@ -144,7 +144,7 @@ describe('Quiz – answer radio buttons', () => {
     const submitQ1Answer = vi.fn();
     await renderQuiz({ submitQ1Answer });
 
-    const answerGroup = screen.getByRole('radiogroup', { name: /answer/i });
+    const answerGroup = screen.getByRole('radiogroup', { name: /antwort/i });
     await user.click(within(answerGroup).getByRole('radio', { name: 'C' }));
 
     expect(submitQ1Answer).toHaveBeenCalledWith('C');
@@ -159,7 +159,7 @@ describe('Quiz – refresh button', () => {
     const refresh = vi.fn();
     await renderQuiz({ refresh });
 
-    await user.click(screen.getByRole('button', { name: /refresh/i }));
+    await user.click(screen.getByRole('button', { name: /neu laden/i }));
 
     expect(refresh).toHaveBeenCalled();
   });
@@ -171,7 +171,7 @@ describe('Quiz – answer count', () => {
   it('shows answered/total beantwortet', async () => {
     await renderQuiz({ answerCount: signal({ answered: 1, total: 3 }) });
 
-    screen.getByText(/1\/3 answered/i);
+    screen.getByText(/1\/3 beantwortet/i);
   });
 });
 
@@ -184,7 +184,7 @@ describe('Quiz – Q2 answer count', () => {
       q2AnswerCount: signal({ answered: 2, total: 4 }),
     });
 
-    screen.getByText(/2\/4 answered/i);
+    screen.getByText(/2\/4 beantwortet/i);
   });
 
   it('shows Q2 count and not Q1 count when Q2 is open', async () => {
@@ -194,8 +194,8 @@ describe('Quiz – Q2 answer count', () => {
       q2AnswerCount: signal({ answered: 3, total: 5 }),
     });
 
-    screen.getByText(/3\/5 answered/i);
-    expect(screen.queryByText(/1\/5 answered/i)).toBeNull();
+    screen.getByText(/3\/5 beantwortet/i);
+    expect(screen.queryByText(/1\/5 beantwortet/i)).toBeNull();
   });
 
   it('shows Q1 count when Q2 is not open', async () => {
@@ -205,8 +205,8 @@ describe('Quiz – Q2 answer count', () => {
       q2AnswerCount: signal({ answered: 3, total: 5 }),
     });
 
-    screen.getByText(/1\/5 answered/i);
-    expect(screen.queryByText(/3\/5 answered/i)).toBeNull();
+    screen.getByText(/1\/5 beantwortet/i);
+    expect(screen.queryByText(/3\/5 beantwortet/i)).toBeNull();
   });
 });
 
@@ -216,11 +216,11 @@ describe('Quiz – host controls', () => {
   it('shows correct-answer picker and Abstimmung schließen for host', async () => {
     await renderQuiz({ isHost: signal(true) });
 
-    const hostControls = screen.getByRole('region', { name: /host controls/i });
+    const hostControls = screen.getByRole('region', { name: /host-steuerung/i });
     within(hostControls).getByRole('radio', { name: 'A' });
     within(hostControls).getByRole('radio', { name: 'B' });
     within(hostControls).getByRole('radio', { name: 'C' });
-    screen.getByRole('button', { name: /close voting/i });
+    screen.getByRole('button', { name: /abstimmung schließen/i });
   });
 
   it('shows country picker and close Q2 voting button for host when Q2 is open', async () => {
@@ -230,9 +230,9 @@ describe('Quiz – host controls', () => {
       q2Status: signal('Open' as const),
     });
 
-    const hostControls = screen.getByRole('region', { name: /host controls/i });
-    within(hostControls).getByRole('combobox', { name: /correct country/i });
-    screen.getByRole('button', { name: /close voting/i });
+    const hostControls = screen.getByRole('region', { name: /host-steuerung/i });
+    within(hostControls).getByRole('combobox', { name: /richtige antwort/i });
+    screen.getByRole('button', { name: /abstimmung schließen/i });
   });
 
   it('close Q2 voting button is aria-disabled when no country is selected', async () => {
@@ -242,7 +242,7 @@ describe('Quiz – host controls', () => {
       q2Status: signal('Open' as const),
     });
 
-    expect(screen.getByRole('button', { name: /close voting/i })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: /abstimmung schließen/i })).toHaveAttribute(
       'aria-disabled',
       'true',
     );
@@ -251,7 +251,7 @@ describe('Quiz – host controls', () => {
   it('hides host controls for a non-host player', async () => {
     await renderQuiz();
 
-    expect(screen.queryByRole('button', { name: /close voting/i })).toBeNull();
+    expect(screen.queryByRole('button', { name: /abstimmung schließen/i })).toBeNull();
   });
 
   it('hides host controls section when both questions are already Closed', async () => {
@@ -261,13 +261,13 @@ describe('Quiz – host controls', () => {
       q2Status: signal('Closed' as const),
     });
 
-    expect(screen.queryByRole('region', { name: /host controls/i })).toBeNull();
+    expect(screen.queryByRole('region', { name: /host-steuerung/i })).toBeNull();
   });
 
   it('Abstimmung schließen is disabled until a correct answer is selected', async () => {
     await renderQuiz({ isHost: signal(true) });
 
-    expect(screen.getByRole('button', { name: /close voting/i })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: /abstimmung schließen/i })).toHaveAttribute(
       'aria-disabled',
       'true',
     );
@@ -283,12 +283,12 @@ describe('Quiz – host controls', () => {
       setQ2CorrectAnswer,
     });
 
-    const hostControls = screen.getByRole('region', { name: /host controls/i });
-    const input = within(hostControls).getByRole('combobox', { name: /correct country/i });
+    const hostControls = screen.getByRole('region', { name: /host-steuerung/i });
+    const input = within(hostControls).getByRole('combobox', { name: /richtige antwort/i });
     await user.click(input);
     const options = screen.getAllByRole('option');
     await user.click(options[0]);
-    await user.click(screen.getByRole('button', { name: /close voting/i }));
+    await user.click(screen.getByRole('button', { name: /abstimmung schließen/i }));
 
     expect(setQ2CorrectAnswer).toHaveBeenCalledWith(expect.any(String));
   });
@@ -301,8 +301,8 @@ describe('Quiz – host controls', () => {
       q2Status: signal('Open' as const),
     });
 
-    const hostControls = screen.getByRole('region', { name: /host controls/i });
-    const input = within(hostControls).getByRole('combobox', { name: /correct country/i });
+    const hostControls = screen.getByRole('region', { name: /host-steuerung/i });
+    const input = within(hostControls).getByRole('combobox', { name: /richtige antwort/i });
     await user.click(input);
     await user.type(input, 'deutsch');
 
@@ -316,9 +316,9 @@ describe('Quiz – host controls', () => {
     const setQ1CorrectAnswer = vi.fn();
     await renderQuiz({ isHost: signal(true), setQ1CorrectAnswer });
 
-    const hostControls = screen.getByRole('region', { name: /host controls/i });
+    const hostControls = screen.getByRole('region', { name: /host-steuerung/i });
     await user.click(within(hostControls).getByRole('radio', { name: 'B' }));
-    await user.click(screen.getByRole('button', { name: /close voting/i }));
+    await user.click(screen.getByRole('button', { name: /abstimmung schließen/i }));
 
     expect(setQ1CorrectAnswer).toHaveBeenCalledWith('B');
   });
@@ -337,7 +337,7 @@ describe('Quiz – Q1 photo lightbox', () => {
     const user = userEvent.setup();
     await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
 
-    await user.click(screen.getByRole('img', { name: 'Question 1' }));
+    await user.click(screen.getByRole('img', { name: 'Frage 1' }));
 
     expect(screen.getByRole('dialog')).toBeVisible();
   });
@@ -346,8 +346,8 @@ describe('Quiz – Q1 photo lightbox', () => {
     const user = userEvent.setup();
     await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
 
-    await user.click(screen.getByRole('img', { name: 'Question 1' }));
-    await user.click(screen.getByRole('img', { name: 'Question 1 enlarged' }));
+    await user.click(screen.getByRole('img', { name: 'Frage 1' }));
+    await user.click(screen.getByRole('img', { name: 'Frage 1 vergrößert' }));
 
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -356,8 +356,8 @@ describe('Quiz – Q1 photo lightbox', () => {
     const user = userEvent.setup();
     await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
 
-    await user.click(screen.getByRole('img', { name: 'Question 1' }));
-    await user.click(screen.getByRole('button', { name: 'Close lightbox' }));
+    await user.click(screen.getByRole('img', { name: 'Frage 1' }));
+    await user.click(screen.getByRole('button', { name: 'Lightbox schließen' }));
 
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -366,7 +366,7 @@ describe('Quiz – Q1 photo lightbox', () => {
     const user = userEvent.setup();
     await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
 
-    screen.getByRole('button', { name: 'Question 1' }).focus();
+    screen.getByRole('button', { name: 'Frage 1' }).focus();
     await user.keyboard('[Enter]');
 
     expect(screen.getByRole('dialog')).toBeVisible();
@@ -376,12 +376,12 @@ describe('Quiz – Q1 photo lightbox', () => {
     const user = userEvent.setup();
     await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
 
-    await user.click(screen.getByRole('img', { name: 'Question 1' }));
-    expect(screen.getByRole('img', { name: 'Question 1 enlarged' })).toBeVisible();
+    await user.click(screen.getByRole('img', { name: 'Frage 1' }));
+    expect(screen.getByRole('img', { name: 'Frage 1 vergrößert' })).toBeVisible();
 
     await user.keyboard('[Escape]');
 
-    expect(screen.queryByRole('img', { name: 'Question 1 enlarged' })).toBeNull();
+    expect(screen.queryByRole('img', { name: 'Frage 1 vergrößert' })).toBeNull();
   });
 });
 
@@ -394,14 +394,14 @@ describe('Quiz – Q2 photo', () => {
       session: signal(makeSession()),
     });
 
-    const img = screen.getByRole('img', { name: /question 2/i });
+    const img = screen.getByRole('img', { name: /frage 2/i });
     expect(img).toHaveAttribute('src', '/api/v1/sessions/default/2026-06-02/photos/q2');
   });
 
   it('does not render the Q2 photo when q2Status is null', async () => {
     await renderQuiz();
 
-    expect(screen.queryByRole('img', { name: /question 2/i })).toBeNull();
+    expect(screen.queryByRole('img', { name: /frage 2/i })).toBeNull();
   });
 });
 
@@ -424,7 +424,7 @@ describe('Quiz – Q2 photo lightbox', () => {
       session: signal(makeSession({ sessionId: 'abc' })),
     });
 
-    await user.click(screen.getByRole('img', { name: 'Question 2' }));
+    await user.click(screen.getByRole('img', { name: 'Frage 2' }));
 
     expect(screen.getByRole('dialog')).toBeVisible();
   });
@@ -436,8 +436,8 @@ describe('Quiz – Q2 photo lightbox', () => {
       session: signal(makeSession({ sessionId: 'abc' })),
     });
 
-    await user.click(screen.getByRole('img', { name: 'Question 2' }));
-    await user.click(screen.getByRole('img', { name: 'Question 2 enlarged' }));
+    await user.click(screen.getByRole('img', { name: 'Frage 2' }));
+    await user.click(screen.getByRole('img', { name: 'Frage 2 vergrößert' }));
 
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -449,8 +449,8 @@ describe('Quiz – Q2 photo lightbox', () => {
       session: signal(makeSession({ sessionId: 'abc' })),
     });
 
-    await user.click(screen.getByRole('img', { name: 'Question 2' }));
-    await user.click(screen.getByRole('button', { name: 'Close lightbox' }));
+    await user.click(screen.getByRole('img', { name: 'Frage 2' }));
+    await user.click(screen.getByRole('button', { name: 'Lightbox schließen' }));
 
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -462,12 +462,12 @@ describe('Quiz – Q2 photo lightbox', () => {
       session: signal(makeSession({ sessionId: 'abc' })),
     });
 
-    await user.click(screen.getByRole('img', { name: 'Question 2' }));
-    expect(screen.getByRole('img', { name: 'Question 2 enlarged' })).toBeVisible();
+    await user.click(screen.getByRole('img', { name: 'Frage 2' }));
+    expect(screen.getByRole('img', { name: 'Frage 2 vergrößert' })).toBeVisible();
 
     await user.keyboard('[Escape]');
 
-    expect(screen.queryByRole('img', { name: 'Question 2 enlarged' })).toBeNull();
+    expect(screen.queryByRole('img', { name: 'Frage 2 vergrößert' })).toBeNull();
   });
 });
 
@@ -477,13 +477,13 @@ describe('Quiz – Q2 country input', () => {
   it('shows country combobox when q2Status is Open', async () => {
     await renderQuiz({ q2Status: signal('Open' as const) });
 
-    screen.getByRole('combobox', { name: /your answer/i });
+    screen.getByRole('combobox', { name: /deine antwort/i });
   });
 
   it('hides country combobox when q2Status is not Open', async () => {
     await renderQuiz();
 
-    expect(screen.queryByRole('combobox', { name: /your answer/i })).toBeNull();
+    expect(screen.queryByRole('combobox', { name: /deine antwort/i })).toBeNull();
   });
 
   it('selecting a country option calls submitQ2Answer with the ISO code', async () => {
@@ -491,7 +491,7 @@ describe('Quiz – Q2 country input', () => {
     const submitQ2Answer = vi.fn();
     await renderQuiz({ q2Status: signal('Open' as const), submitQ2Answer });
 
-    const input = screen.getByRole('combobox', { name: /your answer/i });
+    const input = screen.getByRole('combobox', { name: /deine antwort/i });
     await user.click(input);
     await user.type(input, 'deutsch');
     const option = screen.getAllByRole('option')[0];
@@ -504,7 +504,7 @@ describe('Quiz – Q2 country input', () => {
     const user = userEvent.setup();
     await renderQuiz({ q2Status: signal('Open' as const) });
 
-    const input = screen.getByRole('combobox', { name: /your answer/i });
+    const input = screen.getByRole('combobox', { name: /deine antwort/i });
     await user.click(input);
     await user.type(input, 'deutsch');
 
@@ -519,7 +519,7 @@ describe('Quiz – Q2 country input', () => {
 describe('Quiz – category chip', () => {
   it('shows KNOWLEDGE chip during Q1 voting', async () => {
     await renderQuiz({ q1Status: signal('Open' as const) });
-    screen.getByText(/knowledge/i);
+    screen.getByText(/wer weiss denn sowas/i);
   });
 
   it('hides the KNOWLEDGE chip when Q1 voting is Closed', async () => {
@@ -527,12 +527,12 @@ describe('Quiz – category chip', () => {
       q1Status: signal('Closed' as const),
       q2Status: signal(null),
     });
-    expect(screen.queryByText(/knowledge/i)).toBeNull();
+    expect(screen.queryByText(/wer weiss denn sowas/i)).toBeNull();
   });
 
   it('shows GEOGRAPHY chip during Q2 voting', async () => {
     await renderQuiz({ q2Status: signal('Open' as const) });
-    screen.getByText(/geography/i);
+    screen.getByText(/erdkunde/i);
   });
 
   it('hides the GEOGRAPHY chip when Q2 voting is Closed', async () => {
@@ -540,6 +540,6 @@ describe('Quiz – category chip', () => {
       q1Status: signal('Closed' as const),
       q2Status: signal('Closed' as const),
     });
-    expect(screen.queryByText(/geography/i)).toBeNull();
+    expect(screen.queryByText(/erdkunde/i)).toBeNull();
   });
 });

@@ -17,7 +17,7 @@ describe('QuizHostReveal – close Q1 guard', () => {
     const closeQ1Spy = vi.fn();
     fixture.componentInstance.closeQ1Voting.subscribe(closeQ1Spy);
 
-    fireEvent.click(screen.getByRole('button', { name: /close voting/i }));
+    fireEvent.click(screen.getByRole('button', { name: /abstimmung schließen/i }));
 
     expect(closeQ1Spy).not.toHaveBeenCalled();
   });
@@ -34,7 +34,7 @@ describe('QuizHostReveal – close Q2 guard', () => {
     const closeQ2Spy = vi.fn();
     fixture.componentInstance.closeQ2Voting.subscribe(closeQ2Spy);
 
-    fireEvent.click(screen.getByRole('button', { name: /close voting/i }));
+    fireEvent.click(screen.getByRole('button', { name: /abstimmung schließen/i }));
 
     expect(closeQ2Spy).not.toHaveBeenCalled();
   });

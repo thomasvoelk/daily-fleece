@@ -16,16 +16,16 @@ async function renderComponent(onSelected?: (code: string) => void) {
 // ─── tracer bullet ────────────────────────────────────────────────────────────
 
 describe('CountryAutocomplete', () => {
-  it('renders a combobox labeled "Your answer" by default', async () => {
+  it('renders a combobox labeled "Deine Antwort" by default', async () => {
     await renderComponent();
-    screen.getByRole('combobox', { name: /your answer/i });
+    screen.getByRole('combobox', { name: /deine antwort/i });
   });
 
   it('typing filters the options to matching countries', async () => {
     const user = userEvent.setup();
     await renderComponent();
 
-    const input = screen.getByRole('combobox', { name: /your answer/i });
+    const input = screen.getByRole('combobox', { name: /deine antwort/i });
     await user.click(input);
     await user.type(input, 'deutsch');
 
@@ -39,7 +39,7 @@ describe('CountryAutocomplete', () => {
     const onSelected = vi.fn();
     await renderComponent(onSelected);
 
-    const input = screen.getByRole('combobox', { name: /your answer/i });
+    const input = screen.getByRole('combobox', { name: /deine antwort/i });
     await user.click(input);
     await user.type(input, 'deutsch');
     await user.click(screen.getAllByRole('option')[0]);
