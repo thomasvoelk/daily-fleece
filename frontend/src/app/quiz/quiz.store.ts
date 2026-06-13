@@ -110,6 +110,14 @@ export const QuizStore = signalStore(
         patchState(store, { session, error: null });
         if (session.phase === 'Ended') {
           await router.navigate(['/session', session.projectId, session.date, 'results']);
+        } else if (session.phase === 'Active') {
+          const { q1, q2 } = session.voting;
+          const active = store.activeQuestion();
+          if (active === 'q1' && q1.status === 'Closed' && q2.status === 'Open') {
+            await router.navigate(['/session', session.projectId, session.date, 'q2']);
+          } else if (active === 'q2' && q2.status === 'Closed' && q1.status === 'Open') {
+            await router.navigate(['/session', session.projectId, session.date, 'q1']);
+          }
         }
       },
 

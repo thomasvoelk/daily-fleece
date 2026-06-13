@@ -72,6 +72,7 @@ export async function completeQuizWithPlayer(
   await closeQ1Voting(page);
 
   await playerPage.getByRole('button', { name: 'Neu laden' }).click();
+  await expect(playerPage).toHaveURL(/\/q2/);
 
   const playerCountryInput = playerPage.getByRole('combobox', { name: 'Deine Antwort' });
   await playerCountryInput.click();

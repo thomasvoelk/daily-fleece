@@ -27,6 +27,13 @@ class LobbyStub {}
 })
 class ResultsStub {}
 
+@Component({
+  selector: 'app-quiz-stub',
+  template: '',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class QuizStub {}
+
 const PROVIDERS = [
   ...provideTestEnvironment(),
   provideRouter([
@@ -35,6 +42,8 @@ const PROVIDERS = [
       children: [
         { path: 'lobby', component: LobbyStub },
         { path: 'results', component: ResultsStub },
+        { path: 'q1', component: QuizStub },
+        { path: 'q2', component: QuizStub },
       ],
     },
   ]),
@@ -448,6 +457,46 @@ describe('QuizStore – refresh', () => {
     await promise;
 
     expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'results']);
+  });
+
+  it('navigates to /q2 when refreshing on q1 route and Q1 becomes Closed while Q2 opens', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate');
+
+    store.initializeSession(
+      makeSession({ voting: { q1: { status: 'Open' }, q2: { status: 'Open' } } }),
+      'q1',
+    );
+    const promise = store.refresh();
+    http
+      .expectOne('/api/v1/sessions/default/2026-06-02')
+      .flush(makeSession({ voting: { q1: { status: 'Closed' }, q2: { status: 'Open' } } }));
+    await promise;
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'q2']);
+  });
+
+  it('navigates to /q1 when refreshing on q2 route and Q2 becomes Closed while Q1 is Open', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate');
+
+    store.initializeSession(
+      makeSession({ voting: { q1: { status: 'Open' }, q2: { status: 'Open' } } }),
+      'q2',
+    );
+    const promise = store.refresh();
+    http
+      .expectOne('/api/v1/sessions/default/2026-06-02')
+      .flush(makeSession({ voting: { q1: { status: 'Open' }, q2: { status: 'Closed' } } }));
+    await promise;
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'q1']);
   });
 });
 

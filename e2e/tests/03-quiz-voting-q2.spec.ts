@@ -17,6 +17,7 @@ for (const order of ['player-first', 'host-first'] as const) {
       // ── both see Q2 photo ────────────────────────────────────────────────────
       await expect(page.getByRole('img', { name: 'Frage 2' })).toBeVisible();
       await playerPage.getByRole('button', { name: 'Neu laden' }).click();
+      await expect(playerPage).toHaveURL(/\/q2/);
       await expect(playerPage.getByRole('img', { name: 'Frage 2' })).toBeVisible();
 
       // ── Q1 A/B/C radio group is no longer shown ──────────────────────────────
