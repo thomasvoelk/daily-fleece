@@ -1,4 +1,3 @@
-import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 import { Entry } from './entry';
 import { Lobby, lobbyGuard, sessionResolver } from './lobby';
@@ -6,7 +5,6 @@ import { HostSetup, hasPlayerIdGuard } from './host-setup';
 import { Quiz, quizGuard } from './quiz';
 import { Results, resultsGuard } from './results';
 import { Leaderboard } from './leaderboard';
-import { TODAY } from './shared';
 
 export const routes: Routes = [
   { path: '', component: Entry },
@@ -20,34 +18,6 @@ export const routes: Routes = [
       { path: 'results', component: Results, canActivate: [resultsGuard] },
       { path: 'host', component: HostSetup, canActivate: [hasPlayerIdGuard] },
     ],
-  },
-  {
-    path: 'lobby',
-    redirectTo: () => {
-      const today = inject(TODAY);
-      return `/session/default/${today}/lobby`;
-    },
-  },
-  {
-    path: 'quiz',
-    redirectTo: () => {
-      const today = inject(TODAY);
-      return `/session/default/${today}/q1`;
-    },
-  },
-  {
-    path: 'host',
-    redirectTo: () => {
-      const today = inject(TODAY);
-      return `/session/default/${today}/host`;
-    },
-  },
-  {
-    path: 'results',
-    redirectTo: () => {
-      const today = inject(TODAY);
-      return `/session/default/${today}/results`;
-    },
   },
   { path: 'leaderboard', component: Leaderboard },
 ];

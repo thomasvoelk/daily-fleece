@@ -95,9 +95,9 @@ export const QuizStore = signalStore(
         );
         patchState(store, { session, error: null });
         if (session.phase === 'Ended') {
-          await router.navigate(['/results']);
+          await router.navigate(['/session', session.projectId, session.date, 'results']);
         } else if (session.phase !== 'Active') {
-          await router.navigate(['/lobby']);
+          await router.navigate(['/session', session.projectId, session.date, 'lobby']);
         }
       },
 
@@ -109,7 +109,7 @@ export const QuizStore = signalStore(
         );
         patchState(store, { session, error: null });
         if (session.phase === 'Ended') {
-          await router.navigate(['/results']);
+          await router.navigate(['/session', session.projectId, session.date, 'results']);
         }
       },
 
@@ -173,7 +173,7 @@ export const QuizStore = signalStore(
           }),
         );
         patchState(store, { session: updated, error: null });
-        await router.navigate(['/results']);
+        await router.navigate(['/session', updated.projectId, updated.date, 'results']);
       },
     };
   }),

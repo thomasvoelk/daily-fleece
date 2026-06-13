@@ -43,7 +43,7 @@ export const EntryStore = signalStore(
             api.invoke(registerPlayer, { body: { companyId, displayName } }),
           );
           patchState(store, { playerId: player.playerId, companyId, displayName, phase: 'idle' });
-          await router.navigate(['/host']);
+          await router.navigate(['/session', 'default', today, 'host']);
         } catch {
           patchState(store, {
             phase: 'error',

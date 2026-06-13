@@ -30,8 +30,13 @@ class ResultsStub {}
 const PROVIDERS = [
   ...provideTestEnvironment(),
   provideRouter([
-    { path: 'lobby', component: LobbyStub },
-    { path: 'results', component: ResultsStub },
+    {
+      path: 'session/:projectId/:date',
+      children: [
+        { path: 'lobby', component: LobbyStub },
+        { path: 'results', component: ResultsStub },
+      ],
+    },
   ]),
   QuizStore,
 ];
@@ -430,7 +435,7 @@ describe('QuizStore – refresh', () => {
     expect(navigateSpy).not.toHaveBeenCalled();
   });
 
-  it('navigates to /results when session phase is Ended', async () => {
+  it('navigates to /session/default/2026-06-02/results when session phase is Ended', async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
@@ -442,7 +447,7 @@ describe('QuizStore – refresh', () => {
     http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ phase: 'Ended' }));
     await promise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/results']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'results']);
   });
 });
 
@@ -462,7 +467,7 @@ describe('QuizStore – loadSession', () => {
     expect(store.session()?.sessionId).toBe('abc');
   });
 
-  it('redirects to /lobby when session is not Active', async () => {
+  it('redirects to /session/default/2026-06-02/lobby when session is not Active', async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
@@ -474,10 +479,10 @@ describe('QuizStore – loadSession', () => {
     http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ phase: 'Lobby' }));
     await promise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/lobby']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'lobby']);
   });
 
-  it('redirects to /results when session is Ended', async () => {
+  it('redirects to /session/default/2026-06-02/results when session is Ended', async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
@@ -489,7 +494,7 @@ describe('QuizStore – loadSession', () => {
     http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ phase: 'Ended' }));
     await promise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/results']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'results']);
   });
 });
 
@@ -528,6 +533,6 @@ describe('QuizStore – setQ2CorrectAnswer navigates to results', () => {
     );
     await closePromise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/results']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'results']);
   });
 });
