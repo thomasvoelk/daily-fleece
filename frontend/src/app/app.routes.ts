@@ -4,7 +4,7 @@ import { Entry } from './entry';
 import { Lobby, lobbyGuard, sessionResolver } from './lobby';
 import { HostSetup, hasPlayerIdGuard } from './host-setup';
 import { Quiz, quizGuard } from './quiz';
-import { Results } from './results';
+import { Results, resultsGuard } from './results';
 import { Leaderboard } from './leaderboard';
 import { TODAY } from './shared';
 
@@ -17,6 +17,7 @@ export const routes: Routes = [
       { path: 'lobby', component: Lobby, canActivate: [lobbyGuard] },
       { path: 'q1', component: Quiz, canActivate: [quizGuard] },
       { path: 'q2', component: Quiz, canActivate: [quizGuard] },
+      { path: 'results', component: Results, canActivate: [resultsGuard] },
     ],
   },
   {
@@ -34,6 +35,12 @@ export const routes: Routes = [
     },
   },
   { path: 'host', component: HostSetup, canActivate: [hasPlayerIdGuard] },
-  { path: 'results', component: Results },
+  {
+    path: 'results',
+    redirectTo: () => {
+      const today = inject(TODAY);
+      return `/session/default/${today}/results`;
+    },
+  },
   { path: 'leaderboard', component: Leaderboard },
 ];

@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { ResultsStore } from './results.store';
 import { provideTestEnvironment, mockLocalStorage } from '../shared/testing';
-import { PlayerResult, SessionResultsResponse } from '../backend-client';
+import { PlayerResult, SessionResponse, SessionResultsResponse } from '../backend-client';
 mockLocalStorage();
 
 const TODAY = '2026-06-12';
@@ -17,6 +17,19 @@ function makeResults(overrides: Partial<SessionResultsResponse> = {}): SessionRe
     q1CorrectAnswer: null,
     q2CorrectAnswer: null,
     results: [],
+    ...overrides,
+  };
+}
+
+function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse {
+  return {
+    sessionId: 's1',
+    projectId: 'default',
+    date: TODAY,
+    phase: 'Ended',
+    hostId: 'h1',
+    players: [],
+    voting: { q1: { status: 'Closed' }, q2: { status: 'Closed' } },
     ...overrides,
   };
 }
@@ -65,6 +78,7 @@ describe('ResultsStore – load', () => {
     const store = TestBed.inject(ResultsStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const loadPromise = store.load();
     http.expectOne(RESULTS_URL).flush(
       makeResults({
@@ -91,6 +105,7 @@ describe('ResultsStore – myResult', () => {
     const store = TestBed.inject(ResultsStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const loadPromise = store.load();
     http.expectOne(RESULTS_URL).flush(
       makeResults({
@@ -116,6 +131,7 @@ describe('ResultsStore – myResult', () => {
     const store = TestBed.inject(ResultsStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const loadPromise = store.load();
     http.expectOne(RESULTS_URL).flush(makeResults());
     await loadPromise;
@@ -136,6 +152,7 @@ describe('ResultsStore – sortedResults', () => {
     const store = TestBed.inject(ResultsStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const loadPromise = store.load();
     http.expectOne(RESULTS_URL).flush(
       makeResults({
@@ -171,6 +188,7 @@ describe('ResultsStore – q1CorrectAnswer / q2CorrectAnswer', () => {
     const store = TestBed.inject(ResultsStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const loadPromise = store.load();
     http.expectOne(RESULTS_URL).flush(makeResults({ q1CorrectAnswer: 'B', q2CorrectAnswer: 'FR' }));
     await loadPromise;
@@ -187,6 +205,7 @@ describe('ResultsStore – q1CorrectAnswer / q2CorrectAnswer', () => {
     const store = TestBed.inject(ResultsStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const loadPromise = store.load();
     http.expectOne(RESULTS_URL).flush(makeResults({ q1CorrectAnswer: 'B', q2CorrectAnswer: 'FR' }));
     await loadPromise;
@@ -207,6 +226,7 @@ describe('ResultsStore – correctCount with partial correct answers', () => {
     const store = TestBed.inject(ResultsStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const loadPromise = store.load();
     http.expectOne(RESULTS_URL).flush(
       makeResults({
@@ -231,6 +251,7 @@ describe('ResultsStore – enrichedResults', () => {
     const store = TestBed.inject(ResultsStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const loadPromise = store.load();
     http.expectOne(RESULTS_URL).flush(
       makeResults({
@@ -281,6 +302,7 @@ describe('ResultsStore – enrichedResults', () => {
     const store = TestBed.inject(ResultsStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initializeSession(makeSession());
     const loadPromise = store.load();
     http.expectOne(RESULTS_URL).flush(
       makeResults({

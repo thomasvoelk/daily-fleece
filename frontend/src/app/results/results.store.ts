@@ -1,9 +1,13 @@
 import { computed, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
-import { Api, getSessionResultsByKey, SessionResultsResponse } from '../backend-client';
+import {
+  Api,
+  getSessionResultsByKey,
+  SessionResponse,
+  SessionResultsResponse,
+} from '../backend-client';
 import { EntryContext } from '../entry';
-import { TODAY } from '../shared';
 
 export interface EnrichedResult {
   playerId: string;
@@ -16,12 +20,13 @@ export interface EnrichedResult {
 }
 
 interface ResultsState {
+  session: SessionResponse | null;
   data: SessionResultsResponse | null;
 }
 
 export const ResultsStore = signalStore(
   { providedIn: 'root' },
-  withState<ResultsState>({ data: null }),
+  withState<ResultsState>({ session: null, data: null }),
   withComputed((store) => {
     const entry = inject(EntryContext);
     return {
@@ -66,11 +71,15 @@ export const ResultsStore = signalStore(
   })),
   withMethods((store) => {
     const api = inject(Api);
-    const today = inject(TODAY);
     return {
+      initializeSession(session: SessionResponse): void {
+        patchState(store, { session });
+      },
       async load(): Promise<void> {
+        const date = store.session()?.date;
+        if (!date) return;
         const data = await firstValueFrom(
-          api.invoke(getSessionResultsByKey, { projectId: 'default', date: today }),
+          api.invoke(getSessionResultsByKey, { projectId: 'default', date }),
         );
         patchState(store, { data });
       },
