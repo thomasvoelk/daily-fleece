@@ -134,6 +134,10 @@
         <source>Choose your answer</source>
         <target>Antwort auswählen</target>
       </trans-unit>
+      <trans-unit id="quiz.endedQ1Legend" datatype="html">
+        <source>Your Q1 answer</source>
+        <target>Deine Antwort auf Frage 1</target>
+      </trans-unit>
       <trans-unit id="quiz.hostAnswerFieldsetLegend" datatype="html">
         <source>Pick correct answer</source>
         <target>Richtige Antwort auswählen</target>

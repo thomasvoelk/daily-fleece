@@ -38,6 +38,7 @@ function makeStoreMock(
     myQ1Answer: signal(null),
     myQ2Answer: signal(null),
     isHost: signal(false),
+    activeQuestion: signal('q1' as const),
     submitQ1Answer: vi.fn(),
     submitQ2Answer: vi.fn(),
     refresh: vi.fn(),
@@ -541,5 +542,80 @@ describe('Quiz – category chip', () => {
       q2Status: signal('Closed' as const),
     });
     expect(screen.queryByText('ERDKUNDE')).toBeNull();
+  });
+});
+
+// ─── Ended session: personal highlight ───────────────────────────────────────
+
+describe('Quiz – Ended Q2: personal highlight', () => {
+  const endedSession = makeSession({
+    phase: 'Ended',
+    voting: { q1: { status: 'Closed' }, q2: { status: 'Closed' } },
+  });
+
+  it("shows the player's submitted q2 country answer highlighted in the Ended view", async () => {
+    await renderQuiz({
+      session: signal(endedSession),
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Closed' as const),
+      myQ2Answer: signal('FR'),
+      activeQuestion: signal('q2' as const),
+    });
+
+    expect(screen.getByText('Frankreich')).toHaveAttribute('aria-current', 'true');
+  });
+
+  it('shows no highlighted country when player has no submitted q2 answer', async () => {
+    await renderQuiz({
+      session: signal(endedSession),
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Closed' as const),
+      myQ2Answer: signal(null),
+      activeQuestion: signal('q2' as const),
+    });
+
+    expect(screen.queryByRole('mark')).toBeNull();
+  });
+});
+
+describe('Quiz – Ended Q1: personal highlight', () => {
+  const endedSession = makeSession({
+    phase: 'Ended',
+    voting: { q1: { status: 'Closed' }, q2: { status: 'Closed' } },
+  });
+
+  it("shows the player's submitted q1 answer highlighted (aria-current) in the Ended view", async () => {
+    await renderQuiz({
+      session: signal(endedSession),
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Closed' as const),
+      myQ1Answer: signal('B' as const),
+      activeQuestion: signal('q1' as const),
+    });
+
+    const list = screen.getByRole('list', { name: 'Deine Antwort auf Frage 1' });
+    expect(within(list).getByRole('listitem', { name: 'B' })).toHaveAttribute(
+      'aria-current',
+      'true',
+    );
+    expect(within(list).getByRole('listitem', { name: 'A' })).not.toHaveAttribute('aria-current');
+    expect(within(list).getByRole('listitem', { name: 'C' })).not.toHaveAttribute('aria-current');
+  });
+
+  it('shows no highlighted option for q1 when player has no submitted answer', async () => {
+    await renderQuiz({
+      session: signal(endedSession),
+      q1Status: signal('Closed' as const),
+      q2Status: signal('Closed' as const),
+      myQ1Answer: signal(null),
+      activeQuestion: signal('q1' as const),
+    });
+
+    const list = screen.getByRole('list', { name: 'Deine Antwort auf Frage 1' });
+    within(list)
+      .getAllByRole('listitem')
+      .forEach((item) => {
+        expect(item).not.toHaveAttribute('aria-current');
+      });
   });
 });

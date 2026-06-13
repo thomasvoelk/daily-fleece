@@ -106,6 +106,43 @@
           </fieldset>
         }
 
+        @if (session.phase === 'Ended' && currentQuestion() === 'q1') {
+          <ul
+            class="m-0 flex list-none flex-col gap-2 px-4 py-2"
+            i18n-aria-label="quiz|Read-only Q1 answer list in Ended session@@quiz.endedQ1Legend"
+            aria-label="Your Q1 answer"
+          >
+            @for (option of ['A', 'B', 'C']; track option) {
+              <li
+                [attr.aria-label]="option"
+                [attr.aria-current]="quizStore.myQ1Answer() === option ? 'true' : null"
+                class="flex items-center justify-center rounded-2xl border-2 px-3 py-[18px] font-display text-[28px] font-bold shadow-1"
+                [class.border-grape]="quizStore.myQ1Answer() === option"
+                [class.bg-grape-200]="quizStore.myQ1Answer() === option"
+                [class.text-grape]="quizStore.myQ1Answer() === option"
+                [class.border-wool-line]="quizStore.myQ1Answer() !== option"
+                [class.bg-paper]="quizStore.myQ1Answer() !== option"
+                [class.text-plum]="quizStore.myQ1Answer() !== option"
+              >
+                {{ option }}
+              </li>
+            }
+          </ul>
+        }
+
+        @if (session.phase === 'Ended' && currentQuestion() === 'q2') {
+          <div class="px-4 py-2">
+            @if (quizStore.myQ2Answer(); as answer) {
+              <div
+                aria-current="true"
+                class="rounded-2xl border-2 border-grape bg-grape-200 px-4 py-[18px] font-display text-[20px] font-bold text-grape"
+              >
+                {{ countryName(answer) }}
+              </div>
+            }
+          </div>
+        }
+
         @if (
           quizStore.isHost() && (quizStore.q1Status() === 'Open' || quizStore.q2Status() === 'Open')
         ) {

@@ -30,6 +30,6 @@ export const quizGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
     }
   }
 
-  inject(QuizStore).initializeSession(session);
+  inject(QuizStore).initializeSession(session, routeType === 'q2' ? 'q2' : 'q1');
   return true;
 };

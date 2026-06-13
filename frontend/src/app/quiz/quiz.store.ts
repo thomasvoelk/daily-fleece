@@ -16,6 +16,7 @@ interface QuizState {
   error: string | null;
   ownQ1Answer: 'A' | 'B' | 'C' | null;
   ownQ2Answer: string | null;
+  activeQuestion: 'q1' | 'q2';
 }
 
 export const QuizStore = signalStore(
@@ -25,6 +26,7 @@ export const QuizStore = signalStore(
     error: null,
     ownQ1Answer: null,
     ownQ2Answer: null,
+    activeQuestion: 'q1',
   }),
   withComputed((store) => {
     const entryStore = inject(EntryContext);
@@ -81,8 +83,8 @@ export const QuizStore = signalStore(
     }
 
     return {
-      initializeSession(session: SessionResponse): void {
-        patchState(store, { session, error: null });
+      initializeSession(session: SessionResponse, question: 'q1' | 'q2' = 'q1'): void {
+        patchState(store, { session, error: null, activeQuestion: question });
       },
 
       async loadSession(): Promise<void> {
