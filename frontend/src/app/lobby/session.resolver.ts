@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, ResolveFn, Router, UrlTree } from '@angular/rou
 import { firstValueFrom } from 'rxjs';
 import { Api, getSessionByKey, SessionResponse } from '../backend-client';
 
-export const sessionResolver: ResolveFn<SessionResponse | UrlTree> = async (
+export const sessionResolver: ResolveFn<SessionResponse | UrlTree | null> = async (
   route: ActivatedRouteSnapshot,
 ) => {
   const api = inject(Api);
@@ -11,9 +11,10 @@ export const sessionResolver: ResolveFn<SessionResponse | UrlTree> = async (
   const projectId = route.paramMap.get('projectId');
   const date = route.paramMap.get('date');
   if (!projectId || !date) return router.createUrlTree(['/']);
+  const isHostRoute = route.firstChild?.routeConfig?.path === 'host';
   try {
     return await firstValueFrom(api.invoke(getSessionByKey, { projectId, date }));
   } catch {
-    return router.createUrlTree(['/']);
+    return isHostRoute ? null : router.createUrlTree(['/']);
   }
 };

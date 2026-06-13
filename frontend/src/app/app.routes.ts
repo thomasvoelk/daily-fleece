@@ -18,6 +18,7 @@ export const routes: Routes = [
       { path: 'q1', component: Quiz, canActivate: [quizGuard] },
       { path: 'q2', component: Quiz, canActivate: [quizGuard] },
       { path: 'results', component: Results, canActivate: [resultsGuard] },
+      { path: 'host', component: HostSetup, canActivate: [hasPlayerIdGuard] },
     ],
   },
   {
@@ -34,7 +35,13 @@ export const routes: Routes = [
       return `/session/default/${today}/q1`;
     },
   },
-  { path: 'host', component: HostSetup, canActivate: [hasPlayerIdGuard] },
+  {
+    path: 'host',
+    redirectTo: () => {
+      const today = inject(TODAY);
+      return `/session/default/${today}/host`;
+    },
+  },
   {
     path: 'results',
     redirectTo: () => {
