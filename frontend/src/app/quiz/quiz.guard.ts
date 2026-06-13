@@ -1,17 +1,38 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { EntryContext } from '../entry';
-import { SessionResponse } from '../backend-client';
+import { Api, getSessionByKey, SessionResponse } from '../backend-client';
 import { sessionAccessPolicy, RouteType } from '../session';
 import { QuizStore } from './quiz.store';
 
-export const quizGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+async function resolveSession(
+  route: ActivatedRouteSnapshot,
+  api: Api,
+): Promise<SessionResponse | null> {
+  const fromData = route.data['session'] as SessionResponse | null;
+  if (fromData) return fromData;
+  const projectId = route.parent?.paramMap.get('projectId');
+  const date = route.parent?.paramMap.get('date');
+  if (!projectId || !date) return null;
+  try {
+    return await firstValueFrom(api.invoke(getSessionByKey, { projectId, date }));
+  } catch {
+    return null;
+  }
+}
+
+export const quizGuard: CanActivateFn = async (route: ActivatedRouteSnapshot) => {
   const router = inject(Router);
-  const session = route.data['session'] as SessionResponse | null;
+  const api = inject(Api);
+  const entryContext = inject(EntryContext);
+  const quizStore = inject(QuizStore);
+
+  const session = await resolveSession(route, api);
 
   if (!session) return router.createUrlTree(['/']);
 
-  const hasIdentity = !!inject(EntryContext).playerId();
+  const hasIdentity = !!entryContext.playerId();
   const urlSegment = route.url[route.url.length - 1]?.path ?? 'q1';
   const routeType: RouteType = urlSegment === 'q2' ? 'q2' : 'q1';
 
@@ -30,6 +51,6 @@ export const quizGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
     }
   }
 
-  inject(QuizStore).initializeSession(session, routeType === 'q2' ? 'q2' : 'q1');
+  quizStore.initializeSession(session, routeType === 'q2' ? 'q2' : 'q1');
   return true;
 };

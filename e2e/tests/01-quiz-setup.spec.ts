@@ -45,13 +45,13 @@ test('full pre-game flow: lobby creation, player join, and quiz start', async ({
   await expect(playerPage.getByRole('alert')).toHaveText('Quiz noch nicht gestartet. Bitte warten.');
   await expect(playerPage).toHaveURL(/\/session\/default\/.*\/lobby/);
 
-  // Host clicks "Quiz starten" → session Active, host auto-navigates to /quiz
+  // Host clicks "Quiz starten" → session Active, host auto-navigates to /q1
   await page.getByRole('button', { name: 'Quiz starten' }).click();
-  await expect(page).toHaveURL(/\/quiz/);
+  await expect(page).toHaveURL(/\/q[12]/);
 
-  // Player clicks "Zum Quiz" after host started → navigates to /quiz
+  // Player clicks "Zum Quiz" after host started → navigates to /q1
   await playerPage.getByRole('button', { name: 'Zum Quiz' }).click();
-  await expect(playerPage).toHaveURL(/\/quiz/);
+  await expect(playerPage).toHaveURL(/\/q[12]/);
 
   await playerContext.close();
 });
