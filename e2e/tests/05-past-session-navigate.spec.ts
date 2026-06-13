@@ -3,8 +3,6 @@ import fs from 'fs';
 import { Q1_PHOTO, Q2_PHOTO } from './helpers';
 
 const BACKEND = 'http://localhost:8080';
-const HOST_ID = 'a0000000-0000-0000-0000-000000000001';
-const PLAYER_ID = 'b0000000-0000-0000-0000-000000000002';
 
 function yesterday(): string {
   const d = new Date();
@@ -22,9 +20,21 @@ async function seedPastSession(): Promise<void> {
   const api = await request.newContext({ baseURL: BACKEND });
   const date = yesterday();
 
+  const hostReg = await api.post('/api/v1/players', {
+    data: { companyId: 'test-company', displayName: 'Alice Host' },
+  });
+  if (!hostReg.ok()) throw new Error(`host register failed: ${hostReg.status()} ${await hostReg.text()}`);
+  const { playerId: hostId } = await hostReg.json();
+
+  const playerReg = await api.post('/api/v1/players', {
+    data: { companyId: 'test-company-player', displayName: 'Bob Spieler' },
+  });
+  if (!playerReg.ok()) throw new Error(`player register failed: ${playerReg.status()} ${await playerReg.text()}`);
+  const { playerId } = await playerReg.json();
+
   const create = await api.post(`/api/v1/sessions/default/${date}`, {
     multipart: {
-      hostId: HOST_ID,
+      hostId,
       hostDisplayName: 'Alice Host',
       q1: { name: 'q1.jpg', mimeType: 'image/jpeg', buffer: fs.readFileSync(Q1_PHOTO) },
       q2: { name: 'q2.jpg', mimeType: 'image/jpeg', buffer: fs.readFileSync(Q2_PHOTO) },
@@ -33,32 +43,32 @@ async function seedPastSession(): Promise<void> {
   if (!create.ok()) throw new Error(`create session failed: ${create.status()} ${await create.text()}`);
 
   const join = await api.post(`/api/v1/sessions/default/${date}/join`, {
-    data: { playerId: PLAYER_ID, displayName: 'Bob Spieler' },
+    data: { playerId, displayName: 'Bob Spieler' },
   });
   if (!join.ok()) throw new Error(`join failed: ${join.status()} ${await join.text()}`);
 
   const start = await api.post(`/api/v1/sessions/default/${date}/start`, {
-    data: { hostId: HOST_ID },
+    data: { hostId },
   });
   if (!start.ok()) throw new Error(`start failed: ${start.status()} ${await start.text()}`);
 
   const q1ans = await api.put(`/api/v1/sessions/default/${date}/questions/q1/answers`, {
-    data: { playerId: PLAYER_ID, answer: 'B' },
+    data: { playerId, answer: 'B' },
   });
   if (!q1ans.ok()) throw new Error(`q1 answer failed: ${q1ans.status()} ${await q1ans.text()}`);
 
   const q1correct = await api.post(`/api/v1/sessions/default/${date}/questions/q1/correct`, {
-    data: { hostId: HOST_ID, correctAnswer: 'B' },
+    data: { hostId, correctAnswer: 'B' },
   });
   if (!q1correct.ok()) throw new Error(`q1 correct failed: ${q1correct.status()} ${await q1correct.text()}`);
 
   const q2ans = await api.put(`/api/v1/sessions/default/${date}/questions/q2/answers`, {
-    data: { playerId: PLAYER_ID, answer: 'DE' },
+    data: { playerId, answer: 'DE' },
   });
   if (!q2ans.ok()) throw new Error(`q2 answer failed: ${q2ans.status()} ${await q2ans.text()}`);
 
   const q2correct = await api.post(`/api/v1/sessions/default/${date}/questions/q2/correct`, {
-    data: { hostId: HOST_ID, correctAnswer: 'DE' },
+    data: { hostId, correctAnswer: 'DE' },
   });
   if (!q2correct.ok()) throw new Error(`q2 correct failed: ${q2correct.status()} ${await q2correct.text()}`);
 
@@ -104,17 +114,22 @@ test('vergangene Session Ergebnisse — Tabelle ohne Identität sichtbar', async
 
 // ── Results: own row highlighted when identity matches a participant ──────────
 
-test('vergangene Session Ergebnisse — eigene Zeile hervorgehoben', async ({ page }) => {
-  await page.addInitScript(() => {
+test('vergangene Session Ergebnisse — eigene Zeile hervorgehoben', async ({ page, request: req }) => {
+  const reg = await req.post(`${BACKEND}/api/v1/players`, {
+    data: { companyId: 'test-company-player', displayName: 'Bob Spieler' },
+  });
+  const { playerId: bobId } = await reg.json();
+
+  await page.addInitScript((id) => {
     localStorage.setItem(
       'lobby-player',
       JSON.stringify({
-        playerId: 'b0000000-0000-0000-0000-000000000002',
-        companyId: 'default',
+        playerId: id,
+        companyId: 'test-company-player',
         displayName: 'Bob Spieler',
       }),
     );
-  });
+  }, bobId);
 
   await page.goto(`/session/default/${yesterday()}/results`);
 
