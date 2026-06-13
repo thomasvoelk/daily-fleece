@@ -30,6 +30,18 @@ function makeSession(): SessionResponse {
 const TODAY = '2026-06-12';
 const CREATE_URL = `/api/v1/sessions/default/${TODAY}`;
 
+// ─── initialize ──────────────────────────────────────────────────────────────
+
+describe('HostSetupStore – initialize', () => {
+  it('stores the projectId and date from the route params', () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(HostSetupStore);
+    store.initialize('default', '2026-06-12');
+    expect(store.projectId()).toBe('default');
+    expect(store.date()).toBe('2026-06-12');
+  });
+});
+
 // ─── createSession ───────────────────────────────────────────────────────────
 
 describe('HostSetupStore – createSession', () => {
@@ -39,6 +51,7 @@ describe('HostSetupStore – createSession', () => {
     const store = TestBed.inject(HostSetupStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initialize('default', TODAY);
     const q1File = new File(['img1'], 'q1.jpg', { type: 'image/jpeg' });
     const q2File = new File(['img2'], 'q2.jpg', { type: 'image/jpeg' });
     store.selectQ1(q1File);
@@ -57,7 +70,7 @@ describe('HostSetupStore – createSession', () => {
     await promise;
   });
 
-  it('navigates to /lobby on success', async () => {
+  it('navigates to /session/default/{date}/lobby on success', async () => {
     seedPlayer('p1', 'Alice');
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(HostSetupStore);
@@ -65,6 +78,7 @@ describe('HostSetupStore – createSession', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate');
 
+    store.initialize('default', TODAY);
     store.selectQ1(new File(['x'], 'q1.jpg', { type: 'image/jpeg' }));
     store.selectQ2(new File(['x'], 'q2.jpg', { type: 'image/jpeg' }));
 
@@ -72,7 +86,7 @@ describe('HostSetupStore – createSession', () => {
     http.expectOne(CREATE_URL).flush(makeSession());
     await promise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/lobby']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', TODAY, 'lobby']);
   });
 
   it('sets phase to error when player identity is not set', async () => {
@@ -81,6 +95,7 @@ describe('HostSetupStore – createSession', () => {
     const store = TestBed.inject(HostSetupStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initialize('default', TODAY);
     store.selectQ1(new File(['x'], 'q1.jpg', { type: 'image/jpeg' }));
     store.selectQ2(new File(['x'], 'q2.jpg', { type: 'image/jpeg' }));
 
@@ -97,6 +112,7 @@ describe('HostSetupStore – createSession', () => {
     const store = TestBed.inject(HostSetupStore);
     const http = TestBed.inject(HttpTestingController);
 
+    store.initialize('default', TODAY);
     store.selectQ1(new File(['x'], 'q1.jpg', { type: 'image/jpeg' }));
     store.selectQ2(new File(['x'], 'q2.jpg', { type: 'image/jpeg' }));
 

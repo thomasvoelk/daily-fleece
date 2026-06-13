@@ -3,7 +3,8 @@ import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { EntryContext } from '../entry';
 import { Api, getSessionByKey, SessionResponse } from '../backend-client';
-import { LobbyStore } from './lobby.store';
+import { sessionAccessPolicy } from '../session';
+import { ResultsStore } from './results.store';
 
 async function resolveSession(
   route: ActivatedRouteSnapshot,
@@ -21,17 +22,22 @@ async function resolveSession(
   }
 }
 
-export const lobbyGuard: CanActivateFn = async (route: ActivatedRouteSnapshot) => {
+export const resultsGuard: CanActivateFn = async (route: ActivatedRouteSnapshot) => {
   const router = inject(Router);
   const api = inject(Api);
   const entryContext = inject(EntryContext);
-  const lobbyStore = inject(LobbyStore);
-
-  if (!entryContext.playerId()) return router.createUrlTree(['/']);
+  const resultsStore = inject(ResultsStore);
 
   const session = await resolveSession(route, api);
+
   if (!session) return router.createUrlTree(['/']);
 
-  lobbyStore.initializeSession(session);
+  const hasIdentity = !!entryContext.playerId();
+  const access = sessionAccessPolicy(session, hasIdentity, 'results');
+  if (access !== 'allow') {
+    return router.createUrlTree([access.redirect]);
+  }
+
+  resultsStore.initializeSession(session);
   return true;
 };

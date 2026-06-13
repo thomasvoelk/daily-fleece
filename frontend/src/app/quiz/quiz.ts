@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { ChunkyButton } from '../shared';
+import { ChunkyButton, CountryList } from '../shared';
 import { ApiConfiguration } from '../backend-client';
 import { QuizStore } from './quiz.store';
 import { QuizPhoto } from './quiz-photo/quiz-photo';
@@ -15,10 +15,16 @@ import { CountryAutocomplete } from './country-autocomplete/country-autocomplete
 export class Quiz {
   protected readonly quizStore = inject(QuizStore);
   private readonly apiConfig = inject(ApiConfiguration);
+  private readonly countryList = inject(CountryList);
 
-  protected readonly currentQuestion = computed<'q1' | 'q2'>(() =>
-    this.quizStore.q2Status() === 'Open' ? 'q2' : 'q1',
-  );
+  protected countryName(code: string): string {
+    return this.countryList.nameOf(code);
+  }
+
+  protected readonly currentQuestion = computed<'q1' | 'q2'>(() => {
+    if (this.quizStore.session()?.phase === 'Ended') return this.quizStore.activeQuestion();
+    return this.quizStore.q2Status() === 'Open' ? 'q2' : 'q1';
+  });
 
   protected photoUrl(question: 'q1' | 'q2'): string {
     const session = this.quizStore.session();

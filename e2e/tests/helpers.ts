@@ -25,7 +25,7 @@ export async function navigateToQuiz(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Session erstellen' }).click();
   await expect(page).toHaveURL(/\/lobby/);
   await page.getByRole('button', { name: 'Quiz starten' }).click();
-  await expect(page).toHaveURL(/\/quiz/);
+  await expect(page).toHaveURL(/\/q[12]/);
 }
 
 export async function navigateToQuizWithPlayer(
@@ -51,9 +51,9 @@ export async function navigateToQuizWithPlayer(
   await expect(playerPage).toHaveURL(/\/lobby/);
 
   await page.getByRole('button', { name: 'Quiz starten' }).click();
-  await expect(page).toHaveURL(/\/quiz/);
+  await expect(page).toHaveURL(/\/q[12]/);
   await playerPage.getByRole('button', { name: 'Zum Quiz' }).click();
-  await expect(playerPage).toHaveURL(/\/quiz/);
+  await expect(playerPage).toHaveURL(/\/q[12]/);
 
   return { playerPage, playerContext };
 }
@@ -72,6 +72,7 @@ export async function completeQuizWithPlayer(
   await closeQ1Voting(page);
 
   await playerPage.getByRole('button', { name: 'Neu laden' }).click();
+  await expect(playerPage).toHaveURL(/\/q2/);
 
   const playerCountryInput = playerPage.getByRole('combobox', { name: 'Deine Antwort' });
   await playerCountryInput.click();

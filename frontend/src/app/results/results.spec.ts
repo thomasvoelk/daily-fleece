@@ -336,6 +336,40 @@ describe('Results – board sort order', () => {
   });
 });
 
+// ─── no highlight when no player ID ──────────────────────────────────────────
+
+describe('Results – no highlight when localStorage has no player ID', () => {
+  it('no row has aria-current when localStorage has no player ID', async () => {
+    const stubStore = makeStubStore(makeResults(), [
+      {
+        playerId: 'p1',
+        displayName: 'Alice',
+        q1Answer: 'B',
+        q2Answer: 'FR',
+        q1Correct: true,
+        q2Correct: true,
+        totalPoints: 2,
+      },
+      {
+        playerId: 'p2',
+        displayName: 'Bob',
+        q1Answer: 'A',
+        q2Answer: 'DE',
+        q1Correct: false,
+        q2Correct: false,
+        totalPoints: 0,
+      },
+    ]);
+    await render(Results, {
+      providers: [...BASE_PROVIDERS, { provide: ResultsStore, useValue: stubStore }],
+    });
+
+    screen.getAllByRole('row').forEach((row) => {
+      expect(row).not.toHaveAttribute('aria-current');
+    });
+  });
+});
+
 // ─── Zum Leaderboard button ───────────────────────────────────────────────────
 
 describe('Results – Zum Leaderboard button', () => {

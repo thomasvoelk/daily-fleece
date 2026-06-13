@@ -27,11 +27,25 @@ class LobbyStub {}
 })
 class ResultsStub {}
 
+@Component({
+  selector: 'app-quiz-stub',
+  template: '',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class QuizStub {}
+
 const PROVIDERS = [
   ...provideTestEnvironment(),
   provideRouter([
-    { path: 'lobby', component: LobbyStub },
-    { path: 'results', component: ResultsStub },
+    {
+      path: 'session/:projectId/:date',
+      children: [
+        { path: 'lobby', component: LobbyStub },
+        { path: 'results', component: ResultsStub },
+        { path: 'q1', component: QuizStub },
+        { path: 'q2', component: QuizStub },
+      ],
+    },
   ]),
   QuizStore,
 ];
@@ -430,7 +444,7 @@ describe('QuizStore – refresh', () => {
     expect(navigateSpy).not.toHaveBeenCalled();
   });
 
-  it('navigates to /results when session phase is Ended', async () => {
+  it('navigates to /session/default/2026-06-02/results when session phase is Ended', async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
@@ -442,7 +456,47 @@ describe('QuizStore – refresh', () => {
     http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ phase: 'Ended' }));
     await promise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/results']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'results']);
+  });
+
+  it('navigates to /q2 when refreshing on q1 route and Q1 becomes Closed while Q2 opens', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate');
+
+    store.initializeSession(
+      makeSession({ voting: { q1: { status: 'Open' }, q2: { status: 'Open' } } }),
+      'q1',
+    );
+    const promise = store.refresh();
+    http
+      .expectOne('/api/v1/sessions/default/2026-06-02')
+      .flush(makeSession({ voting: { q1: { status: 'Closed' }, q2: { status: 'Open' } } }));
+    await promise;
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'q2']);
+  });
+
+  it('navigates to /q1 when refreshing on q2 route and Q2 becomes Closed while Q1 is Open', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate');
+
+    store.initializeSession(
+      makeSession({ voting: { q1: { status: 'Open' }, q2: { status: 'Open' } } }),
+      'q2',
+    );
+    const promise = store.refresh();
+    http
+      .expectOne('/api/v1/sessions/default/2026-06-02')
+      .flush(makeSession({ voting: { q1: { status: 'Open' }, q2: { status: 'Closed' } } }));
+    await promise;
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'q1']);
   });
 });
 
@@ -462,7 +516,7 @@ describe('QuizStore – loadSession', () => {
     expect(store.session()?.sessionId).toBe('abc');
   });
 
-  it('redirects to /lobby when session is not Active', async () => {
+  it('redirects to /session/default/2026-06-02/lobby when session is not Active', async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
@@ -474,10 +528,10 @@ describe('QuizStore – loadSession', () => {
     http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ phase: 'Lobby' }));
     await promise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/lobby']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'lobby']);
   });
 
-  it('redirects to /results when session is Ended', async () => {
+  it('redirects to /session/default/2026-06-02/results when session is Ended', async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(QuizStore);
     const http = TestBed.inject(HttpTestingController);
@@ -489,7 +543,7 @@ describe('QuizStore – loadSession', () => {
     http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ phase: 'Ended' }));
     await promise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/results']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'results']);
   });
 });
 
@@ -528,6 +582,6 @@ describe('QuizStore – setQ2CorrectAnswer navigates to results', () => {
     );
     await closePromise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/results']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'results']);
   });
 });

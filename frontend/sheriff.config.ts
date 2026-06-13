@@ -11,6 +11,7 @@ export const sheriffConfig: SheriffConfig = {
     'src/app/quiz': 'domain:quiz',
     'src/app/results': 'domain:results',
     'src/app/shared': 'domain:shared',
+    'src/app/session': 'domain:session',
     'src/app/shared/testing': 'domain:shared',
   },
   depRules: {
@@ -18,6 +19,6 @@ export const sheriffConfig: SheriffConfig = {
     'root:backend-client': [],
     'domain:shared': [],
     'domain:entry': ['domain:shared', 'root', 'root:backend-client'],
-    'domain:*': ['domain:shared', 'domain:entry', 'root', 'root:backend-client'],
+    'domain:*': ['domain:shared', 'domain:entry', 'domain:session', 'root', 'root:backend-client'],
   },
 };

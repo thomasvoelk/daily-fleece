@@ -13,7 +13,7 @@ class QuizStub {}
 
 const PROVIDERS = [
   ...provideTestEnvironment(),
-  provideRouter([{ path: 'quiz', component: QuizStub }]),
+  provideRouter([{ path: 'session/:projectId/:date/q1', component: QuizStub }]),
   LobbyStore,
 ];
 
@@ -43,7 +43,7 @@ describe('LobbyStore – goToQuiz', () => {
     http.verify();
   });
 
-  it('navigates to /quiz when fetched session is Active', async () => {
+  it('navigates to /session/default/<date>/q1 when fetched session is Active', async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(LobbyStore);
     const http = TestBed.inject(HttpTestingController);
@@ -56,7 +56,7 @@ describe('LobbyStore – goToQuiz', () => {
     http.expectOne('/api/v1/sessions/default/2026-05-31').flush(makeSession({ phase: 'Active' }));
     await promise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/quiz']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session/default/2026-05-31/q1']);
   });
 
   it('sets error when session is still in Lobby phase', async () => {
@@ -155,7 +155,7 @@ describe('LobbyStore – startQuiz', () => {
     await promise;
   });
 
-  it('navigates to /quiz on success', async () => {
+  it('navigates to /session/default/<date>/q1 on success', async () => {
     localStorage.setItem(
       'lobby-player',
       JSON.stringify({ playerId: 'host-1', companyId: 'acme', displayName: 'Alice' }),
@@ -174,6 +174,6 @@ describe('LobbyStore – startQuiz', () => {
       .flush(makeSession({ phase: 'Active' }));
     await promise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/quiz']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session/default/2026-05-31/q1']);
   });
 });

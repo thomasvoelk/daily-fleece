@@ -16,6 +16,7 @@ interface QuizState {
   error: string | null;
   ownQ1Answer: 'A' | 'B' | 'C' | null;
   ownQ2Answer: string | null;
+  activeQuestion: 'q1' | 'q2';
 }
 
 export const QuizStore = signalStore(
@@ -25,6 +26,7 @@ export const QuizStore = signalStore(
     error: null,
     ownQ1Answer: null,
     ownQ2Answer: null,
+    activeQuestion: 'q1',
   }),
   withComputed((store) => {
     const entryStore = inject(EntryContext);
@@ -81,8 +83,8 @@ export const QuizStore = signalStore(
     }
 
     return {
-      initializeSession(session: SessionResponse): void {
-        patchState(store, { session, error: null });
+      initializeSession(session: SessionResponse, question: 'q1' | 'q2' = 'q1'): void {
+        patchState(store, { session, error: null, activeQuestion: question });
       },
 
       async loadSession(): Promise<void> {
@@ -93,9 +95,9 @@ export const QuizStore = signalStore(
         );
         patchState(store, { session, error: null });
         if (session.phase === 'Ended') {
-          await router.navigate(['/results']);
+          await router.navigate(['/session', session.projectId, session.date, 'results']);
         } else if (session.phase !== 'Active') {
-          await router.navigate(['/lobby']);
+          await router.navigate(['/session', session.projectId, session.date, 'lobby']);
         }
       },
 
@@ -107,7 +109,15 @@ export const QuizStore = signalStore(
         );
         patchState(store, { session, error: null });
         if (session.phase === 'Ended') {
-          await router.navigate(['/results']);
+          await router.navigate(['/session', session.projectId, session.date, 'results']);
+        } else if (session.phase === 'Active') {
+          const { q1, q2 } = session.voting;
+          const active = store.activeQuestion();
+          if (active === 'q1' && q1.status === 'Closed' && q2.status === 'Open') {
+            await router.navigate(['/session', session.projectId, session.date, 'q2']);
+          } else if (active === 'q2' && q2.status === 'Closed' && q1.status === 'Open') {
+            await router.navigate(['/session', session.projectId, session.date, 'q1']);
+          }
         }
       },
 
@@ -171,7 +181,7 @@ export const QuizStore = signalStore(
           }),
         );
         patchState(store, { session: updated, error: null });
-        await router.navigate(['/results']);
+        await router.navigate(['/session', updated.projectId, updated.date, 'results']);
       },
     };
   }),

@@ -15,12 +15,13 @@ const drainMicrotasks = () =>
 // ─── createLobby ─────────────────────────────────────────────────────────────
 
 describe('EntryStore – createLobby', () => {
-  it('calls registerPlayer with companyId and displayName then navigates to /host', async () => {
+  it('calls registerPlayer with companyId and displayName then navigates to /session/default/<today>/host', async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(EntryStore);
     const http = TestBed.inject(HttpTestingController);
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate');
+    const today = '2026-06-12';
 
     const promise = store.createLobby('acme', 'Alice');
 
@@ -30,14 +31,14 @@ describe('EntryStore – createLobby', () => {
 
     await promise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/host']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', today, 'host']);
   });
 });
 
 // ─── joinLobby ───────────────────────────────────────────────────────────────
 
 describe('EntryStore – joinLobby', () => {
-  it("calls registerPlayer then joinSessionByKey for today's date, then navigates to /lobby", async () => {
+  it("calls registerPlayer then joinSessionByKey for today's date, then navigates to /session/default/<today>/lobby", async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(EntryStore);
     const http = TestBed.inject(HttpTestingController);
@@ -56,6 +57,6 @@ describe('EntryStore – joinLobby', () => {
 
     await promise;
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/lobby']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', today, 'lobby']);
   });
 });

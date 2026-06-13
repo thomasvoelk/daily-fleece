@@ -4,9 +4,10 @@ import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { Api, createSessionByKey } from '../backend-client';
 import { EntryContext } from '../entry';
-import { TODAY } from '../shared';
 
 interface HostSetupState {
+  projectId: string | null;
+  date: string | null;
   q1: File | null;
   q2: File | null;
   phase: 'idle' | 'loading' | 'error';
@@ -16,6 +17,8 @@ interface HostSetupState {
 export const HostSetupStore = signalStore(
   { providedIn: 'root' },
   withState<HostSetupState>({
+    projectId: null,
+    date: null,
     q1: null,
     q2: null,
     phase: 'idle',
@@ -30,8 +33,10 @@ export const HostSetupStore = signalStore(
     const api = inject(Api);
     const router = inject(Router);
     const entryStore = inject(EntryContext);
-    const today = inject(TODAY);
     return {
+      initialize(projectId: string, date: string): void {
+        patchState(store, { projectId, date });
+      },
       selectQ1(file: File): void {
         patchState(store, { q1: file });
       },
@@ -54,10 +59,13 @@ export const HostSetupStore = signalStore(
         if (!q1 || !q2) return; // canSubmit() already guarantees this; needed for type narrowing
         patchState(store, { phase: 'loading', errorMessage: null });
         try {
+          const projectId = store.projectId();
+          const date = store.date();
+          if (!projectId || !date) return;
           await firstValueFrom(
             api.invoke(createSessionByKey, {
-              projectId: 'default',
-              date: today,
+              projectId,
+              date,
               body: {
                 hostId: playerId,
                 hostDisplayName: displayName,
@@ -67,7 +75,7 @@ export const HostSetupStore = signalStore(
             }),
           );
           patchState(store, { phase: 'idle' });
-          await router.navigate(['/lobby']);
+          await router.navigate(['/session', projectId, date, 'lobby']);
         } catch {
           patchState(store, {
             phase: 'error',
