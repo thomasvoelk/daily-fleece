@@ -2,7 +2,7 @@ import { execSync } from 'child_process';
 import * as path from 'path';
 
 const MIGRATION_DIR = path.join(__dirname, '../backend/src/main/resources/db/migration');
-const CONTAINER = 'backend-mongodb-1';
+const CONTAINER = 'daily-fleece-e2e-mongodb-1';
 const DB = 'daily_fleece_e2e';
 const SCRIPTS = [
   'V1__init_players.js',
