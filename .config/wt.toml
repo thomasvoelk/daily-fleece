@@ -1,2 +1,8 @@
-# Install frontend dependencies when creating a new worktree
-pre-start = "cd frontend && npm install"
+# Install frontend and e2e dependencies concurrently when creating a new worktree
+[[pre-start]]
+frontend = "cd frontend && npm install"
+e2e = "cd e2e && npm install"
+
+# Write per-worktree environment file with isolated ports and Docker resource names
+[post-start]
+env = "{ echo BACKEND_PORT={{ (\"backend-\" ~ branch) | hash_port }}; echo FRONTEND_PORT={{ (\"frontend-\" ~ branch) | hash_port }}; echo LOCAL_DEV_MONGODB_PORT={{ (\"mongo-\" ~ branch) | hash_port }}; echo LOCAL_DEV_MONGO_VOLUME=daily-fleece-{{ branch | sanitize_db }}; echo COMPOSE_PROJECT_NAME=daily-fleece-{{ branch | sanitize_db }}; } > .wt.env"
