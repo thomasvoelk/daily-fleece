@@ -210,12 +210,6 @@
 						<configuration>
 							<inputSpec>${project.basedir}/../api/openapi.yaml</inputSpec>
 							<generatorName>spring</generatorName>
-							<!-- Override pathParams.mustache to backport PR #23649 fix:
-							     path params were not resetting nullability, causing required
-							     @PathVariable params to be incorrectly annotated with @Nullable
-							     without the JSpecify import. Fixed in 7.23.0, not yet released. -->
-							<templateDirectory>
-								${project.basedir}/src/main/resources/openapi-templates</templateDirectory>
 							<apiPackage>de.dailyfleece.api</apiPackage>
 							<modelPackage>de.dailyfleece.api.model</modelPackage>
 							<configOptions>
