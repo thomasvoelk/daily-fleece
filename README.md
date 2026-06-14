@@ -12,20 +12,39 @@ A mobile-first quiz app for daily standups. Two questions per session — knowle
 
 ## Running locally
 
-**Backend**
-
 ```bash
-cd backend
-./mvnw spring-boot:run
+./start-app.sh
 ```
 
-**Frontend**
+Starts the backend (Spring Boot + MongoDB via Docker Compose) and the Angular dev server. Both stop on Ctrl+C.
+
+| Service  | Default URL               |
+|----------|---------------------------|
+| Frontend | http://localhost:4200     |
+| Backend  | http://localhost:8080     |
+| MongoDB  | localhost:27017           |
+
+MongoDB runs with `start-only` lifecycle — it stays up between app restarts so you don't lose local data. Stop it manually with `docker compose -f backend/compose.local-dev.yml down`.
+
+## Working on multiple branches
+
+Install [worktrunk](https://github.com/worktrunk/worktrunk) (`wt`) to work on multiple branches simultaneously without port conflicts.
 
 ```bash
-cd frontend
-npm install
-npm start
+wt switch --create my-feature
 ```
+
+The `post-start` hook writes `.wt.env` in the worktree with deterministic per-branch ports:
+
+```
+BACKEND_PORT=...
+FRONTEND_PORT=...
+LOCAL_DEV_MONGODB_PORT=...
+```
+
+`start-app.sh` picks these up automatically — each worktree gets its own isolated backend, frontend, and MongoDB. Run `cat .wt.env` to see the resolved ports.
+
+When you remove a worktree (`wt remove`), the `post-remove` hook tears down its MongoDB container and volume.
 
 ## Dev setup
 
