@@ -9,7 +9,7 @@ services:
       MONGO_INITDB_DATABASE: daily_fleece
       GLIBC_TUNABLES: glibc.cpu.hwcaps=-SHSTK
     volumes:
-      - '${LOCAL_DEV_MONGO_VOLUME:-daily-fleece-local-dev}:/data/db'
+      - 'daily-fleece-local-dev:/data/db'
       - ./src/main/resources/db/migration/V1__init_players.js:/docker-entrypoint-initdb.d/01_init_players.js:ro
       - ./src/main/resources/db/migration/V2__init_sessions.js:/docker-entrypoint-initdb.d/02_init_sessions.js:ro
       - ./src/main/resources/db/migration/V3__add_photo_ids_and_gridfs_ttl.js:/docker-entrypoint-initdb.d/03_add_photo_ids.js:ro
