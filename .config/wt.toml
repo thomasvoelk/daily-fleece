@@ -6,3 +6,7 @@ e2e = "cd e2e && npm install"
 # Write per-worktree environment file with isolated ports and Docker resource names
 [post-start]
 env = "{ echo BACKEND_PORT={{ (\"backend-\" ~ branch) | hash_port }}; echo FRONTEND_PORT={{ (\"frontend-\" ~ branch) | hash_port }}; echo LOCAL_DEV_MONGODB_PORT={{ (\"mongo-\" ~ branch) | hash_port }}; echo LOCAL_DEV_MONGO_VOLUME=daily-fleece-{{ branch | sanitize_db }}; echo COMPOSE_PROJECT_NAME=daily-fleece-{{ branch | sanitize_db }}; } > .wt.env"
+
+# Tear down branch-specific MongoDB container and volume when worktree is removed
+[post-remove]
+cleanup = "COMPOSE_PROJECT_NAME=daily-fleece-{{ branch | sanitize_db }} docker compose -f backend/compose.local-dev.yml down --volumes"
