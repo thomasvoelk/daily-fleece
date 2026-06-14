@@ -25,7 +25,7 @@ trap cleanup EXIT INT TERM
 
 echo "Starting backend (local-dev profile)..."
 cd "$ROOT/backend"
-DOCKER_HOST=unix:///var/run/docker.sock ./mvnw -q spring-boot:run -Dspring-boot.run.profiles=local-dev &
+./mvnw -q spring-boot:run -Dspring-boot.run.profiles=local-dev &
 BACKEND_PID=$!
 
 echo "Starting frontend..."
