@@ -4,7 +4,7 @@ services:
   mongodb:
     image: mongo:8.3
     ports:
-      - '${LOCAL_DEV_MONGODB_PORT:-27018}:27017'
+      - '${LOCAL_DEV_MONGODB_PORT:-27017}:27017'
     environment:
       MONGO_INITDB_DATABASE: daily_fleece
       GLIBC_TUNABLES: glibc.cpu.hwcaps=-SHSTK
