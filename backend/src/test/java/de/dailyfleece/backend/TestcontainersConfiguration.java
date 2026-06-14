@@ -1,7 +1,6 @@
 package de.dailyfleece.backend;
 
 import java.time.Duration;
-import java.util.List;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -25,15 +24,13 @@ public class TestcontainersConfiguration {
     @Bean
     ApplicationRunner schemaSetup(MongoDBContainer container) {
         return args -> {
-            for (var script :
-                    List.of("V1__init_players.js", "V2__init_sessions.js", "V3__add_photo_ids_and_gridfs_ttl.js")) {
-                container.copyFileToContainer(
-                        MountableFile.forClasspathResource("db/migration/" + script), "/tmp/" + script);
-                var result = container.execInContainer(
-                        "mongosh", "mongodb://localhost:27017/test", "--file", "/tmp/" + script, "--quiet");
-                if (result.getExitCode() != 0)
-                    throw new IllegalStateException("Migration failed: " + script + "\n" + result.getStderr());
-            }
+            var script = "V1__init.js";
+            container.copyFileToContainer(
+                    MountableFile.forClasspathResource("db/migration/" + script), "/tmp/" + script);
+            var result = container.execInContainer(
+                    "mongosh", "mongodb://localhost:27017/test", "--file", "/tmp/" + script, "--quiet");
+            if (result.getExitCode() != 0)
+                throw new IllegalStateException("Migration failed: " + script + "\n" + result.getStderr());
         };
     }
 }
