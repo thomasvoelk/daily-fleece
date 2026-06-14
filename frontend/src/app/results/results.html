@@ -2,11 +2,11 @@
   @if (store.data()) {
     <!-- Left: plum hero (fixed column on desktop) -->
     <div
-      class="relative flex items-center justify-center overflow-hidden bg-plum px-6 py-10 md:w-[42%] md:shrink-0"
+      class="relative flex items-center justify-center overflow-hidden bg-plum px-6 py-10 md:w-panel-media md:shrink-0"
     >
       @for (c of confetti; track $index) {
         <div
-          class="pointer-events-none absolute rounded-[2px]"
+          class="pointer-events-none absolute rounded-xs"
           [style.left.%]="c.left"
           [style.top.%]="c.top"
           [style.width.px]="c.size"
@@ -16,19 +16,19 @@
         ></div>
       }
 
-      <div class="relative z-10 flex w-full max-w-[360px] flex-col items-center gap-5 text-center">
+      <div class="relative z-10 flex w-full max-w-app flex-col items-center gap-5 text-center">
         <img
           src="/alpaca-mark.svg"
           alt=""
           width="96"
           height="96"
-          class="rounded-[26px] motion-safe:animate-pop"
+          class="rounded-alpaca motion-safe:animate-pop"
         />
 
         @if (store.myResult(); as me) {
           @if (store.correctCount() === 2) {
             <h1
-              class="m-0 font-display text-[30px] leading-tight font-bold text-white motion-safe:animate-pop"
+              class="m-0 font-display text-display-lg leading-tight font-bold text-white motion-safe:animate-pop"
               i18n="results|perfect score headline@@results.headlinePerfect"
             >
               Perfekt! 🦙
@@ -41,7 +41,7 @@
             </p>
           } @else if (store.correctCount() === 1) {
             <h1
-              class="m-0 font-display text-[30px] leading-tight font-bold text-white motion-safe:animate-pop"
+              class="m-0 font-display text-display-lg leading-tight font-bold text-white motion-safe:animate-pop"
               i18n="results|partial score headline@@results.headlinePartial"
             >
               Gut dabei! 🦙
@@ -54,7 +54,7 @@
             </p>
           } @else {
             <h1
-              class="m-0 font-display text-[30px] leading-tight font-bold text-white motion-safe:animate-pop"
+              class="m-0 font-display text-display-lg leading-tight font-bold text-white motion-safe:animate-pop"
               i18n="results|zero score headline@@results.headlineZero"
             >
               Weiter so! 🦙
@@ -77,12 +77,12 @@
             >
               <div class="mb-2 flex justify-center">
                 <span
-                  class="inline-flex rounded-full bg-grape/30 px-2 py-0.5 font-pixel text-[7px] tracking-wide text-grape-200"
+                  class="inline-flex rounded-full bg-grape/30 px-2 py-0.5 font-pixel text-pixel-sm tracking-wide text-grape-200"
                   i18n="quiz|Knowledge category chip label@@quiz.categoryChipKnowledge"
                   >KNOWLEDGE</span
                 >
               </div>
-              <div class="font-display text-[32px] leading-none font-bold text-white">
+              <div class="font-display text-display-lg leading-none font-bold text-white">
                 {{ me.q1Correct ? '✓' : '✗' }}
               </div>
             </div>
@@ -95,12 +95,12 @@
             >
               <div class="mb-2 flex justify-center">
                 <span
-                  class="inline-flex rounded-full bg-teal/30 px-2 py-0.5 font-pixel text-[7px] tracking-wide text-teal-200"
+                  class="inline-flex rounded-full bg-teal/30 px-2 py-0.5 font-pixel text-pixel-sm tracking-wide text-teal-200"
                   i18n="quiz|Geography category chip label@@quiz.categoryChipGeography"
                   >GEOGRAPHY</span
                 >
               </div>
-              <div class="font-display text-[32px] leading-none font-bold text-white">
+              <div class="font-display text-display-lg leading-none font-bold text-white">
                 {{ me.q2Correct ? '✓' : '✗' }}
               </div>
             </div>
@@ -109,12 +109,12 @@
           <div class="flex items-center gap-4 motion-safe:animate-rise">
             <div class="flex flex-col items-center">
               <div
-                class="font-pixel text-[7px] tracking-[.05em] text-white/50"
+                class="font-pixel text-pixel-sm tracking-wider text-white/50"
                 i18n="results|points earned label@@results.statsPoints"
               >
                 PUNKTE
               </div>
-              <div class="mt-1.5 font-pixel text-[28px] leading-none text-marigold">
+              <div class="mt-1.5 font-pixel text-display-md leading-none text-marigold">
                 +{{ me.totalPoints }}
               </div>
             </div>
@@ -122,12 +122,12 @@
               <div class="h-12 w-px bg-white/20"></div>
               <div class="flex flex-col items-center">
                 <div
-                  class="font-pixel text-[7px] tracking-[.05em] text-white/50"
+                  class="font-pixel text-pixel-sm tracking-wider text-white/50"
                   i18n="results|rank label@@results.statsRank"
                 >
                   RANG
                 </div>
-                <div class="mt-1.5 font-pixel text-[28px] leading-none text-grape-200">
+                <div class="mt-1.5 font-pixel text-display-md leading-none text-grape-200">
                   #{{ rank }}
                 </div>
               </div>
@@ -135,7 +135,7 @@
           </div>
         } @else {
           <h1
-            class="m-0 font-display text-[30px] leading-tight font-bold text-white motion-safe:animate-pop"
+            class="m-0 font-display text-display-lg leading-tight font-bold text-white motion-safe:animate-pop"
             i18n="results|session done headline@@results.headlineDone"
           >
             Session vorbei! 🦙
@@ -154,7 +154,7 @@
     <div class="flex flex-col bg-cream md:flex-1 md:overflow-y-auto">
       <section class="flex flex-1 flex-col gap-3 px-4 pt-6 pb-4">
         <h2
-          class="font-display text-[18px] font-semibold text-plum"
+          class="font-display text-lg font-semibold text-plum"
           i18n="results|board section heading@@results.boardHeading"
         >
           Heutige Ergebnisse
@@ -166,32 +166,33 @@
               <th scope="col" class="p-2 text-left"></th>
               <th scope="col" class="p-2 text-left">
                 <span
-                  class="block font-pixel text-[6px] tracking-[.06em] text-grape-700"
+                  class="block font-pixel text-pixel-sm tracking-pixel-lg text-grape-700"
                   i18n="quiz|Knowledge category chip label@@quiz.categoryChipKnowledge"
                   >WISSEN</span
                 >
                 @if (store.q1CorrectAnswer(); as a) {
                   <span
-                    class="font-body text-[11px] font-extrabold whitespace-nowrap text-grape-700"
+                    class="font-body text-pixel-lg font-extrabold whitespace-nowrap text-grape-700"
                     >✓ {{ a }}</span
                   >
                 }
               </th>
               <th scope="col" class="p-2 text-left">
                 <span
-                  class="block font-pixel text-[6px] tracking-[.06em] text-teal-700"
+                  class="block font-pixel text-pixel-sm tracking-pixel-lg text-teal-700"
                   i18n="quiz|Geography category chip label@@quiz.categoryChipGeography"
                   >GEO</span
                 >
                 @if (store.q2CorrectAnswer(); as code) {
-                  <span class="font-body text-[11px] font-extrabold whitespace-nowrap text-teal-700"
+                  <span
+                    class="font-body text-pixel-lg font-extrabold whitespace-nowrap text-teal-700"
                     >✓ {{ countryName(code) }}</span
                   >
                 }
               </th>
               <th
                 scope="col"
-                class="py-2 pr-0 pl-2 text-right font-pixel text-[7px] whitespace-nowrap text-marigold-700"
+                class="py-2 pr-0 pl-2 text-right font-pixel text-pixel-sm whitespace-nowrap text-marigold-700"
                 i18n="results|points column header@@results.colPts"
               >
                 PTS
@@ -206,11 +207,11 @@
                 [attr.aria-current]="row.playerId === entry.playerId() ? 'true' : null"
                 [attr.aria-label]="row.displayName"
               >
-                <td class="py-2.5 pr-2 pl-0 text-center font-pixel text-[10px] text-plum-faint">
+                <td class="py-2.5 pr-2 pl-0 text-center font-pixel text-pixel-md text-plum-faint">
                   #{{ i + 1 }}
                 </td>
                 <td
-                  class="w-full max-w-0 overflow-hidden px-2 py-2.5 font-body text-[15px] font-extrabold whitespace-nowrap"
+                  class="w-full max-w-0 overflow-hidden px-2 py-2.5 font-body text-body-md font-extrabold whitespace-nowrap"
                   [class.text-grape-700]="row.playerId === entry.playerId()"
                   [class.text-plum]="row.playerId !== entry.playerId()"
                   style="text-overflow: ellipsis"
@@ -220,7 +221,7 @@
                 <td class="px-2 py-2.5">
                   @if (row.q1Answer) {
                     <span
-                      class="rounded-[8px] px-1.5 py-1 font-body text-[12px] font-bold"
+                      class="rounded-lg px-1.5 py-1 font-body text-xs font-bold"
                       [class.bg-green-200]="row.q1Correct"
                       [class.text-green-700]="row.q1Correct"
                       [class.bg-coral-200]="!row.q1Correct"
@@ -232,7 +233,7 @@
                 <td class="px-2 py-2.5 whitespace-nowrap">
                   @if (row.q2Answer) {
                     <span
-                      class="rounded-[8px] px-1.5 py-1 font-body text-[11px] font-bold"
+                      class="rounded-lg px-1.5 py-1 font-body text-xs font-bold"
                       [class.bg-green-200]="row.q2Correct"
                       [class.text-green-700]="row.q2Correct"
                       [class.bg-coral-200]="!row.q2Correct"
@@ -241,7 +242,7 @@
                     >
                   }
                 </td>
-                <td class="py-2.5 pr-0 pl-2 text-right font-pixel text-[11px] text-marigold-700">
+                <td class="py-2.5 pr-0 pl-2 text-right font-pixel text-pixel-lg text-marigold-700">
                   {{ row.totalPoints }}
                 </td>
               </tr>

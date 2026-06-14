@@ -58,6 +58,37 @@
   --duration-fast:  120ms;
   --duration-base:  220ms;
   --duration-slow:  420ms;
+
+  /* Font sizes — Pixel font (Press Start 2P) scale */
+  --text-pixel-sm:  8px;
+  --text-pixel-md:  10px;
+  --text-pixel-lg:  11px;
+
+  /* Font sizes — Body (Nunito) scale */
+  --text-body-md: 15px;
+
+  /* Font sizes — Display (Fredoka) scale, aligned to design system */
+  --text-display-xl: 40px;  /* design system fs-display-xl */
+  --text-display-lg: 32px;  /* design system fs-display    */
+  --text-display-md: 28px;  /* design system fs-h1         */
+  --text-display-sm: 22px;  /* design system fs-h2         */
+
+  /* Letter spacing — pixel font wide tracking */
+  --tracking-pixel-lg: 0.06em;
+
+  /* Border radius — alpaca logo */
+  --radius-alpaca: 24px;
+
+  /* Spacing — quiz UI */
+  --spacing-answer: 1.125rem;  /* 18px — quiz answer option vertical padding */
+  --spacing-press:  0.1875rem; /* 3px  — button press-down translate */
+
+  /* Sizing — layout */
+  --max-width-app:       22.5rem; /* 360px — mobile container max-width */
+  --max-height-media:    50vh;    /* image display (portrait) */
+  --max-height-media-lg: 60vh;    /* image display (landscape) */
+  --width-panel-main:    55%;     /* desktop split: main panel */
+  --width-panel-media:   42%;     /* desktop split: media panel */
 }
 
 /* =============================================================
@@ -96,6 +127,11 @@
   0%   { transform: translate(0, 0) scale(0.4); opacity: 0; }
   15%  { opacity: 1; }
   100% { transform: translate(var(--fx, 0), var(--fy, 0)) scale(1); opacity: 0; }
+}
+
+/* Quiz answer option transition — replaces transition-[transform,border-color,background] */
+@utility transition-answer {
+  transition-property: transform, border-color, background-color;
 }
 
 /* Global heading font — in @layer base so Tailwind utilities (e.g. text-white) can override. */

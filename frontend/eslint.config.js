@@ -103,6 +103,7 @@ module.exports = defineConfig([
       "tailwindcss/classnames-order": "error",
       "tailwindcss/enforces-negative-arbitrary-values": "error",
       "tailwindcss/enforces-shorthand": "error",
+      "tailwindcss/no-arbitrary-value": "error",
       "tailwindcss/no-contradicting-classname": "error",
       "tailwindcss/no-custom-classname": ["error", { whitelist: [".*duration-(fast|base|slow)", "material-symbols-rounded", "^peer$"] }],
       "tailwindcss/no-unnecessary-arbitrary-value": "error",

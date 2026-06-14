@@ -19,12 +19,12 @@
           >
             {{ player.displayName.charAt(0).toUpperCase() }}
           </div>
-          <span class="flex-1 font-body text-[15px] font-extrabold text-plum">
+          <span class="flex-1 font-body text-body-md font-extrabold text-plum">
             {{ player.displayName }}
           </span>
           @if (player.playerId === store.session()?.hostId) {
             <span
-              class="rounded-full bg-marigold-200 px-2 py-0.5 font-pixel text-[7px] tracking-[.04em] text-marigold-700"
+              class="rounded-full bg-marigold-200 px-2 py-0.5 font-pixel text-pixel-sm tracking-wide text-marigold-700"
               i18n="lobby|Badge on the host player row@@lobby.hostBadge"
             >
               HOST

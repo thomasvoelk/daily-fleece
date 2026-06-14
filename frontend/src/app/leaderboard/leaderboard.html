@@ -25,7 +25,7 @@
       }
 
       <h1
-        class="relative font-display text-[26px] font-bold text-white"
+        class="relative font-display text-display-md font-bold text-white"
         i18n="leaderboard|page title@@leaderboard.title"
       >
         Rangliste
@@ -36,7 +36,7 @@
           i18n="leaderboard|Current player rank display@@leaderboard.myRankText"
         >
           Du bist aktuell auf
-          <span class="font-pixel text-[11px] text-marigold">Platz {{ rank }}</span>
+          <span class="font-pixel text-pixel-lg text-marigold">Platz {{ rank }}</span>
         </p>
       }
     </div>
@@ -68,7 +68,7 @@
               >
                 <!-- Rank -->
                 <td
-                  class="w-7 rounded-l-xl py-3 pr-3 pl-3.5 text-center font-pixel text-[10px]"
+                  class="w-7 rounded-l-xl py-3 pr-3 pl-3.5 text-center font-pixel text-pixel-md"
                   [class.text-marigold-700]="i === 0"
                   [class.text-plum-faint]="i !== 0"
                   [class.border-l-2]="i === 0"
@@ -94,7 +94,7 @@
                     </div>
                     <div class="min-w-0">
                       <div
-                        class="flex items-center gap-1 font-body text-[15px] font-extrabold text-plum"
+                        class="flex items-center gap-1 font-body text-body-md font-extrabold text-plum"
                       >
                         <span class="truncate">{{ row.displayName }}</span>
                         @if (i === 0) {
@@ -118,9 +118,9 @@
                   [class.border-y-2]="i === 0"
                   [class.border-marigold]="i === 0"
                 >
-                  <div class="font-pixel text-[11px] text-marigold-700">{{ row.points }}</div>
+                  <div class="font-pixel text-pixel-lg text-marigold-700">{{ row.points }}</div>
                   <div
-                    class="font-body text-[10px] font-bold text-plum-faint"
+                    class="font-body text-pixel-md font-bold text-plum-faint"
                     i18n="leaderboard|points unit@@leaderboard.pts"
                   >
                     Pkt.

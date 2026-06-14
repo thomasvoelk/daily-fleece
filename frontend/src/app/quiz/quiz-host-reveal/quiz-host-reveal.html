@@ -5,11 +5,11 @@
 >
   <div class="flex items-center justify-between">
     <span
-      class="inline-flex items-center gap-1 rounded-full bg-marigold-200 px-2.5 py-1 font-pixel text-[8px] tracking-wider text-marigold-700"
+      class="inline-flex items-center gap-1 rounded-full bg-marigold-200 px-2.5 py-1 font-pixel text-pixel-sm tracking-wide text-marigold-700"
     >
       <span
         aria-hidden="true"
-        class="material-symbols-rounded text-[14px] leading-none"
+        class="material-symbols-rounded text-sm leading-none"
         i18n="quiz|Material Symbols ligature — must not be translated@@quiz.iconSettingsRemote"
         style="font-variation-settings: 'FILL' 1"
         >settings_remote</span
@@ -19,7 +19,7 @@
       >
     </span>
     <span
-      class="font-pixel text-[10px] tracking-wider text-plum-soft"
+      class="font-pixel text-pixel-md tracking-wider text-plum-soft"
       i18n="
         quiz|Helper text prompting the host to pick the correct answer@@quiz.hostPickCorrectAnswer"
       >Pick correct answer</span
@@ -50,7 +50,7 @@
           />
           <label
             [for]="'q1c-' + option"
-            class="duration-fast flex cursor-pointer items-center justify-center rounded-2xl border-2 border-wool-line bg-paper px-3 py-[18px] font-display text-[28px] font-bold text-plum shadow-1 transition-[transform,border-color,background] tap-transparent peer-checked:border-grape peer-checked:bg-grape-200 peer-checked:text-grape peer-focus-visible:ring-2 peer-focus-visible:ring-grape peer-focus-visible:ring-offset-2 active:translate-y-[3px]"
+            class="duration-fast flex cursor-pointer items-center justify-center rounded-2xl border-2 border-wool-line bg-paper px-3 py-answer font-display text-display-md font-bold text-plum shadow-1 transition-answer tap-transparent peer-checked:border-grape peer-checked:bg-grape-200 peer-checked:text-grape peer-focus-visible:ring-2 peer-focus-visible:ring-grape peer-focus-visible:ring-offset-2 active:translate-y-press"
           >
             {{ option }}
           </label>
