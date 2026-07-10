@@ -15,7 +15,7 @@
   },
   "private": true,
   "overrides": {
-    "eslint": "10.6.0",
+    "eslint": "10.7.0",
     "@angular-architects/ngrx-toolkit": {
       "@angular/common": "$@angular/common",
       "@angular/core": "$@angular/core"
@@ -57,7 +57,7 @@
     "@types/node": "25.9.5",
     "angular-eslint": "22.0.0",
     "axe-core": "4.12.1",
-    "eslint": "10.6.0",
+    "eslint": "10.7.0",
     "eslint-plugin-rxjs-x": "1.0.2",
     "eslint-plugin-sonarjs": "4.1.0",
     "eslint-plugin-tailwindcss": "4.1.0",
