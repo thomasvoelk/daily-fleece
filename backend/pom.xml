@@ -33,7 +33,7 @@
 		<nullaway.version>0.13.8</nullaway.version>
 		<error-prone.version>2.50.0</error-prone.version>
 		<archunit.version>1.4.2</archunit.version>
-		<openapi-generator.version>7.23.0</openapi-generator.version>
+		<openapi-generator.version>7.24.0</openapi-generator.version>
 		<spotless.version>3.8.0</spotless.version>
 		<checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
 		<spotbugs.plugin.version>4.10.3.0</spotbugs.plugin.version>
