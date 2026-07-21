@@ -64,7 +64,7 @@
     "jsdom": "29.1.1",
     "ng-openapi-gen": "1.0.5",
     "postcss": "8.5.20",
-    "prettier": "3.9.5",
+    "prettier": "3.9.6",
     "typescript": "6.0.3",
     "typescript-eslint": "8.65.0",
     "vitest": "4.1.10"
