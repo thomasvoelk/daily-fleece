@@ -52,7 +52,7 @@
     "@softarc/sheriff-core": "0.19.6",
     "@testing-library/angular": "19.4.2",
     "@testing-library/jest-dom": "6.9.1",
-    "@testing-library/user-event": "14.6.3",
+    "@testing-library/user-event": "14.6.4",
     "@vitest/coverage-v8": "4.1.10",
     "@types/node": "25.9.5",
     "angular-eslint": "22.1.0",
