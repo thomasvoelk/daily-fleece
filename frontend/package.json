@@ -60,7 +60,7 @@
     "eslint": "10.8.1",
     "eslint-plugin-rxjs-x": "1.0.4",
     "eslint-plugin-sonarjs": "4.2.0",
-    "eslint-plugin-tailwindcss": "4.2.0",
+    "eslint-plugin-tailwindcss": "4.3.0",
     "jsdom": "29.1.1",
     "ng-openapi-gen": "1.0.5",
     "postcss": "8.5.26",
