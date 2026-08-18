@@ -53,7 +53,7 @@
     "@testing-library/angular": "19.4.2",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/user-event": "14.6.5",
-    "@vitest/coverage-v8": "4.1.10",
+    "@vitest/coverage-v8": "4.1.11",
     "@types/node": "25.9.5",
     "angular-eslint": "22.1.0",
     "axe-core": "4.13.0",
@@ -67,6 +67,6 @@
     "prettier": "3.9.6",
     "typescript": "6.0.3",
     "typescript-eslint": "8.67.0",
-    "vitest": "4.1.10"
+    "vitest": "4.1.11"
   }
 }
