@@ -61,7 +61,7 @@
     "eslint-plugin-rxjs-x": "1.0.6",
     "eslint-plugin-sonarjs": "4.2.0",
     "eslint-plugin-tailwindcss": "4.4.0",
-    "jsdom": "29.1.1",
+    "jsdom": "30.0.1",
     "ng-openapi-gen": "1.0.5",
     "postcss": "8.5.26",
     "prettier": "3.9.6",
