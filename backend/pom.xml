@@ -404,6 +404,12 @@
 							<excludes>
 								<!-- Generated OpenAPI client/server code. -->
 								<exclude>de/dailyfleece/api/**</exclude>
+								<!-- BackendApplication#main is never exercised by any test: the Spring
+								     TestContext framework (used by @SpringBootTest/@ApplicationModuleTest)
+								     bootstraps via its own SpringApplication instance, bypassing this class's
+								     main() entirely (see df-0b86.5, df-0b86.6). The class contains nothing
+								     but this one line, so excluding it loses no other coverage tracking. -->
+								<exclude>de/dailyfleece/backend/BackendApplication.class</exclude>
 							</excludes>
 						</configuration>
 					</execution>

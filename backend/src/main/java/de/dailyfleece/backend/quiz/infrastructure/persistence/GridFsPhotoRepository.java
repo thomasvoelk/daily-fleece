@@ -1,7 +1,6 @@
 package de.dailyfleece.backend.quiz.infrastructure.persistence;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
-import de.dailyfleece.backend.infrastructure.Generated;
 import de.dailyfleece.backend.quiz.domain.Photo;
 import de.dailyfleece.backend.quiz.domain.PhotoRepository;
 import de.dailyfleece.backend.quiz.domain.PhotoType;
@@ -51,15 +50,12 @@ class GridFsPhotoRepository implements PhotoRepository {
         return Optional.of(new Photo(sessionId, question, openStream(file, sessionId, question), photoType));
     }
 
-    // GridFsResource#getInputStream() only returns an already-opened stream (verified via
-    // GridFsTemplate#getResource, which eagerly calls GridFSBucket#openDownloadStream) and does not
-    // itself perform I/O, so the catch below is unreachable via real infrastructure -- confirmed by
-    // deliberately deleting a stored file's fs.chunks entries, which surfaces as an unchecked
-    // MongoGridFSException on read, not this checked IOException (see df-0b86.3). Kept only because
-    // the checked signature of InputStreamResource#getInputStream() forces a catch somewhere;
-    // isolated into its own @Generated method so the jacoco gate excludes only this unreachable
-    // path, not the rest of this class.
-    @Generated
+    // No real GridFS state was found where GridFsResource#getInputStream() itself throws checked
+    // IOException (see df-0b86.3, df-0b86.6): it only surfaces via verifyExists(), reachable only for
+    // an "absent" resource obtained through GridFsTemplate#getResource(String), a call this class
+    // never makes. Real reachability isn't the point of testing this catch, though: the method
+    // signature says this can throw, so GridFsPhotoRepositoryOpenStreamFailureTest forces it via a
+    // hand-written GridFsTemplate subclass (see df-0b86.6) to prove the wrap-and-rethrow is correct.
     private InputStream openStream(GridFSFile file, UUID sessionId, String question) {
         try {
             return operations.getResource(file).getInputStream();

@@ -1,6 +1,5 @@
 package de.dailyfleece.backend.player.infrastructure.persistence;
 
-import de.dailyfleece.backend.infrastructure.Generated;
 import de.dailyfleece.backend.player.api.CompanyId;
 import de.dailyfleece.backend.player.domain.Player;
 import de.dailyfleece.backend.player.domain.PlayerRepository;
@@ -47,12 +46,14 @@ class MongoPlayerRepository implements PlayerRepository {
     }
 
     // The null branch here is unreachable given current domain invariants: no Player-delete
-    // operation exists anywhere in this domain, so the document that just caused a duplicate-key
-    // error cannot have vanished by the time we re-query it. Kept as defense-in-depth against a
-    // hypothetical future delete feature rather than removed, since NullAway/SpotBugs both require
-    // some null-handling here regardless (see df-0b86.4); isolated into its own @Generated method
-    // so the jacoco gate excludes only this unreachable path, not the rest of this class.
-    @Generated
+    // operation exists anywhere in this domain (re-checked df-0b86.6), a unique index on companyId
+    // with no TTL/expiry prevents Mongo from reaping the document itself, and no non-primary
+    // ReadPreference is configured, so this re-query can't observe a stale absence either. Re-check
+    // this whenever a player-delete feature or a non-primary read preference is introduced. Real
+    // reachability isn't the point of testing this branch, though: NullAway/SpotBugs both require
+    // handling this null regardless (see df-0b86.4), so
+    // MongoPlayerRepositoryDuplicateKeyRaceFailureTest forces it via a hand-written MongoTemplate
+    // subclass (see df-0b86.6) to prove the defense-in-depth actually works.
     private Player resolveAfterDuplicateKey(Query query, CompanyId companyId, DuplicateKeyException e) {
         @Nullable PlayerDocument raced = mongoTemplate.findOne(query, PlayerDocument.class);
         if (raced == null) {
