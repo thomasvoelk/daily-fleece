@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "spring-tools-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "backend/.spring-tools/launcher.js"
+      ],
+      "env": {}
+    }
+  }
+}

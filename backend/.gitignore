@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Spring Tools MCP server (manual install, see .spring-tools/) ###
+.spring-tools/language-server/
+.spring-tools/boot-ls.log
