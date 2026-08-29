@@ -51,7 +51,7 @@
     "@softarc/eslint-plugin-sheriff": "0.19.6",
     "@softarc/sheriff-core": "0.19.6",
     "@testing-library/angular": "19.4.2",
-    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/jest-dom": "7.0.1",
     "@testing-library/user-event": "14.6.6",
     "@vitest/coverage-v8": "4.1.11",
     "@types/node": "25.9.5",
