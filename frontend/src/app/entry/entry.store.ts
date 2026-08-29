@@ -2,9 +2,8 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
-import { withStorageSync } from '@angular-architects/ngrx-toolkit';
 import { Api, registerPlayer, joinSessionByKey } from '../backend-client';
-import { TODAY } from '../shared';
+import { TODAY, withLocalStorageSync } from '../shared';
 
 interface EntryState {
   playerId: string | null;
@@ -23,7 +22,7 @@ export const EntryStore = signalStore(
     phase: 'idle',
     errorMessage: null,
   }),
-  withStorageSync({
+  withLocalStorageSync({
     key: 'lobby-player',
     select: (state: EntryState) => ({
       playerId: state.playerId,

@@ -6,3 +6,4 @@ export type {
 export { CountryList } from './country-list';
 export { AVATAR_TONES } from './avatar-tones';
 export { TODAY } from './today';
+export { withLocalStorageSync } from './with-local-storage-sync';

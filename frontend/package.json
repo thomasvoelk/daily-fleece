@@ -15,19 +15,10 @@
   },
   "private": true,
   "overrides": {
-    "eslint": "10.9.1",
-    "@angular-architects/ngrx-toolkit": {
-      "@angular/common": "$@angular/common",
-      "@angular/core": "$@angular/core"
-    },
-    "@ngrx/signals": {
-      "@angular/common": "$@angular/common",
-      "@angular/core": "$@angular/core"
-    }
+    "eslint": "10.9.1"
   },
   "packageManager": "npm@12.0.2",
   "dependencies": {
-    "@angular-architects/ngrx-toolkit": "21.0.1",
     "@angular/cdk": "22.1.4",
     "@angular/common": "22.1.4",
     "@angular/compiler": "22.1.4",
@@ -36,7 +27,7 @@
     "@angular/material": "22.1.4",
     "@angular/platform-browser": "22.1.4",
     "@angular/router": "22.1.4",
-    "@ngrx/signals": "21.1.1",
+    "@ngrx/signals": "22.0.0",
     "@tailwindcss/postcss": "4.3.3",
     "rxjs": "7.8.2",
     "tailwindcss": "4.3.3",

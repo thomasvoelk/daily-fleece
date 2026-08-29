@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
-import { signal } from '@angular/core';
+import { signal, type Signal } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { Quiz } from './quiz';
 import { QuizStore } from './quiz.store';
@@ -26,9 +26,11 @@ function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse 
   };
 }
 
-function makeStoreMock(
-  overrides: Partial<InstanceType<typeof QuizStore>> = {},
-): InstanceType<typeof QuizStore> {
+type QuizStoreOverrides = Partial<Omit<InstanceType<typeof QuizStore>, 'session'>> & {
+  session?: Signal<SessionResponse | null>;
+};
+
+function makeStoreMock(overrides: QuizStoreOverrides = {}): InstanceType<typeof QuizStore> {
   return {
     session: signal(makeSession()),
     answerCount: signal({ answered: 0, total: 0 }),
