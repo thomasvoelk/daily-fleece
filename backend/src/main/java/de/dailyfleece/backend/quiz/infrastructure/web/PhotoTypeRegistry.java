@@ -34,6 +34,9 @@ final class PhotoTypeRegistry {
     }
 
     static MediaType toMediaType(PhotoType type) {
-        return Objects.requireNonNull(ENUM_TO_MEDIA_TYPE.get(type), () -> "No MediaType registered for: " + type);
+        // REGISTRY maps all PhotoType values, so this can't be null for a valid enum constant.
+        // No message supplier: a plain requireNonNull keeps the failure loud (NullPointerException)
+        // without introducing an uncoverable branch for a message lambda that can never run.
+        return Objects.requireNonNull(ENUM_TO_MEDIA_TYPE.get(type));
     }
 }

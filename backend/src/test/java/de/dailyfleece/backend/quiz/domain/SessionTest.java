@@ -151,6 +151,23 @@ class SessionTest {
     }
 
     @Test
+    void submitting_answer_for_q2_before_q1_has_closed_throws_votingClosed() {
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
+        session.start();
+
+        assertThatThrownBy(() -> session.submitAnswer(QuestionKey.Q2, HOST_ID, "DE"))
+                .isInstanceOf(VotingClosed.class);
+    }
+
+    @Test
+    void setting_correct_answer_for_q2_before_q1_has_closed_throws_votingClosed() {
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
+        session.start();
+
+        assertThatThrownBy(() -> session.setCorrectAnswer(QuestionKey.Q2, "DE")).isInstanceOf(VotingClosed.class);
+    }
+
+    @Test
     void setCorrectAnswer_on_q1_closes_q1_and_opens_q2() {
         Session session = Session.create(KEY, HOST_ID, HOST_NAME);
         session.start();
@@ -229,5 +246,17 @@ class SessionTest {
         assertThat(results.get(0).q1Correct()).isTrue();
         assertThat(results.get(0).q2Correct()).isFalse();
         assertThat(results.get(0).totalPoints()).isEqualTo(1);
+    }
+
+    @Test
+    void results_before_voting_has_started_gives_every_player_0_points() {
+        Session session = Session.create(KEY, HOST_ID, HOST_NAME);
+
+        List<PlayerResult> results = session.results();
+
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0).q1Correct()).isFalse();
+        assertThat(results.get(0).q2Correct()).isFalse();
+        assertThat(results.get(0).totalPoints()).isEqualTo(0);
     }
 }

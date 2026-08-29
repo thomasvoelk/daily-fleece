@@ -389,14 +389,20 @@
 									<element>BUNDLE</element>
 									<limits>
 										<limit>
+											<counter>LINE</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>1.00</minimum>
+										</limit>
+										<limit>
 											<counter>BRANCH</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.80</minimum>
+											<minimum>1.00</minimum>
 										</limit>
 									</limits>
 								</rule>
 							</rules>
 							<excludes>
+								<!-- Generated OpenAPI client/server code. -->
 								<exclude>de/dailyfleece/api/**</exclude>
 							</excludes>
 						</configuration>
