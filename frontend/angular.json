@@ -85,7 +85,8 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "tsconfig.spec.json",
-            "setupFiles": ["src/app/shared/testing/setup.ts"]
+            "setupFiles": ["src/app/shared/testing/setup.ts"],
+            "runnerConfig": "vitest.config.ts"
           },
           "configurations": {
             "ci": {
@@ -100,7 +101,7 @@
                 "statements": 100,
                 "lines": 100,
                 "functions": 100,
-                "branches": 98
+                "branches": 100
               }
             }
           }
