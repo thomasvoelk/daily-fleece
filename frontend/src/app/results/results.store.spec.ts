@@ -239,6 +239,43 @@ describe('ResultsStore – correctCount with partial correct answers', () => {
 
     expect(store.correctCount()).toBe(1);
   });
+
+  it('counts a correct Q2 answer when Q1 is wrong', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(ResultsStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    store.initializeSession(makeSession());
+    const loadPromise = store.load();
+    http.expectOne(RESULTS_URL).flush(
+      makeResults({
+        results: [
+          makePlayer({ playerId: 'p1', q1Correct: false, q2Correct: true, totalPoints: 1 }),
+        ],
+      }),
+    );
+    await loadPromise;
+
+    expect(store.correctCount()).toBe(1);
+  });
+});
+
+// ─── load with no session ─────────────────────────────────────────────────────
+
+describe('ResultsStore – load with no session', () => {
+  it('does nothing when there is no session', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(ResultsStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    await store.load();
+
+    http.verify();
+  });
 });
 
 describe('ResultsStore – enrichedResults', () => {

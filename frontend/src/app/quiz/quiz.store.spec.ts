@@ -238,6 +238,47 @@ describe('QuizStore – setQ2CorrectAnswer', () => {
 // ─── computed signals ────────────────────────────────────────────────────────
 
 describe('QuizStore – computed signals', () => {
+  it('q1Status and q2Status are null before a session is loaded', () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+
+    expect(store.q1Status()).toBeNull();
+    expect(store.q2Status()).toBeNull();
+  });
+
+  it('myQ1Answer and myQ2Answer are null when there is no player identity', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    store.initializeSession(makeSession());
+    const promise = store.refresh();
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession());
+    await promise;
+
+    expect(store.myQ1Answer()).toBeNull();
+    expect(store.myQ2Answer()).toBeNull();
+  });
+
+  it('answerCount/q2AnswerCount default to 0 answered when answerCount is not set', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    store.initializeSession(makeSession());
+    const promise = store.refresh();
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(
+      makeSession({
+        players: [{ playerId: 'p1', displayName: 'Alice' }],
+        voting: { q1: { status: 'Open' }, q2: { status: 'Open' } },
+      }),
+    );
+    await promise;
+
+    expect(store.answerCount()).toEqual({ answered: 0, total: 1 });
+    expect(store.q2AnswerCount()).toEqual({ answered: 0, total: 1 });
+  });
+
   it('q1Status reflects session voting status', async () => {
     TestBed.configureTestingModule({ providers: PROVIDERS });
     const store = TestBed.inject(QuizStore);
@@ -498,6 +539,31 @@ describe('QuizStore – refresh', () => {
 
     expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'q1']);
   });
+
+  it('does nothing when there is no session', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    await store.refresh();
+
+    http.verify();
+  });
+
+  it('does not redirect when phase is neither Active nor Ended', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate');
+
+    store.initializeSession(makeSession());
+    const promise = store.refresh();
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession({ phase: 'Lobby' }));
+    await promise;
+
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
 });
 
 // ─── loadSession ─────────────────────────────────────────────────────────────
@@ -544,6 +610,16 @@ describe('QuizStore – loadSession', () => {
     await promise;
 
     expect(navigateSpy).toHaveBeenCalledWith(['/session', 'default', '2026-06-02', 'results']);
+  });
+
+  it('does nothing when there is no session', async () => {
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(QuizStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    await store.loadSession();
+
+    http.verify();
   });
 });
 

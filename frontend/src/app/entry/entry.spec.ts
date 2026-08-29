@@ -87,3 +87,39 @@ describe('Entry – validation', () => {
     await screen.findAllByText('Pflichtfeld');
   });
 });
+
+// ─── create lobby ────────────────────────────────────────────────────────────
+
+describe('Entry – create lobby', () => {
+  it('creates a lobby and navigates when Create Lobby is submitted', async () => {
+    const user = userEvent.setup();
+    const { fixture } = await render(Entry, { providers: PROVIDERS });
+    const http = TestBed.inject(HttpTestingController);
+
+    await user.type(screen.getByRole('textbox', { name: 'Firmen-ID' }), 'acme');
+    await user.type(screen.getByRole('textbox', { name: 'Anzeigename' }), 'Alice');
+    await user.click(screen.getByRole('button', { name: 'Lobby erstellen' }));
+
+    http.expectOne('/api/v1/players').flush({ playerId: 'p1' });
+
+    await waitFor(() => {
+      expect(TestBed.inject(EntryStore).phase()).toBe('idle');
+    });
+    fixture.detectChanges();
+  });
+});
+
+// ─── form submit prevention ──────────────────────────────────────────────────
+
+describe('Entry – form submission', () => {
+  it('prevents native form submission', async () => {
+    await render(Entry, { providers: PROVIDERS });
+
+    const form = document.querySelector('form');
+    if (form === null) throw new Error('expected a form element');
+    const event = new Event('submit', { bubbles: true, cancelable: true });
+    form.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+});

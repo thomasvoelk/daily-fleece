@@ -117,6 +117,32 @@ describe('Results – player table', () => {
     expect(screen.getAllByText('0').length).toBeGreaterThan(0);
   });
 
+  it('renders empty answer cells when a player has no q1/q2 answer', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    const stubStore = makeStubStore(makeResults(), [
+      {
+        playerId: 'p1',
+        displayName: 'Alice',
+        q1Answer: null,
+        q2Answer: null,
+        q1Correct: false,
+        q2Correct: false,
+        totalPoints: 0,
+      },
+    ]);
+    await render(Results, {
+      providers: [...BASE_PROVIDERS, { provide: ResultsStore, useValue: stubStore }],
+    });
+
+    const row = screen.getByRole('row', { name: 'Alice' });
+    const cells = row.querySelectorAll('td');
+    expect(cells[2].textContent.trim()).toBe('');
+    expect(cells[3].textContent.trim()).toBe('');
+  });
+
   it('shows the player Q1 answer text in the cell', async () => {
     localStorage.setItem(
       'lobby-player',
@@ -254,6 +280,57 @@ describe('Results – arcade headline', () => {
     });
 
     expect(screen.getByText(/Weiter so/)).toBeTruthy();
+  });
+
+  it('shows the RANG badge when myRank is set', async () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    const stubStore = makeStubStore(makeResults());
+    stubStore.myResult = signal({
+      playerId: 'p1',
+      displayName: 'Alice',
+      q1Correct: true,
+      q2Correct: true,
+      totalPoints: 2,
+    });
+    stubStore.correctCount = signal(2);
+    stubStore.myRank = signal(3);
+    await render(Results, {
+      providers: [...BASE_PROVIDERS, { provide: ResultsStore, useValue: stubStore }],
+    });
+
+    expect(screen.getByText('#3')).toBeTruthy();
+  });
+});
+
+// ─── no data ──────────────────────────────────────────────────────────────────
+
+describe('Results – no data', () => {
+  it('renders nothing when the results have not loaded yet', async () => {
+    const stubStore = makeStubStore(null);
+    const { container } = await render(Results, {
+      providers: [...BASE_PROVIDERS, { provide: ResultsStore, useValue: stubStore }],
+    });
+
+    expect(container.querySelector('main')?.textContent.trim()).toBe('');
+  });
+});
+
+// ─── countryName ──────────────────────────────────────────────────────────────
+
+describe('Results – countryName', () => {
+  it('returns an empty string when code is null', async () => {
+    const stubStore = makeStubStore(null);
+    const { fixture } = await render(Results, {
+      providers: [...BASE_PROVIDERS, { provide: ResultsStore, useValue: stubStore }],
+    });
+    const instance = fixture.componentInstance as unknown as {
+      countryName: (code: string | null) => string;
+    };
+
+    expect(instance.countryName(null)).toBe('');
   });
 });
 

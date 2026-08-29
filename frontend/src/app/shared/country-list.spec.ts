@@ -54,5 +54,21 @@ describe('CountryList', () => {
     it('returns the code itself as fallback for an unknown code', () => {
       expect(service.nameOf('UNKNOWN')).toBe('UNKNOWN');
     });
+
+    it('falls back to the ISO code when Intl.DisplayNames returns no name for it', () => {
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- called via .call() below with an explicit `this`
+      const original = Intl.DisplayNames.prototype.of;
+      vi.spyOn(Intl.DisplayNames.prototype, 'of').mockImplementation(function (
+        this: Intl.DisplayNames,
+        code: string,
+      ) {
+        return code === 'DE' ? undefined : original.call(this, code);
+      });
+
+      const fallbackService = new CountryList();
+      expect(fallbackService.nameOf('DE')).toBe('DE');
+
+      vi.restoreAllMocks();
+    });
   });
 });

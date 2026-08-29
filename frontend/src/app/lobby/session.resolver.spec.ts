@@ -39,6 +39,20 @@ describe('sessionResolver', () => {
     });
   });
 
+  it('redirects to / when projectId or date is missing from the route', async () => {
+    const route = {
+      paramMap: convertToParamMap({}),
+      firstChild: null,
+    } as unknown as ActivatedRouteSnapshot;
+
+    const result = await TestBed.runInInjectionContext(() =>
+      sessionResolver(route, {} as RouterStateSnapshot),
+    );
+
+    expect(result).toBeInstanceOf(UrlTree);
+    expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe('/');
+  });
+
   it('redirects to / when the API returns 404', async () => {
     const route = makeRoute('default', '2026-06-12');
     const http = TestBed.inject(HttpTestingController);

@@ -44,7 +44,9 @@ export const HostSetupStore = signalStore(
         patchState(store, { q2: file });
       },
       async createSession(): Promise<void> {
-        if (!store.canSubmit()) return;
+        const q1 = store.q1();
+        const q2 = store.q2();
+        if (!q1 || !q2 || store.phase() === 'loading') return;
         const playerId = entryStore.playerId();
         const displayName = entryStore.displayName();
         if (!playerId || !displayName) {
@@ -54,9 +56,6 @@ export const HostSetupStore = signalStore(
           });
           return;
         }
-        const q1 = store.q1();
-        const q2 = store.q2();
-        if (!q1 || !q2) return; // canSubmit() already guarantees this; needed for type narrowing
         patchState(store, { phase: 'loading', errorMessage: null });
         try {
           const projectId = store.projectId();

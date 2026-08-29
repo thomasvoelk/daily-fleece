@@ -195,7 +195,63 @@ describe('Leaderboard – champion fireworks', () => {
 
   it('does not render fireworks for an empty board', async () => {
     const container = await renderWith([]);
+    await screen.findByText('Rangliste');
 
     expect(container.querySelector('[data-fireworks]')).toBeNull();
+  });
+
+  it('does not show the rank text when the current player is not on the board', async () => {
+    await renderWith([
+      { playerId: 'p1', displayName: 'Alice', sessionsParticipated: 5, totalPoints: 10 },
+    ]);
+    await screen.findByRole('row', { name: 'Alice' });
+
+    expect(screen.queryByText(/Platz/)).toBeNull();
+  });
+});
+
+// ─── unit-level computed signals ──────────────────────────────────────────────
+
+describe('Leaderboard – computed signals', () => {
+  it('entries() is empty before the leaderboard has loaded', () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'p1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const fixture = TestBed.createComponent(Leaderboard);
+    const instance = fixture.componentInstance as unknown as {
+      entries: () => unknown[];
+      myRank: () => number | null;
+    };
+    fixture.detectChanges();
+
+    expect(instance.entries()).toEqual([]);
+    expect(instance.myRank()).toBeNull();
+
+    TestBed.inject(HttpTestingController).expectOne('/api/v1/leaderboard').flush(makeLeaderboard());
+  });
+
+  it('myRank() is null when the current player is not on the board', () => {
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'not-listed', companyId: 'acme', displayName: 'Ghost' }),
+    );
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const fixture = TestBed.createComponent(Leaderboard);
+    const instance = fixture.componentInstance as unknown as { myRank: () => number | null };
+    fixture.detectChanges();
+
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/v1/leaderboard')
+      .flush(
+        makeLeaderboard({
+          entries: [
+            { playerId: 'p1', displayName: 'Alice', sessionsParticipated: 5, totalPoints: 10 },
+          ],
+        }),
+      );
+
+    expect(instance.myRank()).toBeNull();
   });
 });

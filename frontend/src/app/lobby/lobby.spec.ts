@@ -33,7 +33,10 @@ function makeSession(overrides: Partial<SessionResponse> = {}): SessionResponse 
 
 const PROVIDERS = [
   ...provideTestEnvironment(),
-  provideRouter([{ path: 'quiz', component: QuizStub }]),
+  provideRouter([
+    { path: 'quiz', component: QuizStub },
+    { path: 'session/:projectId/:date/q1', component: QuizStub },
+  ]),
   LobbyStore,
 ];
 
@@ -113,6 +116,24 @@ describe('Lobby – Start Quiz button', () => {
     fixture.detectChanges();
 
     screen.getByRole('button', { name: 'Quiz starten' });
+  });
+
+  it('starts the quiz when clicked', async () => {
+    const user = userEvent.setup();
+    localStorage.setItem(
+      'lobby-player',
+      JSON.stringify({ playerId: 'host-1', companyId: 'acme', displayName: 'Alice' }),
+    );
+    const { fixture } = await render(Lobby, { providers: PROVIDERS });
+    const http = TestBed.inject(HttpTestingController);
+    TestBed.inject(LobbyStore).initializeSession(makeSession({ hostId: 'host-1' }));
+    fixture.detectChanges();
+
+    await user.click(screen.getByRole('button', { name: 'Quiz starten' }));
+
+    http
+      .expectOne('/api/v1/sessions/default/2026-05-31/start')
+      .flush(makeSession({ hostId: 'host-1' }));
   });
 
   it('is absent for a regular player', async () => {

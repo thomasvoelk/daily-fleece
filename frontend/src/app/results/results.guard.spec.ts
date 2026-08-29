@@ -2,12 +2,14 @@ import { signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import {
   ActivatedRouteSnapshot,
+  convertToParamMap,
   MaybeAsync,
   GuardResult,
   Router,
   UrlTree,
   provideRouter,
 } from '@angular/router';
+import { HttpTestingController } from '@angular/common/http/testing';
 import { resultsGuard } from './results.guard';
 import { ResultsStore } from './results.store';
 import { EntryContext } from '../entry';
@@ -102,5 +104,51 @@ describe('resultsGuard', () => {
     expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe(
       '/session/default/2026-06-12/lobby',
     );
+  });
+
+  it('fetches the session via the API using route.parent params when route.data has no session', async () => {
+    playerId.set('p1');
+    const route = {
+      data: {},
+      url: [{ path: 'results' }],
+      parent: { paramMap: convertToParamMap({ projectId: 'default', date: '2026-06-12' }) },
+    } as unknown as ActivatedRouteSnapshot;
+
+    const http = TestBed.inject(HttpTestingController);
+    const promise = TestBed.runInInjectionContext(() => resultsGuard(route, {} as never));
+    http.expectOne('/api/v1/sessions/default/2026-06-12').flush(makeSession({ phase: 'Ended' }));
+
+    expect(await promise).toBe(true);
+  });
+
+  it('redirects to / when route.parent is missing projectId/date and route.data has no session', async () => {
+    const route = {
+      data: {},
+      url: [{ path: 'results' }],
+      parent: { paramMap: convertToParamMap({}) },
+    } as unknown as ActivatedRouteSnapshot;
+
+    const result = await TestBed.runInInjectionContext(() => resultsGuard(route, {} as never));
+
+    expect(result).toBeInstanceOf(UrlTree);
+    expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe('/');
+  });
+
+  it('redirects to / when the API call fails', async () => {
+    const route = {
+      data: {},
+      url: [{ path: 'results' }],
+      parent: { paramMap: convertToParamMap({ projectId: 'default', date: '2026-06-12' }) },
+    } as unknown as ActivatedRouteSnapshot;
+
+    const http = TestBed.inject(HttpTestingController);
+    const promise = TestBed.runInInjectionContext(() => resultsGuard(route, {} as never));
+    http
+      .expectOne('/api/v1/sessions/default/2026-06-12')
+      .flush({ message: 'Not Found' }, { status: 404, statusText: 'Not Found' });
+
+    const result = await promise;
+    expect(result).toBeInstanceOf(UrlTree);
+    expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe('/');
   });
 });

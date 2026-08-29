@@ -73,9 +73,7 @@ export const QuizStore = signalStore(
     const router = inject(Router);
     const entryStore = inject(EntryContext);
 
-    async function fetchAndStore(): Promise<void> {
-      const date = store.session()?.date;
-      if (!date) return;
+    async function fetchAndStore(date: string): Promise<void> {
       const session = await firstValueFrom(
         api.invoke(getSessionByKey, { projectId: 'default', date }),
       );
@@ -134,7 +132,7 @@ export const QuizStore = signalStore(
             body: { playerId, answer },
           }),
         );
-        await fetchAndStore();
+        await fetchAndStore(session.date);
       },
 
       async submitQ2Answer(answer: string): Promise<void> {
@@ -150,7 +148,7 @@ export const QuizStore = signalStore(
             body: { playerId, answer },
           }),
         );
-        await fetchAndStore();
+        await fetchAndStore(session.date);
       },
 
       async setQ1CorrectAnswer(correctAnswer: 'A' | 'B' | 'C'): Promise<void> {

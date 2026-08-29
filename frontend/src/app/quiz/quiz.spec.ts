@@ -76,6 +76,23 @@ describe('Quiz – a11y', () => {
   });
 });
 
+// ─── no session ──────────────────────────────────────────────────────────────
+
+describe('Quiz – no session', () => {
+  it('renders nothing when there is no session', async () => {
+    const { container } = await renderQuiz({ session: signal(null) });
+    expect(container.querySelector('main')?.textContent.trim()).toBe('');
+  });
+
+  it('photoUrl() returns an empty string when there is no session', async () => {
+    const { fixture } = await renderQuiz({ session: signal(null) });
+    const instance = fixture.componentInstance as unknown as {
+      photoUrl: (question: 'q1' | 'q2') => string;
+    };
+    expect(instance.photoUrl('q1')).toBe('');
+  });
+});
+
 // ─── Q1 photo ────────────────────────────────────────────────────────────────
 
 describe('Quiz – Q1 photo', () => {
@@ -383,6 +400,18 @@ describe('Quiz – Q1 photo lightbox', () => {
     await user.keyboard('[Escape]');
 
     expect(screen.queryByRole('img', { name: 'Frage 1 vergrößert' })).toBeNull();
+  });
+
+  it('pressing Escape while focus is inside the dialog closes it', async () => {
+    const user = userEvent.setup();
+    await renderQuiz({ session: signal(makeSession({ sessionId: 'abc' })) });
+
+    await user.click(screen.getByRole('img', { name: 'Frage 1' }));
+    screen.getByRole('dialog').focus();
+
+    await user.keyboard('[Escape]');
+
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 });
 

@@ -64,4 +64,13 @@ describe('hasPlayerIdGuard', () => {
     expect(store.projectId()).toBe('default');
     expect(store.date()).toBe('2026-06-12');
   });
+
+  it('falls back to "default" projectId and empty date when route has no parent', async () => {
+    playerId.set('p1');
+    const routeWithoutParent = { parent: null } as unknown as ActivatedRouteSnapshot;
+    await runGuard(routeWithoutParent);
+    const store = TestBed.inject(HostSetupStore);
+    expect(store.projectId()).toBe('default');
+    expect(store.date()).toBe('');
+  });
 });

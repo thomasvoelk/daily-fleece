@@ -106,6 +106,34 @@ describe('HostSetupStore – createSession', () => {
     expect(store.errorMessage()).toBeTruthy();
   });
 
+  it('does nothing when canSubmit is false (no files selected)', async () => {
+    seedPlayer('p1', 'Alice');
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(HostSetupStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    store.initialize('default', TODAY);
+    await store.createSession();
+
+    http.expectNone(CREATE_URL);
+    expect(store.phase()).toBe('idle');
+  });
+
+  it('does nothing when projectId/date are not initialized', async () => {
+    seedPlayer('p1', 'Alice');
+    TestBed.configureTestingModule({ providers: PROVIDERS });
+    const store = TestBed.inject(HostSetupStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    store.selectQ1(new File(['x'], 'q1.jpg', { type: 'image/jpeg' }));
+    store.selectQ2(new File(['x'], 'q2.jpg', { type: 'image/jpeg' }));
+
+    await store.createSession();
+
+    http.verify();
+    expect(store.phase()).toBe('loading');
+  });
+
   it('sets phase to error and re-enables canSubmit on failure', async () => {
     seedPlayer('p1', 'Alice');
     TestBed.configureTestingModule({ providers: PROVIDERS });

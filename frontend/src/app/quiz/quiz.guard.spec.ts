@@ -2,12 +2,14 @@ import { signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import {
   ActivatedRouteSnapshot,
+  convertToParamMap,
   MaybeAsync,
   GuardResult,
   Router,
   UrlTree,
   provideRouter,
 } from '@angular/router';
+import { HttpTestingController } from '@angular/common/http/testing';
 import { quizGuard } from './quiz.guard';
 import { QuizStore } from './quiz.store';
 import { EntryContext } from '../entry';
@@ -116,5 +118,64 @@ describe('quizGuard', () => {
   it('allows /q2 access for Ended session without identity', async () => {
     const result = await runGuard(makeSession({ phase: 'Ended' }), 'q2');
     expect(result).toBe(true);
+  });
+
+  it('defaults to q1 when route.url is empty', async () => {
+    playerId.set('p1');
+    const route = {
+      data: { session: makeSession() },
+      url: [],
+    } as unknown as ActivatedRouteSnapshot;
+
+    const result = await TestBed.runInInjectionContext(() => quizGuard(route, {} as never));
+
+    expect(result).toBe(true);
+    expect(TestBed.inject(QuizStore).activeQuestion()).toBe('q1');
+  });
+
+  it('fetches the session via the API using route.parent params when route.data has no session', async () => {
+    playerId.set('p1');
+    const route = {
+      data: {},
+      url: [{ path: 'q1' }],
+      parent: { paramMap: convertToParamMap({ projectId: 'default', date: '2026-06-02' }) },
+    } as unknown as ActivatedRouteSnapshot;
+
+    const http = TestBed.inject(HttpTestingController);
+    const promise = TestBed.runInInjectionContext(() => quizGuard(route, {} as never));
+    http.expectOne('/api/v1/sessions/default/2026-06-02').flush(makeSession());
+
+    expect(await promise).toBe(true);
+  });
+
+  it('redirects to / when route.parent is missing projectId/date and route.data has no session', async () => {
+    const route = {
+      data: {},
+      url: [{ path: 'q1' }],
+      parent: { paramMap: convertToParamMap({}) },
+    } as unknown as ActivatedRouteSnapshot;
+
+    const result = await TestBed.runInInjectionContext(() => quizGuard(route, {} as never));
+
+    expect(result).toBeInstanceOf(UrlTree);
+    expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe('/');
+  });
+
+  it('redirects to / when the API call fails', async () => {
+    const route = {
+      data: {},
+      url: [{ path: 'q1' }],
+      parent: { paramMap: convertToParamMap({ projectId: 'default', date: '2026-06-02' }) },
+    } as unknown as ActivatedRouteSnapshot;
+
+    const http = TestBed.inject(HttpTestingController);
+    const promise = TestBed.runInInjectionContext(() => quizGuard(route, {} as never));
+    http
+      .expectOne('/api/v1/sessions/default/2026-06-02')
+      .flush({ message: 'Not Found' }, { status: 404, statusText: 'Not Found' });
+
+    const result = await promise;
+    expect(result).toBeInstanceOf(UrlTree);
+    expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toBe('/');
   });
 });
