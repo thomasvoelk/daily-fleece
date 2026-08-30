@@ -2,6 +2,7 @@ package de.dailyfleece.backend.player.application;
 
 import de.dailyfleece.backend.player.domain.LeaderboardEntry;
 import de.dailyfleece.backend.player.domain.LeaderboardRepository;
+import io.micrometer.observation.annotation.Observed;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ public class GetLeaderboardUseCase {
     }
 
     /** Returns all leaderboard entries ordered by totalPoints descending. */
+    @Observed
     public List<LeaderboardEntry> get() {
         return leaderboardRepository.findAllOrderedByTotalPointsDesc();
     }

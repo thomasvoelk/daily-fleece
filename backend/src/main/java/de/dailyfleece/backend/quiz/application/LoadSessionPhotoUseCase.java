@@ -3,6 +3,9 @@ package de.dailyfleece.backend.quiz.application;
 import de.dailyfleece.backend.quiz.domain.Photo;
 import de.dailyfleece.backend.quiz.domain.PhotoRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.observation.annotation.ObservationKeyValue;
+import io.micrometer.observation.annotation.Observed;
+import io.micrometer.observation.aop.Cardinality;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +21,10 @@ public class LoadSessionPhotoUseCase {
     }
 
     /** Returns the photo for the given session and question, or throws {@link SessionNotFound}. */
-    public Photo load(UUID sessionId, String question) {
+    @Observed
+    public Photo load(
+            @ObservationKeyValue(key = "session.id", cardinality = Cardinality.HIGH) UUID sessionId,
+            @ObservationKeyValue(key = "voting.question", cardinality = Cardinality.LOW) String question) {
         return photoRepository.load(sessionId, question).orElseThrow(() -> new SessionNotFound(sessionId));
     }
 }

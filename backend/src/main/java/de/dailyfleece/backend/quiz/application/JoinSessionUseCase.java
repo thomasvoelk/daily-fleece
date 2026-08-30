@@ -4,6 +4,9 @@ import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import de.dailyfleece.backend.shared.PlayerName;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.observation.annotation.ObservationKeyValue;
+import io.micrometer.observation.annotation.Observed;
+import io.micrometer.observation.aop.Cardinality;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +26,11 @@ public class JoinSessionUseCase {
      * if no Session exists with that ID, or {@link
      * de.dailyfleece.backend.quiz.domain.LobbyClosed} if the session is no longer in Lobby phase.
      */
-    public Session join(UUID sessionId, UUID playerId, PlayerName displayName) {
+    @Observed
+    public Session join(
+            @ObservationKeyValue(key = "session.id", cardinality = Cardinality.HIGH) UUID sessionId,
+            @ObservationKeyValue(key = "player.id", cardinality = Cardinality.HIGH) UUID playerId,
+            PlayerName displayName) {
         Session session = sessionRepository.findById(sessionId).orElseThrow(() -> new SessionNotFound(sessionId));
         session.join(playerId, displayName);
         sessionRepository.save(session);

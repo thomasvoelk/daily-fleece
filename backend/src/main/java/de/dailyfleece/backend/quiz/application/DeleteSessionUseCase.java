@@ -3,6 +3,7 @@ package de.dailyfleece.backend.quiz.application;
 import de.dailyfleece.backend.quiz.domain.PhotoRepository;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.observation.annotation.Observed;
 import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ public class DeleteSessionUseCase {
     }
 
     /** Deletes the session for the given date and its photos; no-op if none exists. */
+    @Observed
     public void delete(LocalDate date) {
         sessionRepository.findByDate(date).ifPresent(session -> {
             photoRepository.deleteBySessionId(session.sessionId());
