@@ -7,6 +7,9 @@ import de.dailyfleece.backend.quiz.domain.Session;
 import de.dailyfleece.backend.quiz.domain.SessionPhase;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.observation.annotation.ObservationKeyValue;
+import io.micrometer.observation.annotation.Observed;
+import io.micrometer.observation.aop.Cardinality;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.context.ApplicationEventPublisher;
@@ -30,7 +33,16 @@ public class SetCorrectAnswerUseCase {
      * delegates to the domain. Throws {@link SessionNotFound} if the session does not exist or
      * {@link NotTheHost} if the caller is not the host.
      */
-    public Session set(UUID sessionId, QuestionKey question, UUID requestingPlayerId, String correctAnswer) {
+    @Observed
+    @ObservationKeyValue(
+            key = "session.phase",
+            resolver = SessionPhaseKeyValueResolver.class,
+            cardinality = Cardinality.LOW)
+    public Session set(
+            @ObservationKeyValue(key = "session.id", cardinality = Cardinality.HIGH) UUID sessionId,
+            @ObservationKeyValue(key = "voting.question", cardinality = Cardinality.LOW) QuestionKey question,
+            @ObservationKeyValue(key = "player.id", cardinality = Cardinality.HIGH) UUID requestingPlayerId,
+            String correctAnswer) {
         Session session = sessionRepository.findById(sessionId).orElseThrow(() -> new SessionNotFound(sessionId));
         if (!session.hostId().equals(requestingPlayerId)) {
             throw new NotTheHost(sessionId, requestingPlayerId);

@@ -59,14 +59,24 @@ produces both a span and a metric from the same call.
 
 ## Local validation stack
 
-**Grafana Tempo**, run locally via the single-container `grafana/otel-lgtm` image:
+**Grafana Tempo**, run locally via the single-container `grafana/otel-lgtm` image, wired into Spring
+Boot's own Docker Compose lifecycle management (`backend/compose.observability.yml`, layered onto
+`compose.local-dev.yml` via `spring.docker.compose.file` in `application-local-dev.properties`) so it
+starts and stops alongside the backend and MongoDB — no separate `docker run` step:
 
-```
-docker run -p 3000:3000 -p 4317:4317 -p 4318:4318 grafana/otel-lgtm
+```yaml
+# backend/compose.observability.yml
+services:
+  otel-lgtm:
+    image: grafana/otel-lgtm:0.32.0
+    ports:
+      - '${LOCAL_DEV_GRAFANA_PORT:-3000}:3000' # Grafana UI
+      - '${LOCAL_DEV_OTLP_GRPC_PORT:-4317}:4317' # OTLP gRPC
+      - '${LOCAL_DEV_OTLP_HTTP_PORT:-4318}:4318' # OTLP HTTP
+      - '${LOCAL_DEV_TEMPO_PORT:-3200}:3200' # Tempo query API (TraceQL)
 ```
 
-(Grafana UI on 3000, OTLP gRPC on 4317, OTLP HTTP on 4318.) The multi-container docker-compose
-example is available if closer-to-prod fidelity is ever needed.
+The multi-container docker-compose example is available if closer-to-prod fidelity is ever needed.
 
 Tempo is the only local candidate that fully satisfies the wide-event query bar: **TraceQL** filters
 on any span/resource attribute without pre-declared indexing (`{ span.session.id = "…" }`), and
@@ -85,31 +95,59 @@ comparison: `docs/research/local-observability-backend-comparison.md` on the thr
 Three tiers, all Micrometer `Observation`s landing in one trace:
 
 1. **HTTP span** — auto-created by Spring MVC via the OTel starter. A global `ObservationFilter`
-   bean runs on every `Observation` created anywhere (HTTP or not) and, when available, attaches:
-   - `player.id` — from `SecurityContextHolder`'s `AuthenticatedPlayer` principal
-     ([ADR-0019](../adr/0019-pluggable-authentication.md))
-   - `session.project_id`, `session.date` — from path variables; sessions are natural-key-routed
-     per [ADR-0016](../adr/0016-natural-key-routing-for-sessions.md), so these are literally in the
-     URL
+   bean (`RequestContextObservationFilter`, in `infrastructure.web`) runs on every `Observation`
+   created anywhere (HTTP or not) and, when available, attaches `session.project_id` and
+   `session.date` by reading the resolved Spring MVC path variables off the carrier request;
+   sessions are natural-key-routed per [ADR-0016](../adr/0016-natural-key-routing-for-sessions.md),
+   so these are literally in the URL. The filter no-ops gracefully for non-HTTP observations and
+   for HTTP requests without those path variables (`/api/v1/players`, `/api/v1/leaderboard`, …).
 
-   The filter no-ops gracefully where these aren't available (`/auth/login`, non-HTTP work).
+   **Deviation from the original design (df-9aoe.3): `player.id` is not attached here.** The
+   original design called for `player.id` from `SecurityContextHolder`'s `AuthenticatedPlayer`
+   principal ([ADR-0019](../adr/0019-pluggable-authentication.md)) — but ADR-0019's auth stack
+   (Spring Security, the `AuthenticatedPlayer` type) was never implemented; today player/host IDs
+   arrive as request-body fields (`playerId`, `hostId`), resolved to a `UUID` inside each
+   controller before it calls the use case, not as a path variable or a pre-populated security
+   context available to a filter that runs before the body is parsed. Implemented instead: each
+   use case that receives a caller `UUID` attaches its own `player.id` (tier 2, below) via
+   `@ObservationKeyValue` on that parameter. This closes once ADR-0019 lands and a real
+   `SecurityContextHolder` principal exists.
 
 2. **Use-case span** — `@Observed` on each use case's execute method
-   (`SubmitAnswerUseCase`, `SetCorrectAnswerUseCase`, `UpdateLeaderboardUseCase`, …). Carries
-   `session.id` — the internal `UUID` ([ADR-0010](../adr/0010-domain-value-types-and-shared-named-interface.md)),
-   resolved from the natural key and not present in the URL — plus outcome attributes only knowable
-   after execution: voting phase, correctness, computed scores.
+   (`SubmitAnswerUseCase`, `SetCorrectAnswerUseCase`, `UpdateLeaderboardUseCase`, …), backed by
+   `spring-boot-starter-aspectj` and `management.observations.annotations.enabled=true` (off by
+   default in Spring Boot 4). Attributes are declared with Micrometer's `@ObservationKeyValue`
+   annotation rather than hand-written code:
+   - Inputs already available as method parameters — `session.id` (the internal `UUID`,
+     [ADR-0010](../adr/0010-domain-value-types-and-shared-named-interface.md)), `player.id`,
+     `voting.question` — are annotated directly on the parameter; the default behaviour
+     (`toString()` of the argument) is enough for `UUID`/enum parameters.
+   - Outcome attributes only knowable after execution (`session.phase` after
+     `SetCorrectAnswerUseCase`/`StartSessionUseCase`; the created `session.id` for
+     `CreateSessionUseCase`; the created `player.id` for `RegisterPlayerUseCase`) are declared on
+     the method, evaluated against the return value. These use a small `ValueResolver` class
+     (`SessionIdKeyValueResolver`, `SessionPhaseKeyValueResolver`, `PlayerIdKeyValueResolver`) per
+     use-case package rather than a SpEL `expression` string: Micrometer's `ObservedAspect`
+     evaluates method-result annotations unconditionally, including on the exception path where
+     the result is `null` — a SpEL expression throws in that case (logged as noisy
+     `AnnotationHandler` errors on every handled-exception request), whereas a resolver can just
+     check `instanceof` and return `""` for a `null`/wrong-type argument.
 
 3. **Module-boundary spans** — Spring Modulith's existing `spring-modulith-starter-insight`
    instrumentation ([ADR-0006](../adr/0006-spring-modulith-modules.md)), left untouched. Another
    layer in the same trace, already Micrometer-based.
 
 **Attribute naming:** dotted lower-snake, OTel semantic-convention style (`session.id`,
-`session.project_id`, `player.id`, `voting.question`, `voting.correct`, …) to match the
+`session.project_id`, `player.id`, `voting.question`, `session.phase`, …) to match the
 auto-instrumented attributes already present on the same spans (`http.route`, `db.system`, …).
+Identifiers (`session.id`, `player.id`) are high-cardinality (span-only, never a metric tag, since
+`@Observed` also emits a `Timer` meter tagged with the low-cardinality key values); bounded values
+(`session.project_id`, `voting.question`, `session.phase`) are low-cardinality. `session.date` is
+high-cardinality despite being bounded per day, because it grows by one new value every day
+indefinitely — unsuitable as an unbounded `Timer` tag.
 
 Full design rationale, including why `@Observed` was chosen over `@WithSpan`:
-resolution comment on df-9aoe.3.
+resolution comment on df-9aoe.3. Implementation: df-9aoe.7.
 
 ## Error handling
 
@@ -203,15 +241,22 @@ than re-deriving the model from prose each time:
 > - OpenTelemetry spans are our primary signal. Logging is reserved for infra/startup noise outside
 >   request scope — never duplicate a fact that's already an attribute on a span.
 > - Instrument exclusively through the Micrometer Observation API (`@Observed`,
->   `ObservationFilter`, `.lowCardinalityKeyValue()` / `.highCardinalityKeyValue()`). Never the raw
->   OpenTelemetry API (`@WithSpan`, `Span.current()`).
-> - Every use-case span must carry `session.id` and outcome attributes (voting phase, correctness,
->   computed scores) — via `@Observed` on the use case's execute method.
-> - `player.id`, `session.project_id`, and `session.date` are attached globally by the
->   `ObservationFilter` — do not re-attach them per use case.
+>   `@ObservationKeyValue`, `ObservationFilter`). Never the raw OpenTelemetry API (`@WithSpan`,
+>   `Span.current()`).
+> - Every use-case span must carry `session.id` and outcome attributes (voting phase, computed
+>   scores) — via `@ObservationKeyValue` on the use case's execute method/parameters. Use a
+>   `ValueResolver` (not a SpEL `expression`) for anything evaluated against the method's return
+>   value, since `ObservedAspect` evaluates result annotations even on the exception path
+>   (result is `null`) and a SpEL expression throws there.
+> - `session.project_id` and `session.date` are attached globally by the `ObservationFilter` — do
+>   not re-attach them per use case. `player.id` is **not** global (no `SecurityContextHolder`
+>   principal exists yet — ADR-0019 isn't implemented): attach it per use case via
+>   `@ObservationKeyValue` on whatever parameter carries the caller's `UUID`.
 > - Attribute names are dotted lower-snake, OTel semantic-convention style
->   (`session.id`, `voting.correct`, …) — match existing auto-instrumented attributes
->   (`http.route`, `db.system`).
+>   (`session.id`, `voting.question`, `session.phase`, …) — match existing auto-instrumented
+>   attributes (`http.route`, `db.system`). Identifiers are high-cardinality; bounded values
+>   (enums, the project ID) are low-cardinality — low-cardinality values also become `Timer`
+>   meter tags, so never mark an unboundedly-growing value (like `session.date`) low-cardinality.
 > - On error: HTTP-level handlers call `ServerHttpObservationFilter.findObservationContext(request)
 >   .ifPresent(context -> context.setError(exception))` explicitly; use-case and non-HTTP spans mark
 >   errors automatically via `ObservedAspect` — no extra code needed there.
@@ -234,9 +279,11 @@ validated here:
 - OTLP export endpoint configuration (`management.opentelemetry.tracing.export.otlp.endpoint`) will
   need to point at whatever backend the CF deployment (or the author's work fork) uses instead of
   the local `grafana/otel-lgtm` container.
-- Sampling (`management.tracing.sampling.probability`) is unconfigured/default locally; a
-  production deployment with real traffic volume should set this deliberately rather than trace
-  every request.
+- Sampling (`management.tracing.sampling.probability`) is set to `1.0` in
+  `application-local-dev.properties` — Spring Boot's default of `0.1` would make the ODD workflow's
+  single manual/e2e hit (see below) unreliable, since 9 in 10 such requests would go untraced. A
+  production deployment with real traffic volume should override this and set sampling deliberately
+  rather than trace every request.
 - This spec's instrumentation approach and vocabulary (Micrometer Observation API, the three-tier
   span model, the ODD workflow) are written to be portable to the author's production work fork,
   which does have real CF traffic — only the local validation stack (Tempo via Docker) is

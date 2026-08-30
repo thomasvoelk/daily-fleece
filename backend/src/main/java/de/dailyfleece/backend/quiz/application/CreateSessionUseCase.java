@@ -8,6 +8,9 @@ import de.dailyfleece.backend.quiz.domain.SessionKey;
 import de.dailyfleece.backend.quiz.domain.SessionRepository;
 import de.dailyfleece.backend.shared.PlayerName;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.observation.annotation.ObservationKeyValue;
+import io.micrometer.observation.annotation.Observed;
+import io.micrometer.observation.aop.Cardinality;
 import java.io.InputStream;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -26,9 +29,11 @@ public class CreateSessionUseCase {
     }
 
     /** Creates and persists a new session with two host-supplied photos; throws if one already exists for the key. */
+    @Observed
+    @ObservationKeyValue(key = "session.id", resolver = SessionIdKeyValueResolver.class, cardinality = Cardinality.HIGH)
     public Session create(
             SessionKey key,
-            UUID hostId,
+            @ObservationKeyValue(key = "player.id", cardinality = Cardinality.HIGH) UUID hostId,
             PlayerName hostDisplayName,
             InputStream q1Data,
             PhotoType q1PhotoType,
