@@ -15,7 +15,7 @@
   },
   "private": true,
   "overrides": {
-    "eslint": "10.9.1"
+    "eslint": "10.10.0"
   },
   "packageManager": "npm@12.0.2",
   "dependencies": {
@@ -48,7 +48,7 @@
     "@types/node": "25.9.5",
     "angular-eslint": "22.2.0",
     "axe-core": "4.13.0",
-    "eslint": "10.9.1",
+    "eslint": "10.10.0",
     "eslint-plugin-rxjs-x": "1.0.6",
     "eslint-plugin-sonarjs": "4.2.0",
     "eslint-plugin-tailwindcss": "4.4.0",
