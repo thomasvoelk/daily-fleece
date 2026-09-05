@@ -36,7 +36,7 @@
 		<spotless.version>3.10.2</spotless.version>
 		<openapi-generator.version>7.25.0</openapi-generator.version>
 		<checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
-		<spotbugs.plugin.version>4.10.4.0</spotbugs.plugin.version>
+		<spotbugs.plugin.version>4.10.4.1</spotbugs.plugin.version>
 		<pmd.plugin.version>3.28.0</pmd.plugin.version>
 		<spotbugs.annotations.version>4.10.4</spotbugs.annotations.version>
 		<findsecbugs.version>1.14.0</findsecbugs.version>
