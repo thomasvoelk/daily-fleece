@@ -47,7 +47,7 @@
     "@vitest/coverage-istanbul": "4.1.11",
     "@types/node": "25.9.9",
     "angular-eslint": "22.5.0",
-    "axe-core": "4.13.0",
+    "axe-core": "4.14.0",
     "eslint": "10.12.0",
     "eslint-plugin-rxjs-x": "1.0.6",
     "eslint-plugin-sonarjs": "4.2.1",
