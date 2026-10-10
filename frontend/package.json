@@ -40,7 +40,7 @@
     "@angular/localize": "22.2.2",
     "@eslint/js": "10.0.1",
     "@softarc/eslint-plugin-sheriff": "0.19.6",
-    "@softarc/sheriff-core": "0.19.6",
+    "@softarc/sheriff-core": "0.20.0",
     "@testing-library/angular": "19.5.0",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/user-event": "14.6.7",
