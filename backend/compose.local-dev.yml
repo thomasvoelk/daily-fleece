@@ -2,7 +2,7 @@ name: daily-fleece-local-dev
 
 services:
   mongodb:
-    image: mongo:8.3
+    image: mongo:9.0
     ports:
       - '${LOCAL_DEV_MONGODB_PORT:-27017}:27017'
     environment:

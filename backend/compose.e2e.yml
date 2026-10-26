@@ -2,7 +2,7 @@ name: daily-fleece-e2e
 
 services:
   mongodb:
-    image: mongo:8.3
+    image: mongo:9.0
     ports:
       - '${E2E_MONGODB_PORT:-27018}:27017'
     environment:
